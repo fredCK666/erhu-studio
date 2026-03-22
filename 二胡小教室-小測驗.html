@@ -17,10 +17,18 @@
     .hero { padding:28px; margin-bottom:18px; }
     h1 { margin:0 0 10px; font-size:clamp(30px,5vw,46px); }
     .hero p,.panel p { color:var(--muted); line-height:1.8; }
+    .tabs { display:flex; gap:12px; flex-wrap:wrap; margin-top:18px; }
+    .tab { padding:12px 18px; border-radius:999px; border:1px solid var(--line); background:#fffdf8; color:var(--wood); font-size:18px; font-weight:800; cursor:pointer; }
+    .tab.active { background:linear-gradient(135deg,#efc06f,#ca8531); color:#4d2f15; border-color:transparent; }
     .quiz-grid { display:grid; gap:14px; }
     .question { padding:18px; border-radius:20px; border:1px solid var(--line); background:#fffdf8; }
+    .question.correct { border-color:rgba(105, 161, 84, 0.5); background:rgba(240, 251, 235, 0.92); }
+    .question.incorrect { border-color:rgba(204, 107, 77, 0.4); background:rgba(255, 244, 240, 0.96); }
     .options { display:grid; gap:10px; margin-top:12px; }
     .option { display:flex; gap:10px; align-items:start; padding:12px 14px; border-radius:14px; border:1px solid var(--line); background:rgba(255,255,255,0.78); }
+    .feedback { margin-top:12px; font-weight:800; }
+    .feedback.correct { color:#4f7d35; }
+    .feedback.incorrect { color:#ba5d3c; }
     .controls { display:flex; gap:12px; flex-wrap:wrap; margin-top:16px; }
     .button { display:inline-flex; align-items:center; justify-content:center; padding:12px 16px; border:0; border-radius:999px; background:linear-gradient(135deg,#efc06f,#ca8531); color:#4d2f15; font-weight:800; cursor:pointer; }
     .button.secondary { background:rgba(123,77,45,0.1); color:var(--wood); }
@@ -41,7 +49,8 @@
     </header>
     <section class="hero">
       <h1>入門小測驗</h1>
-      <p>做完後會立即顯示分數，幫你確認有沒有掌握基本觀念。</p>
+      <p id="quizIntro">每個等級都有 10 題，分別對應每週訓練內容。做完後會立即顯示分數，幫你確認有沒有掌握這一輪的重點。</p>
+      <div class="tabs" id="levelTabs"></div>
     </section>
     <section class="panel" style="padding:24px;">
       <div class="quiz-grid" id="quizContainer"></div>
@@ -52,49 +61,155 @@
       <div class="result" id="quizResult">尚未作答</div>
     </section>
   <script>
-    const quizQuestions = [
-      { id:"q1", question:"初學二胡時，最應該先穩定的是哪一項？", options:["追求速度","姿勢與運弓","一次學很多曲子"], answer:1 },
-      { id:"q2", question:"二胡聲音太尖太乾，最常見的原因是什麼？", options:["手太放鬆","弓壓太重或手太緊","音階練太少"], answer:1 },
-      { id:"q3", question:"為什麼二胡的音準要特別靠耳朵訓練？", options:["因為二胡沒有固定品格","因為二胡不能按音","因為節奏比音準重要"], answer:0 }
-    ];
+    const quizData = {
+      beginner: {
+        label: "初級",
+        intro: "初級 10 題對應 10 週打底內容，從姿勢、長弓、切弦一路到完整成果驗收。",
+        questions: [
+          { id:"q1", question:"第 1 週姿勢與持琴重整時，最先要確認的是什麼？", options:["先把速度拉快","持琴與握弓位置先放正","先背完整曲子"], answer:1, explanation:"第 1 週重點是把坐姿、琴筒位置和握弓先放正。" },
+          { id:"q2", question:"第 2 週長弓訓練時，哪一個目標最重要？", options:["弓速平均、每個長弓拉滿","只要音量夠大就好","越快拉完越好"], answer:0, explanation:"第 2 週要練的是長弓穩定和弓速平均，不是追求大聲或快。" },
+          { id:"q3", question:"第 3 週練內外弦切換時，切弦動作應該怎麼做？", options:["動作小、手肘轉換穩定","整隻手大力甩過去","先停住再換弦"], answer:0, explanation:"切弦要小而準，避免甩動造成雜音。" },
+          { id:"q4", question:"第 4 週節奏與短句訓練，最適合搭配什麼工具？", options:["錄影燈","拍器","調音器"], answer:1, explanation:"第 4 週主軸是拍點概念與短句穩定，所以要配拍器。" },
+          { id:"q5", question:"第 5 週左手按音基礎時，按音後最需要注意的是什麼？", options:["肩膀保持放鬆並把音聽準","手指越用力越好","只看手指不要聽聲音"], answer:0, explanation:"第 5 週開始建立音準感，落點和放鬆都要一起顧。" },
+          { id:"q6", question:"第 6 週音階反覆校正時，遇到偏音最好的做法是什麼？", options:["直接跳過","做記號並反覆修正","換一首曲子"], answer:1, explanation:"第 6 週重點是反覆修正同一個音，讓耳朵和手指對齊。" },
+          { id:"q7", question:"第 7 週分弓與連弓的學習目的，是把什麼放進句子裡？", options:["不同弓法的連接與差異","只練左手按音","只練拍子不出聲"], answer:0, explanation:"第 7 週是把分弓和連弓真正放進樂句裡。" },
+          { id:"q8", question:"第 8 週基礎旋律整合時，應該怎麼練？", options:["只顧單一音準","把姿勢、節奏和音準一起放進旋律","先不管流暢度"], answer:1, explanation:"第 8 週第一次把前面累積的基礎放進完整旋律。" },
+          { id:"q9", question:"第 9 週完整段落演奏時，第一優先是什麼？", options:["先求完整不中斷","每個音都停下來修","一定要比上週更快"], answer:0, explanation:"第 9 週先求完整演奏，再回頭修正卡點。" },
+          { id:"q10", question:"第 10 週初級成果驗收最重要的任務是什麼？", options:["錄下一支完整版本作為成果","每天只拉 30 秒","直接跳到中級不錄音"], answer:0, explanation:"第 10 週是初級收尾，要留下完整成果版本。" }
+        ]
+      },
+      intermediate: {
+        label: "中級",
+        intro: "中級 10 題對應 10 週技巧強化內容，從換把、揉弦、音色到成果錄影。",
+        questions: [
+          { id:"q1", question:"第 1 週換把定位重整時，換把前最應該先想什麼？", options:["目標音在哪裡","觀眾會不會拍手","弓要不要換新的"], answer:0, explanation:"中級第 1 週的關鍵是先想目標音，再做短而準的移動。" },
+          { id:"q2", question:"第 2 週揉弦穩定起步時，最好的起手方式是什麼？", options:["先做大幅度揉弦","先用小幅度、可控制的揉弦","先不管音準"], answer:1, explanation:"揉弦一開始要小而穩，不能因為揉弦把音拉掉。" },
+          { id:"q3", question:"第 3 週音色控制訓練時，為什麼要做強弱變化？", options:["讓音色和層次更明顯","只是為了練速度","因為拍器要求"], answer:0, explanation:"這一週是開始學會設計音色和層次。" },
+          { id:"q4", question:"第 4 週弓法組合進階時，哪一點最重要？", options:["句子不中斷且弓法切換順","只看右手不管聲音","每句都用同一種弓法"], answer:0, explanation:"中級弓法組合要能放進長句中，不是孤立動作。" },
+          { id:"q5", question:"第 5 週中速節奏穩定時，拍速亂掉最好的處理方式是什麼？", options:["硬撐更快","退回前一段速度再穩住","直接停止練習"], answer:1, explanation:"中速訓練要逐步提升，亂掉就退回，不要硬追。" },
+          { id:"q6", question:"第 6 週段落與換氣感的目標是什麼？", options:["只求音越大越好","讓句子開始有方向和層次","只記指法不管表情"], answer:1, explanation:"第 6 週開始從『拉對』走向『拉出句子感』。" },
+          { id:"q7", question:"第 7 週耐力與不中斷演奏訓練時，出現錯音應該怎麼做？", options:["先不中斷完成，再標記問題點","立刻停下重來","直接跳下一段"], answer:0, explanation:"這週訓練的是長段落耐力和注意力，不是每錯必停。" },
+          { id:"q8", question:"第 8 週速度提升訓練時，適合怎麼加速？", options:["每次慢慢加一點拍速","一次加快很多","完全不用拍器"], answer:0, explanation:"速度提升要漸進，這樣才維持乾淨和穩定。" },
+          { id:"q9", question:"第 9 週技巧整合到曲目時，技巧最主要的角色是什麼？", options:["用來炫技","為曲子和段落表現服務","只要會做就好"], answer:1, explanation:"中級第 9 週要把技巧真正放回曲目，不是只展示招式。" },
+          { id:"q10", question:"第 10 週中級成果錄影的成果標準是什麼？", options:["完成有表情、完整段落感的演奏","只錄 10 秒示範片段","只要音準對就好"], answer:0, explanation:"中級成果重點是完整度與表情，不只是拉對音。" }
+        ]
+      },
+      advanced: {
+        label: "高級",
+        intro: "高級 10 題對應 10 週高階表現訓練，從高強度控制、難段修正到正式錄影。",
+        questions: [
+          { id:"q1", question:"第 1 週高強度長弓控制時，最需要避免什麼情況？", options:["因為用力而全身變緊","長弓太穩","音色太一致"], answer:0, explanation:"高級第 1 週是回頭校正控制力，不能因為強度變高就僵硬。" },
+          { id:"q2", question:"第 2 週快速換把與定位時，核心原則是什麼？", options:["手位移動越大越好","高速度下仍要短、準、清楚","只追求更快不管音準"], answer:1, explanation:"高級換把不是只有快，還要準、短、乾淨。" },
+          { id:"q3", question:"第 3 週複合弓法連接時，最重要的檢查點是什麼？", options:["整段連接是否乾淨、重音是否清楚","弓毛顏色","音量是不是最大"], answer:0, explanation:"複合弓法的重點是順接和重音位置清楚。" },
+          { id:"q4", question:"第 4 週揉弦與表情深化時，揉弦應該怎麼用？", options:["每句都同一種速度","依照句子情緒調整揉弦速度與感覺","只要幅度夠大"], answer:1, explanation:"高級揉弦已經要服務表情，而不是只有動作本身。" },
+          { id:"q5", question:"第 5 週高速度節奏穩定時，動作應該有什麼變化？", options:["動作更小更精確","動作更大比較有力","不用管節奏"], answer:0, explanation:"速度越高，動作通常要更精簡，節奏才不會散。" },
+          { id:"q6", question:"第 6 週段落推進與層次的目的，是讓演奏具備什麼？", options:["更複雜的指法","起承轉合與敘事方向","更高的音量"], answer:1, explanation:"這週要開始設計整段敘事，不只是把音拉出來。" },
+          { id:"q7", question:"第 7 週困難段拆解修正時，最有效的做法是什麼？", options:["鎖定最難片段，拆出節奏、弓法、指法","整首一直從頭拉到尾","只練最簡單的地方"], answer:0, explanation:"高級修正要精準拆解問題，而不是盲目整首重複。" },
+          { id:"q8", question:"第 8 週整首曲目連續演奏時，第一輪練習最適合怎麼做？", options:["先完整跑完，不中斷","每錯一個音就停","只挑喜歡的片段練"], answer:0, explanation:"這週練的是完整度，第一輪先建立整首連續性。" },
+          { id:"q9", question:"第 9 週錄影回看與舞台修正時，為什麼一定要看影片？", options:["因為只聽聲音就夠了","因為還要檢查動作、表情和舞台完整度","只是為了存檔"], answer:1, explanation:"錄影能讓你看到音色以外的動作、表情和舞台感。" },
+          { id:"q10", question:"第 10 週高級總驗收的核心任務是什麼？", options:["完成正式版本錄影，留下最終成果","只做暖身不錄","換一首新曲子"], answer:0, explanation:"高級總驗收就是要留下正式版本，作為成果輸出。" }
+        ]
+      }
+    };
+    let currentLevel = new URLSearchParams(window.location.search).get("level") || "beginner";
+    if (!quizData[currentLevel]) currentLevel = "beginner";
     const quizContainer = document.getElementById("quizContainer");
     const quizResult = document.getElementById("quizResult");
-    quizQuestions.forEach((item, index) => {
-      const wrapper = document.createElement("div");
-      wrapper.className = "question";
-      wrapper.innerHTML = "<p><strong>第 " + (index + 1) + " 題</strong><br>" + item.question + "</p>";
-      const options = document.createElement("div");
-      options.className = "options";
-      item.options.forEach((option, optionIndex) => {
-        const label = document.createElement("label");
-        label.className = "option";
-        label.innerHTML = "<input type=\"radio\" name=\"" + item.id + "\" value=\"" + optionIndex + "\"><span>" + option + "</span>";
-        options.appendChild(label);
+    const levelTabs = document.getElementById("levelTabs");
+
+    function renderTabs() {
+      levelTabs.innerHTML = "";
+      Object.entries(quizData).forEach(([key, value]) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "tab";
+        button.textContent = value.label;
+        button.addEventListener("click", () => setLevel(key));
+        levelTabs.appendChild(button);
       });
-      wrapper.appendChild(options);
-      quizContainer.appendChild(wrapper);
-    });
+    }
+
+    function renderQuiz() {
+      const currentQuiz = quizData[currentLevel];
+      document.title = "二胡小教室 | " + currentQuiz.label + "小測驗";
+      document.querySelector("h1").textContent = currentQuiz.label + "學習小測驗";
+      document.getElementById("quizIntro").textContent = currentQuiz.intro;
+      history.replaceState(null, "", "./二胡小教室-小測驗.html?level=" + currentLevel);
+      document.querySelectorAll(".tab").forEach((tab, index) => {
+        const key = Object.keys(quizData)[index];
+        tab.classList.toggle("active", key === currentLevel);
+      });
+      quizContainer.innerHTML = "";
+      quizResult.textContent = "尚未作答";
+      currentQuiz.questions.forEach((item, index) => {
+        const wrapper = document.createElement("div");
+        wrapper.className = "question";
+        wrapper.dataset.questionId = item.id;
+        wrapper.innerHTML = "<p><strong>第 " + (index + 1) + " 題</strong><br>" + item.question + "</p>";
+        const options = document.createElement("div");
+        options.className = "options";
+        item.options.forEach((option, optionIndex) => {
+          const label = document.createElement("label");
+          label.className = "option";
+          label.innerHTML = "<input type=\"radio\" name=\"" + item.id + "\" value=\"" + optionIndex + "\"><span>" + option + "</span>";
+          options.appendChild(label);
+        });
+        wrapper.appendChild(options);
+        const feedback = document.createElement("div");
+        feedback.className = "feedback";
+        wrapper.appendChild(feedback);
+        quizContainer.appendChild(wrapper);
+      });
+    }
+
+    function setLevel(levelKey) {
+      currentLevel = levelKey;
+      renderQuiz();
+    }
+
     document.getElementById("submitQuizButton").addEventListener("click", () => {
+      const currentQuiz = quizData[currentLevel];
       let score = 0;
       let answered = 0;
-      quizQuestions.forEach((item) => {
+      currentQuiz.questions.forEach((item) => {
         const checked = document.querySelector("input[name=\"" + item.id + "\"]:checked");
+        const questionCard = document.querySelector("[data-question-id=\"" + item.id + "\"]");
+        const feedback = questionCard.querySelector(".feedback");
+        questionCard.classList.remove("correct", "incorrect");
+        feedback.textContent = "";
+        feedback.className = "feedback";
         if (checked) {
           answered += 1;
-          if (Number(checked.value) === item.answer) score += 1;
+          if (Number(checked.value) === item.answer) {
+            score += 1;
+            questionCard.classList.add("correct");
+            feedback.classList.add("correct");
+            feedback.textContent = "答對了：" + item.explanation;
+          } else {
+            questionCard.classList.add("incorrect");
+            feedback.classList.add("incorrect");
+            feedback.textContent = "答錯了：" + item.explanation;
+          }
         }
       });
-      if (answered < quizQuestions.length) {
+      if (answered < currentQuiz.questions.length) {
         quizResult.textContent = "你還有題目沒作答，先全部選完再送出。";
         return;
       }
-      quizResult.textContent = "你的分數是 " + score + " / " + quizQuestions.length + "。"
-        + (score === quizQuestions.length ? " 全對，基本觀念已經掌握。" : " 建議回去複習章節教學。");
+      quizResult.textContent = "你的分數是 " + score + " / " + currentQuiz.questions.length + "。"
+        + (score === currentQuiz.questions.length ? " 全對，這一輪重點已掌握。" : " 建議回去複習對應週次內容，再做一次。");
     });
     document.getElementById("resetQuizButton").addEventListener("click", () => {
       document.querySelectorAll("input[type=\"radio\"]").forEach((input) => { input.checked = false; });
+      document.querySelectorAll(".question").forEach((question) => question.classList.remove("correct", "incorrect"));
+      document.querySelectorAll(".feedback").forEach((feedback) => {
+        feedback.textContent = "";
+        feedback.className = "feedback";
+      });
       quizResult.textContent = "尚未作答";
     });
+    renderTabs();
+    renderQuiz();
   </script>
   </main>
 </body>

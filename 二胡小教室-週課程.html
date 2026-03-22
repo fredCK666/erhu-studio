@@ -215,6 +215,7 @@
         <ul class="task-list" id="taskList"></ul>
         <div class="actions">
           <a class="button secondary" id="prevWeekLink" href="#">上一週</a>
+          <a class="button secondary" id="quizLink" href="./二胡小教室-小測驗.html">學習測驗</a>
           <a class="button" id="nextWeekLink" href="#">下一週</a>
         </div>
       </article>
@@ -315,6 +316,7 @@
     const nextWeek = Math.min(10, week + 1);
     const prevLink = document.getElementById("prevWeekLink");
     const nextLink = document.getElementById("nextWeekLink");
+    document.getElementById("quizLink").href = "./二胡小教室-小測驗.html?level=" + level;
     prevLink.href = "./二胡小教室-週課程.html?level=" + level + "&week=" + prevWeek;
     nextLink.href = "./二胡小教室-週課程.html?level=" + level + "&week=" + nextWeek;
     if (week === 1) prevLink.textContent = "已經是第一週";
