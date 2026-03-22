@@ -328,25 +328,58 @@
     display: flex;
     flex-direction: column;
     gap: 18px;
-    padding: 24px 20px;
-    border-radius: 24px;
-    background: linear-gradient(180deg, rgba(255, 248, 225, 0.9), rgba(255, 255, 255, 0.95));
-    border: 1px solid rgba(255, 179, 0, 0.22);
-    box-shadow: 0 18px 36px rgba(245, 124, 0, 0.12);
+    padding: 22px 18px 18px;
+    border-radius: 28px;
+    background:
+      radial-gradient(circle at top right, rgba(255, 183, 77, 0.16), transparent 32%),
+      linear-gradient(180deg, rgba(255, 249, 235, 0.96), rgba(255, 255, 255, 0.98));
+    border: 1px solid rgba(255, 179, 0, 0.18);
+    box-shadow: 0 20px 40px rgba(245, 124, 0, 0.14);
   }
 
   .status-card .card-title {
-    font-size: 24px;
-    line-height: 1.15;
+    font-size: 28px;
+    line-height: 1.1;
   }
 
   .status-card .muted {
     font-size: 15px;
   }
 
+  .status-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 14px;
+  }
+
+  .status-meta {
+    display: grid;
+    gap: 8px;
+  }
+
+  .status-id {
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+
+  .status-id strong {
+    display: block;
+    margin-top: 4px;
+    font-size: 18px;
+    color: var(--ink);
+    word-break: break-word;
+  }
+
   .timeline {
     display: grid;
     gap: 14px;
+    padding: 18px;
+    border-radius: 24px;
+    background: rgba(255, 255, 255, 0.78);
+    border: 1px solid rgba(255, 179, 0, 0.14);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72);
   }
 
   .timeline-item {
@@ -355,15 +388,23 @@
     align-items: flex-start;
   }
 
+  .timeline-copy {
+    flex: 1;
+    min-width: 0;
+  }
+
   .timeline-item strong {
     display: block;
-    font-size: 18px;
-    margin-bottom: 4px;
+    font-size: 20px;
+    margin-bottom: 6px;
   }
 
   .timeline-item .muted {
-    font-size: 16px;
-    line-height: 1.7;
+    font-size: 22px;
+    line-height: 1.35;
+    color: var(--ink);
+    font-weight: 800;
+    word-break: break-word;
   }
 
   .timeline-dot {
@@ -393,7 +434,6 @@
   .info-list {
     display: grid;
     gap: 12px;
-    margin-top: 12px;
   }
 
   .info-item {
@@ -414,6 +454,12 @@
   .info-item span:last-child {
     text-align: right;
     font-weight: 700;
+  }
+
+  .status-actions {
+    display: grid;
+    gap: 12px;
+    margin-top: 4px;
   }
 
   .stars {
@@ -515,6 +561,7 @@
 
   @media (max-width: 720px) {
     .hero, .panel, .card { border-radius: 22px; }
+    .status-header,
     .history-top,
     .info-item {
       flex-direction: column;
@@ -1100,10 +1147,10 @@
 
           <section id="status" class="hidden" style="margin-top:18px;">
             <div class="status-card">
-              <div class="history-top">
-                <div>
-                  <h3 class="card-title" style="margin-bottom:4px;">目前行程</h3>
-                  <div class="muted">訂單編號：<span id="ride-id">-</span></div>
+              <div class="status-header">
+                <div class="status-meta">
+                  <h3 class="card-title">目前行程</h3>
+                  <div class="status-id">訂單編號<strong id="ride-id">-</strong></div>
                 </div>
                 <span class="status-chip" id="ride-status-chip">等待派車中</span>
               </div>
@@ -1111,14 +1158,14 @@
               <div class="timeline">
                 <div class="timeline-item">
                   <span class="timeline-dot"></span>
-                  <div>
+                  <div class="timeline-copy">
                     <strong>上車地點</strong>
                     <div class="muted" id="ride-route-from">-</div>
                   </div>
                 </div>
                 <div class="timeline-item">
                   <span class="timeline-dot"></span>
-                  <div>
+                  <div class="timeline-copy">
                     <strong>目的地</strong>
                     <div class="muted" id="ride-route-to">-</div>
                   </div>
@@ -1133,7 +1180,7 @@
 
               <div id="driver-info" class="driver-box hidden"></div>
 
-              <div class="actions" style="grid-template-columns: 1fr;">
+              <div class="status-actions">
                 <button id="cancel-btn" class="btn-danger hidden" onclick="cancelRide()">取消叫車</button>
                 <button class="btn-ghost" onclick="showHistory()">查看歷史紀錄</button>
               </div>
