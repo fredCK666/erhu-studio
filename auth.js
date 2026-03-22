@@ -26,20 +26,41 @@
     }, { merge: true });
   }
 
+  function authErrorMessage(error, fallback) {
+    if (error.code === "auth/email-already-in-use") {
+      return "這個姓名已經註冊過，請直接登入或換一個姓名。";
+    }
+    if (error.code === "auth/weak-password") {
+      return "密碼至少需要 6 個字元。";
+    }
+    if (error.code === "auth/operation-not-allowed") {
+      return "Firebase 的電子郵件/密碼登入尚未啟用。";
+    }
+    if (error.code === "auth/invalid-credential" || error.code === "auth/user-not-found" || error.code === "auth/wrong-password") {
+      return "姓名或密碼不正確。";
+    }
+    if (error.code === "auth/network-request-failed") {
+      return "網路連線失敗，請確認網路後再試。";
+    }
+    if (error.code === "permission-denied" || error.code === "firestore/permission-denied") {
+      return "Firestore 權限被拒絕，請檢查規則是否已發布。";
+    }
+    return fallback + (error && error.code ? "（" + error.code + "）" : "");
+  }
+
   async function register(name, password) {
     try {
       const credential = await getAuth().createUserWithEmailAndPassword(encodeNameToEmail(name), password);
       await credential.user.updateProfile({ displayName: name });
-      await saveStudentProfile(credential.user, name);
+      try {
+        await saveStudentProfile(credential.user, name);
+      } catch (profileError) {
+        console.error("saveStudentProfile(register) failed", profileError);
+      }
       return { ok: true };
     } catch (error) {
-      if (error.code === "auth/email-already-in-use") {
-        return { ok: false, message: "這個姓名已經註冊過，請直接登入或換一個姓名。" };
-      }
-      if (error.code === "auth/weak-password") {
-        return { ok: false, message: "密碼至少需要 6 個字元。" };
-      }
-      return { ok: false, message: "註冊失敗，請稍後再試。" };
+      console.error("register failed", error);
+      return { ok: false, message: authErrorMessage(error, "註冊失敗，請稍後再試。") };
     }
   }
 
@@ -49,13 +70,15 @@
       if (!credential.user.displayName) {
         await credential.user.updateProfile({ displayName: name });
       }
-      await saveStudentProfile(credential.user, name);
+      try {
+        await saveStudentProfile(credential.user, name);
+      } catch (profileError) {
+        console.error("saveStudentProfile(login) failed", profileError);
+      }
       return { ok: true };
     } catch (error) {
-      if (error.code === "auth/invalid-credential" || error.code === "auth/user-not-found" || error.code === "auth/wrong-password") {
-        return { ok: false, message: "姓名或密碼不正確。" };
-      }
-      return { ok: false, message: "登入失敗，請稍後再試。" };
+      console.error("login failed", error);
+      return { ok: false, message: authErrorMessage(error, "登入失敗，請稍後再試。") };
     }
   }
 
