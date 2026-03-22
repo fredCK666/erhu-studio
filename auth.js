@@ -19,6 +19,22 @@
     return "u_" + hex + "@erhu-auth.local";
   }
 
+  function decodeNameFromEmail(email) {
+    if (!email || email.indexOf("u_") !== 0 || email.indexOf("@erhu-auth.local") === -1) {
+      return null;
+    }
+    try {
+      const hex = email.slice(2, email.indexOf("@"));
+      const bytes = [];
+      for (let index = 0; index < hex.length; index += 2) {
+        bytes.push(parseInt(hex.slice(index, index + 2), 16));
+      }
+      return new TextDecoder().decode(new Uint8Array(bytes));
+    } catch (error) {
+      return null;
+    }
+  }
+
   async function saveStudentProfile(user, displayName) {
     await getDb().collection("students").doc(user.uid).set({
       displayName: displayName,
@@ -100,7 +116,7 @@
     if (!user) return null;
     return {
       uid: user.uid,
-      displayName: user.displayName || "學生"
+      displayName: user.displayName || decodeNameFromEmail(user.email) || "學生"
     };
   }
 
@@ -136,7 +152,7 @@
   function onReady(callback) {
     getAuth().onAuthStateChanged(async function (user) {
       if (!user) return;
-      let displayName = user.displayName || "學生";
+      let displayName = user.displayName || decodeNameFromEmail(user.email) || "學生";
       try {
         const profile = await readStudentProfile(user);
         if (profile && profile.displayName) {
@@ -159,7 +175,7 @@
       const existing = document.getElementById("authArea");
       if (existing) existing.remove();
       if (!user) return;
-      let displayName = user.displayName || "學生";
+      let displayName = user.displayName || decodeNameFromEmail(user.email) || "學生";
       try {
         const profile = await readStudentProfile(user);
         if (profile && profile.displayName) {
