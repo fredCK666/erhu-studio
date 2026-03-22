@@ -26,6 +26,11 @@
     }, { merge: true });
   }
 
+  async function readStudentProfile(user) {
+    const snapshot = await getDb().collection("students").doc(user.uid).get();
+    return snapshot.exists ? snapshot.data() : null;
+  }
+
   function authErrorMessage(error, fallback) {
     if (error.code === "auth/email-already-in-use") {
       return "這個姓名已經註冊過，請直接登入或換一個姓名。";
@@ -51,7 +56,11 @@
   async function register(name, password) {
     try {
       const credential = await getAuth().createUserWithEmailAndPassword(encodeNameToEmail(name), password);
-      await credential.user.updateProfile({ displayName: name });
+      try {
+        await credential.user.updateProfile({ displayName: name });
+      } catch (profileUpdateError) {
+        console.error("updateProfile(register) failed", profileUpdateError);
+      }
       try {
         await saveStudentProfile(credential.user, name);
       } catch (profileError) {
@@ -68,7 +77,11 @@
     try {
       const credential = await getAuth().signInWithEmailAndPassword(encodeNameToEmail(name), password);
       if (!credential.user.displayName) {
-        await credential.user.updateProfile({ displayName: name });
+        try {
+          await credential.user.updateProfile({ displayName: name });
+        } catch (profileUpdateError) {
+          console.error("updateProfile(login) failed", profileUpdateError);
+        }
       }
       try {
         await saveStudentProfile(credential.user, name);
@@ -121,11 +134,20 @@
   }
 
   function onReady(callback) {
-    getAuth().onAuthStateChanged(function (user) {
+    getAuth().onAuthStateChanged(async function (user) {
       if (!user) return;
+      let displayName = user.displayName || "學生";
+      try {
+        const profile = await readStudentProfile(user);
+        if (profile && profile.displayName) {
+          displayName = profile.displayName;
+        }
+      } catch (error) {
+        console.error("readStudentProfile(onReady) failed", error);
+      }
       callback({
         uid: user.uid,
-        displayName: user.displayName || "學生"
+        displayName: displayName
       });
     });
   }
@@ -133,10 +155,19 @@
   function attachAuthUI() {
     const topbar = document.querySelector(".topbar");
     if (!topbar) return;
-    getAuth().onAuthStateChanged(function (user) {
+    getAuth().onAuthStateChanged(async function (user) {
       const existing = document.getElementById("authArea");
       if (existing) existing.remove();
       if (!user) return;
+      let displayName = user.displayName || "學生";
+      try {
+        const profile = await readStudentProfile(user);
+        if (profile && profile.displayName) {
+          displayName = profile.displayName;
+        }
+      } catch (error) {
+        console.error("readStudentProfile(attachAuthUI) failed", error);
+      }
       const authArea = document.createElement("div");
       authArea.id = "authArea";
       authArea.style.display = "flex";
@@ -144,7 +175,7 @@
       authArea.style.gap = "10px";
       authArea.style.flexWrap = "wrap";
       authArea.innerHTML =
-        "<span style=\"color:#69584d;font-weight:700;\">目前登入：" + (user.displayName || "學生") + "</span>" +
+        "<span style=\"color:#69584d;font-weight:700;\">目前登入：" + displayName + "</span>" +
         "<button type=\"button\" id=\"logoutButton\" style=\"border:1px solid rgba(123,77,45,0.18);background:rgba(123,77,45,0.08);color:#7b4d2d;border-radius:999px;padding:10px 14px;font-weight:800;cursor:pointer;\">登出</button>";
       topbar.appendChild(authArea);
       document.getElementById("logoutButton").addEventListener("click", function () {
