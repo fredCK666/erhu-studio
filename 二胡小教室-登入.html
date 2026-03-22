@@ -98,7 +98,7 @@
           ? "請輸入已註冊的姓名與密碼登入。"
           : "目前還沒有帳號，你可以先按下方入口前往註冊。";
         modeHint.textContent = accounts.length
-          ? "已註冊帳號：" + accounts.map((account) => account.name).join("、")
+          ? "如果你已經註冊過，直接輸入自己的姓名和密碼即可。"
           : "目前還沒有任何帳號。";
         submitButton.textContent = "登入";
         switchText.textContent = "還沒註冊？";
