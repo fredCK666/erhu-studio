@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>二胡小教室 | 登入</title>
+  <style>
+    :root { --ink:#211914; --muted:#69584d; --paper:rgba(255,250,244,0.94); --line:rgba(83,57,39,0.12); --wood:#7b4d2d; --shadow:0 22px 54px rgba(46,28,18,0.14); }
+    * { box-sizing:border-box; }
+    body { margin:0; min-height:100vh; color:var(--ink); font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif; background:linear-gradient(180deg,#f7efe3 0%,#fbf9f5 40%,#efe4d5 100%); }
+    a { color:inherit; text-decoration:none; }
+    .shell { width:min(1120px,calc(100% - 28px)); margin:0 auto; padding:24px 0 40px; }
+    .topbar { display:flex; justify-content:space-between; gap:16px; margin-bottom:18px; flex-wrap:wrap; }
+    .brand { font-size:22px; font-weight:800; letter-spacing:0.08em; }
+    .home-link { color:var(--muted); font-weight:700; }
+    .hero,.card { background:var(--paper); border:1px solid var(--line); border-radius:28px; box-shadow:var(--shadow); }
+    .hero { padding:28px; margin-bottom:18px; }
+    h1 { margin:0 0 10px; font-size:clamp(32px,5vw,50px); }
+    p { color:var(--muted); line-height:1.8; }
+    .grid { display:grid; grid-template-columns:minmax(0,1fr) minmax(360px,0.92fr); gap:18px; }
+    .card { padding:24px; }
+    .eyebrow { display:inline-flex; margin-bottom:12px; padding:6px 10px; border-radius:999px; background:rgba(123,77,45,0.1); color:var(--wood); font-size:13px; font-weight:800; }
+    .status { margin-bottom:12px; color:var(--wood); font-weight:800; }
+    .field { display:grid; gap:8px; margin-top:14px; }
+    .field label { font-weight:700; color:var(--ink); }
+    .field input { width:100%; padding:14px 16px; border-radius:16px; border:1px solid var(--line); background:#fffdf8; font-size:16px; }
+    .button { display:inline-flex; align-items:center; justify-content:center; min-width:150px; padding:12px 16px; border:0; border-radius:999px; background:linear-gradient(135deg,#efc06f,#ca8531); color:#4d2f15; font-weight:800; cursor:pointer; margin-top:16px; }
+    .hint { margin-top:14px; font-size:14px; color:var(--muted); }
+    .message { margin-top:14px; font-weight:800; color:var(--wood); }
+    ul { margin:0; padding-left:20px; color:var(--muted); line-height:1.8; }
+    @media (max-width: 860px) { .grid { grid-template-columns:1fr; } }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header class="topbar">
+      <div class="brand">二胡小教室</div>
+      <a class="home-link" href="./">回首頁</a>
+    </header>
+    <section class="hero">
+      <h1>先登入再開始學習</h1>
+      <p>第一次進來可以先建立姓名和密碼。之後如果已經註冊過，就用同一組姓名與密碼登入，登入成功後會直接進入課程入口。</p>
+    </section>
+    <section class="grid">
+      <article class="card">
+        <div class="eyebrow">使用方式</div>
+        <ul>
+          <li>第一次使用：建立姓名與密碼。</li>
+          <li>已經註冊：輸入姓名與密碼登入。</li>
+          <li>這個版本會把帳號資料存在你目前使用的瀏覽器。</li>
+        </ul>
+      </article>
+      <article class="card">
+        <div class="eyebrow" id="modeBadge">註冊帳號</div>
+        <div class="status" id="modeStatus">第一次進來，先建立你的登入資料。</div>
+        <div class="field">
+          <label for="nameInput">姓名</label>
+          <input id="nameInput" type="text" autocomplete="username" />
+        </div>
+        <div class="field">
+          <label for="passwordInput">密碼</label>
+          <input id="passwordInput" type="password" autocomplete="current-password" />
+        </div>
+        <button class="button" id="submitButton" type="button">建立帳號</button>
+        <div class="hint" id="modeHint"></div>
+        <div class="message" id="formMessage">尚未操作</div>
+      </article>
+    </section>
+  </main>
+  <script src="./auth.js"></script>
+  <script>
+    const account = window.ErhuAuth.getAccount();
+    const params = new URLSearchParams(window.location.search);
+    const next = params.get("next") || "./二胡小教室.html";
+    const modeBadge = document.getElementById("modeBadge");
+    const modeStatus = document.getElementById("modeStatus");
+    const modeHint = document.getElementById("modeHint");
+    const submitButton = document.getElementById("submitButton");
+    const formMessage = document.getElementById("formMessage");
+    const nameInput = document.getElementById("nameInput");
+    const passwordInput = document.getElementById("passwordInput");
+
+    window.ErhuAuth.redirectIfAuthenticated(next);
+
+    if (account) {
+      modeBadge.textContent = "登入";
+      modeStatus.textContent = "這個網站已經建立過帳號，請直接輸入姓名與密碼登入。";
+      modeHint.textContent = "已註冊姓名：" + account.name;
+      submitButton.textContent = "登入";
+      nameInput.value = account.name;
+    } else {
+      modeHint.textContent = "註冊成功後，之後就用同一組姓名與密碼登入。";
+    }
+
+    submitButton.addEventListener("click", () => {
+      const name = nameInput.value.trim();
+      const password = passwordInput.value.trim();
+      if (!name || !password) {
+        formMessage.textContent = "請先輸入姓名和密碼。";
+        return;
+      }
+      const result = account
+        ? window.ErhuAuth.login(name, password)
+        : window.ErhuAuth.register(name, password);
+      formMessage.textContent = result.ok
+        ? (account ? "登入成功，正在進入課程入口。" : "註冊成功，正在進入課程入口。")
+        : result.message;
+      if (result.ok) {
+        window.location.href = next;
+      }
+    });
+  </script>
+</body>
+</html>

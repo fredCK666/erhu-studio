@@ -231,7 +231,10 @@
     </section>
   </main>
 
+  <script src="./auth.js"></script>
   <script>
+    window.ErhuAuth.requireAuth();
+    window.ErhuAuth.attachAuthUI();
     const weeklyData = {
       beginner: {
         label: "初級",

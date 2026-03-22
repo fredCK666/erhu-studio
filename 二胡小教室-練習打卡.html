@@ -48,7 +48,10 @@
       <div class="summary" id="trackerSummary">目前完成 0 / 10 週</div>
       <button class="button" id="resetTrackerButton" type="button">清除目前等級打卡</button>
     </section>
+  <script src="./auth.js"></script>
   <script>
+    window.ErhuAuth.requireAuth();
+    window.ErhuAuth.attachAuthUI();
     const courseTracks = {
       beginner: { label: "初級", items: [
         "完成姿勢與持琴重整", "完成基本長弓穩定", "完成內外弦切換", "完成節奏與短句",

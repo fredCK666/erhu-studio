@@ -60,7 +60,10 @@
         </div>
       </div>
     </section>
+  <script src="./auth.js"></script>
   <script>
+    window.ErhuAuth.requireAuth();
+    window.ErhuAuth.attachAuthUI();
     const chapters = [
       { id:"week-1", label:"第 1 週", title:"重整姿勢與基本長弓", level:"強度 1", duration:"每日 20 分鐘", description:"把身體、握弓與長弓穩定度重新拉回標準，這是後面加強度的底。", points:["每次練習前先做 2 分鐘姿勢檢查。","長弓必須保持音量平均，不追求速度。","先把肩膀和手腕放鬆，避免用力硬拉。"], task:"完成 5 天長弓練習，每天至少 20 分鐘，並錄 30 秒長音回聽。" },
       { id:"week-2", label:"第 2 週", title:"內外弦切換與弓路控制", level:"強度 2", duration:"每日 22 分鐘", description:"加入內外弦切換，練弓路乾淨與手肘轉換，開始要求穩定精準。", points:["切弦動作要小，不要整隻手甩。","維持同樣弓速，不因換弦而忽快忽慢。","練習時用慢拍器固定節奏。"], task:"完成 4 組切弦循環練習，並在固定拍速下不中斷拉完。" },

@@ -64,7 +64,10 @@
       </div>
       <div class="result" id="quizResult">尚未作答</div>
     </section>
+  <script src="./auth.js"></script>
   <script>
+    window.ErhuAuth.requireAuth();
+    window.ErhuAuth.attachAuthUI();
     const weeklyData = {
       beginner: {
         label: "初級",

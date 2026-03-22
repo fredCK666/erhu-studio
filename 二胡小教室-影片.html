@@ -79,7 +79,10 @@
         <div class="playlist" id="videoPlaylist"></div>
       </div>
     </section>
+  <script src="./auth.js"></script>
   <script>
+    window.ErhuAuth.requireAuth();
+    window.ErhuAuth.attachAuthUI();
     const courseData = {
       beginner: {
         label: "初級",
