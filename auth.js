@@ -1,5 +1,6 @@
 (function () {
   const ACCOUNT_KEY = "erhu-auth-account";
+  const ACCOUNTS_KEY = "erhu-auth-accounts";
   const SESSION_KEY = "erhu-auth-session";
 
   function readJson(key) {
@@ -14,41 +15,63 @@
     localStorage.setItem(key, JSON.stringify(value));
   }
 
+  function migrateAccounts() {
+    const legacy = readJson(ACCOUNT_KEY);
+    const accounts = readJson(ACCOUNTS_KEY);
+    if (!accounts && legacy) {
+      writeJson(ACCOUNTS_KEY, [legacy]);
+    }
+  }
+
+  function getAccounts() {
+    migrateAccounts();
+    return readJson(ACCOUNTS_KEY) || [];
+  }
+
   function getAccount() {
-    return readJson(ACCOUNT_KEY);
+    const accounts = getAccounts();
+    return accounts[0] || null;
+  }
+
+  function findAccount(name) {
+    return getAccounts().find(function (account) {
+      return account.name === name;
+    }) || null;
   }
 
   function getSession() {
     return readJson(SESSION_KEY);
   }
 
-  function getCurrentUser() {
-    const account = getAccount();
-    const session = getSession();
-    if (!account || !session) return null;
-    if (account.name !== session.name) return null;
-    return account.name;
-  }
-
   function register(name, password) {
-    if (getAccount()) {
-      return { ok: false, message: "這個網站已經註冊過帳號，請直接登入。" };
+    if (findAccount(name)) {
+      return { ok: false, message: "這個姓名已經註冊過，請直接登入或換一個姓名。" };
     }
-    writeJson(ACCOUNT_KEY, { name: name, password: password });
+    const accounts = getAccounts();
+    accounts.push({ name: name, password: password });
+    writeJson(ACCOUNTS_KEY, accounts);
     writeJson(SESSION_KEY, { name: name });
     return { ok: true };
   }
 
   function login(name, password) {
-    const account = getAccount();
-    if (!account) {
+    const account = findAccount(name);
+    if (!getAccounts().length) {
       return { ok: false, message: "目前還沒有帳號，請先註冊。" };
     }
-    if (account.name !== name || account.password !== password) {
+    if (!account || account.password !== password) {
       return { ok: false, message: "姓名或密碼不正確。" };
     }
     writeJson(SESSION_KEY, { name: name });
     return { ok: true };
+  }
+
+  function getCurrentUser() {
+    const session = getSession();
+    if (!session) return null;
+    const account = findAccount(session.name);
+    if (!account) return null;
+    return account.name;
   }
 
   function logout() {
@@ -94,6 +117,7 @@
 
   window.ErhuAuth = {
     getAccount,
+    getAccounts,
     getCurrentUser,
     register,
     login,
