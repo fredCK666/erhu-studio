@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>二胡小教室 | 入門小測驗</title>
+  <title>二胡小教室 | 每週學習測驗</title>
   <style>
     :root { --ink:#211914; --muted:#69584d; --paper:rgba(255,250,244,0.92); --line:rgba(83,57,39,0.12); --wood:#7b4d2d; --shadow:0 22px 54px rgba(46,28,18,0.14); }
     * { box-sizing:border-box; }
@@ -17,15 +17,17 @@
     .hero { padding:28px; margin-bottom:18px; }
     h1 { margin:0 0 10px; font-size:clamp(30px,5vw,46px); }
     .hero p,.panel p { color:var(--muted); line-height:1.8; }
-    .tabs { display:flex; gap:12px; flex-wrap:wrap; margin-top:18px; }
-    .tab { padding:12px 18px; border-radius:999px; border:1px solid var(--line); background:#fffdf8; color:var(--wood); font-size:18px; font-weight:800; cursor:pointer; }
-    .tab.active { background:linear-gradient(135deg,#efc06f,#ca8531); color:#4d2f15; border-color:transparent; }
+    .tabs,.week-tabs { display:flex; gap:12px; flex-wrap:wrap; margin-top:18px; }
+    .tab,.week-tab { padding:12px 18px; border-radius:999px; border:1px solid var(--line); background:#fffdf8; color:var(--wood); font-size:18px; font-weight:800; cursor:pointer; }
+    .week-tab { font-size:16px; padding:10px 14px; }
+    .tab.active,.week-tab.active { background:linear-gradient(135deg,#efc06f,#ca8531); color:#4d2f15; border-color:transparent; }
     .quiz-grid { display:grid; gap:14px; }
     .question { padding:18px; border-radius:20px; border:1px solid var(--line); background:#fffdf8; }
-    .question.correct { border-color:rgba(105, 161, 84, 0.5); background:rgba(240, 251, 235, 0.92); }
-    .question.incorrect { border-color:rgba(204, 107, 77, 0.4); background:rgba(255, 244, 240, 0.96); }
+    .question.correct { border-color:rgba(105,161,84,0.5); background:rgba(240,251,235,0.92); }
+    .question.incorrect { border-color:rgba(204,107,77,0.4); background:rgba(255,244,240,0.96); }
     .options { display:grid; gap:10px; margin-top:12px; }
     .option { display:flex; gap:10px; align-items:start; padding:12px 14px; border-radius:14px; border:1px solid var(--line); background:rgba(255,255,255,0.78); }
+    .meta { margin:18px 0 22px; padding:16px 18px; border-radius:18px; background:rgba(123,77,45,0.08); color:var(--muted); }
     .feedback { margin-top:12px; font-weight:800; }
     .feedback.correct { color:#4f7d35; }
     .feedback.incorrect { color:#ba5d3c; }
@@ -48,11 +50,13 @@
       </nav>
     </header>
     <section class="hero">
-      <h1>入門小測驗</h1>
-      <p id="quizIntro">每個等級都有 10 題，分別對應每週訓練內容。做完後會立即顯示分數，幫你確認有沒有掌握這一輪的重點。</p>
+      <h1 id="pageTitle">每週學習測驗</h1>
+      <p id="quizIntro">每個等級的每一週都有獨立 10 題，學生練完當週內容後，可以直接做該週測驗確認自己有沒有吸收。</p>
       <div class="tabs" id="levelTabs"></div>
+      <div class="week-tabs" id="weekTabs"></div>
     </section>
     <section class="panel" style="padding:24px;">
+      <div class="meta" id="quizMeta"></div>
       <div class="quiz-grid" id="quizContainer"></div>
       <div class="controls">
         <button class="button" id="submitQuizButton" type="button">送出測驗</button>
@@ -61,87 +65,149 @@
       <div class="result" id="quizResult">尚未作答</div>
     </section>
   <script>
-    const quizData = {
+    const weeklyData = {
       beginner: {
         label: "初級",
-        intro: "初級 10 題對應 10 週打底內容，從姿勢、長弓、切弦一路到完整成果驗收。",
-        questions: [
-          { id:"q1", question:"第 1 週姿勢與持琴重整時，最先要確認的是什麼？", options:["先把速度拉快","持琴與握弓位置先放正","先背完整曲子"], answer:1, explanation:"第 1 週重點是把坐姿、琴筒位置和握弓先放正。" },
-          { id:"q2", question:"第 2 週長弓訓練時，哪一個目標最重要？", options:["弓速平均、每個長弓拉滿","只要音量夠大就好","越快拉完越好"], answer:0, explanation:"第 2 週要練的是長弓穩定和弓速平均，不是追求大聲或快。" },
-          { id:"q3", question:"第 3 週練內外弦切換時，切弦動作應該怎麼做？", options:["動作小、手肘轉換穩定","整隻手大力甩過去","先停住再換弦"], answer:0, explanation:"切弦要小而準，避免甩動造成雜音。" },
-          { id:"q4", question:"第 4 週節奏與短句訓練，最適合搭配什麼工具？", options:["錄影燈","拍器","調音器"], answer:1, explanation:"第 4 週主軸是拍點概念與短句穩定，所以要配拍器。" },
-          { id:"q5", question:"第 5 週左手按音基礎時，按音後最需要注意的是什麼？", options:["肩膀保持放鬆並把音聽準","手指越用力越好","只看手指不要聽聲音"], answer:0, explanation:"第 5 週開始建立音準感，落點和放鬆都要一起顧。" },
-          { id:"q6", question:"第 6 週音階反覆校正時，遇到偏音最好的做法是什麼？", options:["直接跳過","做記號並反覆修正","換一首曲子"], answer:1, explanation:"第 6 週重點是反覆修正同一個音，讓耳朵和手指對齊。" },
-          { id:"q7", question:"第 7 週分弓與連弓的學習目的，是把什麼放進句子裡？", options:["不同弓法的連接與差異","只練左手按音","只練拍子不出聲"], answer:0, explanation:"第 7 週是把分弓和連弓真正放進樂句裡。" },
-          { id:"q8", question:"第 8 週基礎旋律整合時，應該怎麼練？", options:["只顧單一音準","把姿勢、節奏和音準一起放進旋律","先不管流暢度"], answer:1, explanation:"第 8 週第一次把前面累積的基礎放進完整旋律。" },
-          { id:"q9", question:"第 9 週完整段落演奏時，第一優先是什麼？", options:["先求完整不中斷","每個音都停下來修","一定要比上週更快"], answer:0, explanation:"第 9 週先求完整演奏，再回頭修正卡點。" },
-          { id:"q10", question:"第 10 週初級成果驗收最重要的任務是什麼？", options:["錄下一支完整版本作為成果","每天只拉 30 秒","直接跳到中級不錄音"], answer:0, explanation:"第 10 週是初級收尾，要留下完整成果版本。" }
+        weeks: [
+          { title: "第 1 週：姿勢與持琴重整", description: "重整坐姿、琴筒位置、握弓與身體放鬆感。", focus: ["先把持琴與握弓位置放正。", "觀察肩膀是否放鬆。", "用鏡子檢查身體角度。"], tasks: ["完成 5 次姿勢檢查。", "錄 30 秒持琴姿勢影片。", "確認右手握弓不僵硬。"], note: "初級第 1 週以空弦與姿勢節奏為主。" },
+          { title: "第 2 週：基本長弓穩定", description: "練長弓平均、弓速控制與音色乾淨度。", focus: ["每個長弓要拉滿。", "控制弓速平均。", "避免音頭太重。"], tasks: ["每天做 8 組長弓。", "錄一段長音回聽。", "穩定維持 4 拍長音。"], note: "先求穩，不求快。" },
+          { title: "第 3 週：內外弦切換", description: "建立切弦手感，讓弓路乾淨不混亂。", focus: ["切弦動作要小。", "手肘轉換不要甩。", "保持聲音連續。"], tasks: ["完成 4 組切弦循環。", "配拍器做慢速切換。", "回聽是否有雜音。"], note: "這週主角是弓路與切弦準確。" },
+          { title: "第 4 週：節奏與短句", description: "用拍器把短句拉穩，建立拍點概念。", focus: ["句子先拆短。", "拍點要穩。", "短句收尾乾淨。"], tasks: ["拍器下完成 8 小節。", "每句至少重複 3 次。", "避免中途停頓。"], note: "先把短句完整，不急著拉長段落。" },
+          { title: "第 5 週：左手按音基礎", description: "加入按音和簡單音階，開始建立音準感。", focus: ["手指落點要穩。", "每個音都先聽準。", "按音後肩膀仍放鬆。"], tasks: ["完成上下行音階 4 次。", "記錄最不穩的兩個音。", "練完回聽音準。"], note: "開始進入左手訓練。" },
+          { title: "第 6 週：音階反覆校正", description: "反覆修正落點，讓耳朵和手指對齊。", focus: ["同一個音反覆確認。", "先少量音再加長。", "偏音要做記號。"], tasks: ["每天做 2 輪音階校正。", "錄音回聽 1 次。", "標出偏高偏低位置。"], note: "重點是重複，不是求新。" },
+          { title: "第 7 週：分弓與連弓", description: "把常見弓法放進簡單樂句中練習。", focus: ["分弓要清楚。", "連弓要順。", "句子不要斷掉。"], tasks: ["同一句做分弓版與連弓版。", "比較音色差異。", "完整錄一段。"], note: "弓法開始進入句子。" },
+          { title: "第 8 週：基礎旋律整合", description: "開始把姿勢、節奏和音準放進旋律。", focus: ["保持完整旋律感。", "音準與節奏同時顧。", "不要只顧單點。"], tasks: ["完成一段短旋律。", "中途不停下。", "錄音回看流暢度。"], note: "第一次進入完整旋律練習。" },
+          { title: "第 9 週：完整段落演奏", description: "連續拉完一段短曲，不中斷完成。", focus: ["演奏不能中斷。", "先求完整。", "錯音先做記號。"], tasks: ["完整拉完一段。", "記錄卡住的位置。", "第二次再修正。"], note: "這週要開始像表演，而不是片段練習。" },
+          { title: "第 10 週：初級成果驗收", description: "錄下一段完整基礎演奏，作為初級收尾。", focus: ["從頭到尾完成。", "維持姿勢與穩定。", "留下成果版本。"], tasks: ["錄一支完整版本。", "聽一次並寫 3 個心得。", "準備進入中級。"], note: "這一週的譜可以直接換成你的成果曲譜。" }
         ]
       },
       intermediate: {
         label: "中級",
-        intro: "中級 10 題對應 10 週技巧強化內容，從換把、揉弦、音色到成果錄影。",
-        questions: [
-          { id:"q1", question:"第 1 週換把定位重整時，換把前最應該先想什麼？", options:["目標音在哪裡","觀眾會不會拍手","弓要不要換新的"], answer:0, explanation:"中級第 1 週的關鍵是先想目標音，再做短而準的移動。" },
-          { id:"q2", question:"第 2 週揉弦穩定起步時，最好的起手方式是什麼？", options:["先做大幅度揉弦","先用小幅度、可控制的揉弦","先不管音準"], answer:1, explanation:"揉弦一開始要小而穩，不能因為揉弦把音拉掉。" },
-          { id:"q3", question:"第 3 週音色控制訓練時，為什麼要做強弱變化？", options:["讓音色和層次更明顯","只是為了練速度","因為拍器要求"], answer:0, explanation:"這一週是開始學會設計音色和層次。" },
-          { id:"q4", question:"第 4 週弓法組合進階時，哪一點最重要？", options:["句子不中斷且弓法切換順","只看右手不管聲音","每句都用同一種弓法"], answer:0, explanation:"中級弓法組合要能放進長句中，不是孤立動作。" },
-          { id:"q5", question:"第 5 週中速節奏穩定時，拍速亂掉最好的處理方式是什麼？", options:["硬撐更快","退回前一段速度再穩住","直接停止練習"], answer:1, explanation:"中速訓練要逐步提升，亂掉就退回，不要硬追。" },
-          { id:"q6", question:"第 6 週段落與換氣感的目標是什麼？", options:["只求音越大越好","讓句子開始有方向和層次","只記指法不管表情"], answer:1, explanation:"第 6 週開始從『拉對』走向『拉出句子感』。" },
-          { id:"q7", question:"第 7 週耐力與不中斷演奏訓練時，出現錯音應該怎麼做？", options:["先不中斷完成，再標記問題點","立刻停下重來","直接跳下一段"], answer:0, explanation:"這週訓練的是長段落耐力和注意力，不是每錯必停。" },
-          { id:"q8", question:"第 8 週速度提升訓練時，適合怎麼加速？", options:["每次慢慢加一點拍速","一次加快很多","完全不用拍器"], answer:0, explanation:"速度提升要漸進，這樣才維持乾淨和穩定。" },
-          { id:"q9", question:"第 9 週技巧整合到曲目時，技巧最主要的角色是什麼？", options:["用來炫技","為曲子和段落表現服務","只要會做就好"], answer:1, explanation:"中級第 9 週要把技巧真正放回曲目，不是只展示招式。" },
-          { id:"q10", question:"第 10 週中級成果錄影的成果標準是什麼？", options:["完成有表情、完整段落感的演奏","只錄 10 秒示範片段","只要音準對就好"], answer:0, explanation:"中級成果重點是完整度與表情，不只是拉對音。" }
+        weeks: [
+          { title: "第 1 週：換把定位重整", description: "重新整理換把的目標音與手位移動。", focus: ["換把前先想目標音。", "動作要短。", "保持音準。"], tasks: ["做 10 次目標換把。", "錄 1 段換把片段。", "標記常偏的位置。"], note: "中級譜例著重換把定位。" },
+          { title: "第 2 週：揉弦穩定起步", description: "建立小幅度、可控制的揉弦動作。", focus: ["揉弦先小。", "不要掉音。", "配合長音。"], tasks: ["4 個長音揉弦。", "比較有無揉弦差異。", "回聽音準是否穩。"], note: "~~~ 表示持續揉弦。" },
+          { title: "第 3 週：音色控制訓練", description: "練習不同力度和接觸位置造成的音色差異。", focus: ["同一句做強弱變化。", "拉出層次。", "保持乾淨音色。"], tasks: ["完成一組強弱對比。", "錄音比較前後。", "維持穩定弓速。"], note: "中級開始要加入力度設計。" },
+          { title: "第 4 週：弓法組合進階", description: "把分弓、連弓、重音放進更長的句子。", focus: ["重音要有位置。", "弓法切換要順。", "句子不中斷。"], tasks: ["同句做兩種弓法。", "拍器下完成。", "記錄最難一格。"], note: "這週重點是弓法切換與句子連續。" },
+          { title: "第 5 週：中速節奏穩定", description: "從慢速跨到中速，保持節奏與音準不散。", focus: ["拍速逐步增加。", "亂掉就退回。", "不要硬追速度。"], tasks: ["至少提升兩段拍速。", "每段都完整拉對。", "保持放鬆。"], note: "逐步加速，不一次跳太快。" },
+          { title: "第 6 週：段落與換氣感", description: "讓演奏不只正確，也開始有句子方向。", focus: ["設計句子高低。", "收尾清楚。", "有呼吸感。"], tasks: ["畫出句子段落。", "完整拉 2 次。", "回聽是否有層次。"], note: "把句子切出結構感。" },
+          { title: "第 7 週：耐力與不中斷演奏", description: "提升中段演奏耐力與注意力維持。", focus: ["演奏長段落。", "錯音不立刻停。", "保持節奏。"], tasks: ["連續拉 16 小節。", "標記問題點。", "第二輪修正。"], note: "耐力比短句更重要。" },
+          { title: "第 8 週：速度提升訓練", description: "逐步提高拍速，維持乾淨與穩定。", focus: ["速度上升仍乾淨。", "手不能緊。", "句子要完整。"], tasks: ["每次加 4 bpm。", "完成 3 段速度。", "回聽是否變亂。"], note: "速度上來更要放鬆。" },
+          { title: "第 9 週：技巧整合到曲目", description: "把換把、揉弦、弓法整合進完整段落。", focus: ["技巧為曲子服務。", "不要只顧招式。", "段落表現一致。"], tasks: ["挑一段曲目整合。", "錄影回看。", "寫下 3 個修正點。"], note: "把技巧真的放回曲子裡。" },
+          { title: "第 10 週：中級成果錄影", description: "完成一段具有表情和完整段落感的演奏。", focus: ["保有表情。", "完成整段。", "錄成成果版本。"], tasks: ["錄一支中級成果。", "回看姿勢與音色。", "準備進入高級。"], note: "成果曲譜可之後替換成正式版本。" }
         ]
       },
       advanced: {
         label: "高級",
-        intro: "高級 10 題對應 10 週高階表現訓練，從高強度控制、難段修正到正式錄影。",
-        questions: [
-          { id:"q1", question:"第 1 週高強度長弓控制時，最需要避免什麼情況？", options:["因為用力而全身變緊","長弓太穩","音色太一致"], answer:0, explanation:"高級第 1 週是回頭校正控制力，不能因為強度變高就僵硬。" },
-          { id:"q2", question:"第 2 週快速換把與定位時，核心原則是什麼？", options:["手位移動越大越好","高速度下仍要短、準、清楚","只追求更快不管音準"], answer:1, explanation:"高級換把不是只有快，還要準、短、乾淨。" },
-          { id:"q3", question:"第 3 週複合弓法連接時，最重要的檢查點是什麼？", options:["整段連接是否乾淨、重音是否清楚","弓毛顏色","音量是不是最大"], answer:0, explanation:"複合弓法的重點是順接和重音位置清楚。" },
-          { id:"q4", question:"第 4 週揉弦與表情深化時，揉弦應該怎麼用？", options:["每句都同一種速度","依照句子情緒調整揉弦速度與感覺","只要幅度夠大"], answer:1, explanation:"高級揉弦已經要服務表情，而不是只有動作本身。" },
-          { id:"q5", question:"第 5 週高速度節奏穩定時，動作應該有什麼變化？", options:["動作更小更精確","動作更大比較有力","不用管節奏"], answer:0, explanation:"速度越高，動作通常要更精簡，節奏才不會散。" },
-          { id:"q6", question:"第 6 週段落推進與層次的目的，是讓演奏具備什麼？", options:["更複雜的指法","起承轉合與敘事方向","更高的音量"], answer:1, explanation:"這週要開始設計整段敘事，不只是把音拉出來。" },
-          { id:"q7", question:"第 7 週困難段拆解修正時，最有效的做法是什麼？", options:["鎖定最難片段，拆出節奏、弓法、指法","整首一直從頭拉到尾","只練最簡單的地方"], answer:0, explanation:"高級修正要精準拆解問題，而不是盲目整首重複。" },
-          { id:"q8", question:"第 8 週整首曲目連續演奏時，第一輪練習最適合怎麼做？", options:["先完整跑完，不中斷","每錯一個音就停","只挑喜歡的片段練"], answer:0, explanation:"這週練的是完整度，第一輪先建立整首連續性。" },
-          { id:"q9", question:"第 9 週錄影回看與舞台修正時，為什麼一定要看影片？", options:["因為只聽聲音就夠了","因為還要檢查動作、表情和舞台完整度","只是為了存檔"], answer:1, explanation:"錄影能讓你看到音色以外的動作、表情和舞台感。" },
-          { id:"q10", question:"第 10 週高級總驗收的核心任務是什麼？", options:["完成正式版本錄影，留下最終成果","只做暖身不錄","換一首新曲子"], answer:0, explanation:"高級總驗收就是要留下正式版本，作為成果輸出。" }
+        weeks: [
+          { title: "第 1 週：高強度長弓控制", description: "重新提升弓速、弓壓與音色統一性。", focus: ["高強度仍要穩。", "音色統一。", "不要因為用力而緊。"], tasks: ["完成高強度長弓 8 組。", "錄 1 段高低強弱對比。", "回聽音色均勻度。"], note: "高級先從控制力回頭校正。" },
+          { title: "第 2 週：快速換把與定位", description: "處理高速度下的手位準確與穩定。", focus: ["高速度目標更準。", "手位移動短。", "聲音不能糊。"], tasks: ["做快速換把 12 次。", "拍器提速測試。", "記錄不穩位置。"], note: "高級換把要快又準。" },
+          { title: "第 3 週：複合弓法連接", description: "把複雜弓法放在高難度片段中完成。", focus: ["複合弓法順接。", "重音位置清楚。", "整段不散。"], tasks: ["慢速拆解。", "回到原速。", "完成一段錄音。"], note: "高級弓法重點是連接與乾淨。" },
+          { title: "第 4 週：揉弦與表情深化", description: "精修不同速度、不同情緒的揉弦效果。", focus: ["揉弦速度有變化。", "符合樂句情緒。", "不犧牲音準。"], tasks: ["同句做兩種表情。", "錄音比較。", "選最適合版本。"], note: "揉弦開始服務於表情。" },
+          { title: "第 5 週：高速度節奏穩定", description: "在更高拍速下維持乾淨、準確與放鬆。", focus: ["高拍速不能亂。", "動作要更小。", "節奏更精確。"], tasks: ["逐步加速。", "維持乾淨音色。", "完成 3 次原速。"], note: "這週的譜更接近高難度片段。" },
+          { title: "第 6 週：段落推進與層次", description: "設計樂句起伏、呼吸感和結構感。", focus: ["分層次演奏。", "有推進方向。", "收尾清楚。"], tasks: ["標出起承轉合。", "完整拉一次。", "寫下段落設計。"], note: "高級要開始設計整段敘事。" },
+          { title: "第 7 週：困難段拆解修正", description: "鎖定最難片段，做精準拆解練習。", focus: ["找最難的 2 小節。", "拆出節奏、弓法、指法。", "再組回原段。"], tasks: ["列出困難段。", "拆練 3 輪。", "回到整段測試。"], note: "這週是修正週，不是拼命往下練。" },
+          { title: "第 8 週：整首曲目連續演奏", description: "訓練從頭到尾不中斷完成曲目。", focus: ["完整演奏。", "不中斷。", "保持專注。"], tasks: ["至少完成兩次整首。", "第一次不修，第二次修。", "記錄失誤點。"], note: "練的是完整度。" },
+          { title: "第 9 週：錄影回看與舞台修正", description: "用錄影檢查音色、動作與舞台完整度。", focus: ["不只聽，也要看。", "修動作與表情。", "調整舞台感。"], tasks: ["錄影 1 次。", "回看並寫 3 個問題。", "做第二次修正版。"], note: "錄影是高級課程的必備工具。" },
+          { title: "第 10 週：高級總驗收", description: "完成正式版本錄影，作為高級課程成果輸出。", focus: ["像正式演出一樣。", "從頭到尾完成。", "留下最終版本。"], tasks: ["錄正式版。", "回看完整度。", "保留成果檔案。"], note: "最後可直接換成你的正式演出曲譜。" }
         ]
       }
     };
-    let currentLevel = new URLSearchParams(window.location.search).get("level") || "beginner";
-    if (!quizData[currentLevel]) currentLevel = "beginner";
+
+    const distractors = {
+      goal: ["追求更快速度", "直接跳到下一週", "只求音量變大"],
+      focus: ["完全忽略身體放鬆", "只看手不聽聲音", "遇到問題立刻停掉"],
+      task: ["直接跳過練習記錄", "只做一次就結束", "不回聽也不檢查"],
+      note: ["這週重點是趕進度", "這週只要多練時間", "這週先不管穩定度"]
+    };
+
+    let params = new URLSearchParams(window.location.search);
+    let currentLevel = params.get("level") || "beginner";
+    let currentWeek = Math.min(10, Math.max(1, Number(params.get("week") || "1")));
+    if (!weeklyData[currentLevel]) currentLevel = "beginner";
+
+    const pageTitle = document.getElementById("pageTitle");
+    const quizIntro = document.getElementById("quizIntro");
+    const quizMeta = document.getElementById("quizMeta");
     const quizContainer = document.getElementById("quizContainer");
     const quizResult = document.getElementById("quizResult");
     const levelTabs = document.getElementById("levelTabs");
+    const weekTabs = document.getElementById("weekTabs");
 
-    function renderTabs() {
+    function buildQuestion(id, question, correct, wrong1, wrong2, explanation) {
+      return { id, question, options: [correct, wrong1, wrong2], answer: 0, explanation };
+    }
+
+    function buildWeekQuiz(levelKey, weekIndex) {
+      const course = weeklyData[levelKey];
+      const week = course.weeks[weekIndex];
+      const weekNo = weekIndex + 1;
+      return [
+        buildQuestion("q1", "這一週的主題是什麼？", week.title.replace("第 " + weekNo + " 週：", "").trim(), course.weeks[(weekIndex + 1) % 10].title.replace(/^第 \d+ 週：/, "").trim(), course.weeks[(weekIndex + 2) % 10].title.replace(/^第 \d+ 週：/, "").trim(), "這份測驗對應的是 " + week.title + "。"),
+        buildQuestion("q2", "這一週主要在處理哪一個學習方向？", week.description, course.weeks[(weekIndex + 3) % 10].description, course.weeks[(weekIndex + 4) % 10].description, "先抓準這週的主要學習方向，再進入細部練習。"),
+        buildQuestion("q3", "本週教學重點之一是什麼？", week.focus[0], distractors.focus[0], distractors.focus[1], "本週第一個重點就是這一項。"),
+        buildQuestion("q4", "本週第二個要注意的重點是什麼？", week.focus[1], distractors.focus[1], distractors.focus[2], "第二個教學重點要一起顧，不能只顧第一點。"),
+        buildQuestion("q5", "本週第三個練習提醒是什麼？", week.focus[2], distractors.focus[2], distractors.focus[0], "第三個重點通常是把動作和聲音收得更完整。"),
+        buildQuestion("q6", "下列哪一個是本週任務？", week.tasks[0], distractors.task[0], distractors.task[1], "這是本週任務安排之一。"),
+        buildQuestion("q7", "學生本週還需要完成哪一項任務？", week.tasks[1], distractors.task[1], distractors.task[2], "這項任務是讓學生回看自己實際狀況。"),
+        buildQuestion("q8", "本週最後還要完成什麼練習？", week.tasks[2], distractors.task[2], distractors.task[0], "第三個任務通常是收尾與自我檢查。"),
+        buildQuestion("q9", "依照這週備註，最符合的練習提醒是什麼？", week.note, distractors.note[0], distractors.note[1], "備註是在提醒學生這週真正的主軸。"),
+        buildQuestion("q10", course.label + "第 " + weekNo + " 週練完後，最應該先確認什麼？", "自己是否掌握了這週的重點、任務和練習方向", distractors.goal[0], distractors.goal[1], "這份測驗的目的，就是確認學生有沒有吸收到當週內容。")
+      ];
+    }
+
+    function updateUrl() {
+      history.replaceState(null, "", "./二胡小教室-小測驗.html?level=" + currentLevel + "&week=" + currentWeek);
+    }
+
+    function renderLevelTabs() {
       levelTabs.innerHTML = "";
-      Object.entries(quizData).forEach(([key, value]) => {
+      Object.entries(weeklyData).forEach(([key, value]) => {
         const button = document.createElement("button");
         button.type = "button";
         button.className = "tab";
         button.textContent = value.label;
-        button.addEventListener("click", () => setLevel(key));
+        button.addEventListener("click", () => {
+          currentLevel = key;
+          renderQuiz();
+        });
         levelTabs.appendChild(button);
       });
     }
 
+    function renderWeekTabs() {
+      weekTabs.innerHTML = "";
+      for (let week = 1; week <= 10; week += 1) {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "week-tab";
+        button.textContent = "第 " + week + " 週";
+        button.addEventListener("click", () => {
+          currentWeek = week;
+          renderQuiz();
+        });
+        weekTabs.appendChild(button);
+      }
+    }
+
     function renderQuiz() {
-      const currentQuiz = quizData[currentLevel];
-      document.title = "二胡小教室 | " + currentQuiz.label + "小測驗";
-      document.querySelector("h1").textContent = currentQuiz.label + "學習小測驗";
-      document.getElementById("quizIntro").textContent = currentQuiz.intro;
-      history.replaceState(null, "", "./二胡小教室-小測驗.html?level=" + currentLevel);
+      const course = weeklyData[currentLevel];
+      const weekData = course.weeks[currentWeek - 1];
+      const questions = buildWeekQuiz(currentLevel, currentWeek - 1);
+      document.title = "二胡小教室 | " + course.label + "第 " + currentWeek + " 週測驗";
+      pageTitle.textContent = course.label + "第 " + currentWeek + " 週學習測驗";
+      quizIntro.textContent = "這一份是 " + course.label + "第 " + currentWeek + " 週的 10 題測驗，題目直接對應本週的學習主題、重點與任務。";
+      quizMeta.textContent = weekData.title + "｜" + weekData.description;
+      updateUrl();
       document.querySelectorAll(".tab").forEach((tab, index) => {
-        const key = Object.keys(quizData)[index];
+        const key = Object.keys(weeklyData)[index];
         tab.classList.toggle("active", key === currentLevel);
+      });
+      document.querySelectorAll(".week-tab").forEach((tab, index) => {
+        tab.classList.toggle("active", index + 1 === currentWeek);
       });
       quizContainer.innerHTML = "";
       quizResult.textContent = "尚未作答";
-      currentQuiz.questions.forEach((item, index) => {
+      questions.forEach((item, index) => {
         const wrapper = document.createElement("div");
         wrapper.className = "question";
         wrapper.dataset.questionId = item.id;
@@ -160,18 +226,13 @@
         wrapper.appendChild(feedback);
         quizContainer.appendChild(wrapper);
       });
-    }
-
-    function setLevel(levelKey) {
-      currentLevel = levelKey;
-      renderQuiz();
+      window.currentQuestions = questions;
     }
 
     document.getElementById("submitQuizButton").addEventListener("click", () => {
-      const currentQuiz = quizData[currentLevel];
       let score = 0;
       let answered = 0;
-      currentQuiz.questions.forEach((item) => {
+      window.currentQuestions.forEach((item) => {
         const checked = document.querySelector("input[name=\"" + item.id + "\"]:checked");
         const questionCard = document.querySelector("[data-question-id=\"" + item.id + "\"]");
         const feedback = questionCard.querySelector(".feedback");
@@ -192,13 +253,14 @@
           }
         }
       });
-      if (answered < currentQuiz.questions.length) {
+      if (answered < window.currentQuestions.length) {
         quizResult.textContent = "你還有題目沒作答，先全部選完再送出。";
         return;
       }
-      quizResult.textContent = "你的分數是 " + score + " / " + currentQuiz.questions.length + "。"
-        + (score === currentQuiz.questions.length ? " 全對，這一輪重點已掌握。" : " 建議回去複習對應週次內容，再做一次。");
+      quizResult.textContent = "你的分數是 " + score + " / " + window.currentQuestions.length + "。"
+        + (score === window.currentQuestions.length ? " 全對，這一週重點已掌握。" : " 建議回去複習這一週內容，再做一次。");
     });
+
     document.getElementById("resetQuizButton").addEventListener("click", () => {
       document.querySelectorAll("input[type=\"radio\"]").forEach((input) => { input.checked = false; });
       document.querySelectorAll(".question").forEach((question) => question.classList.remove("correct", "incorrect"));
@@ -208,7 +270,9 @@
       });
       quizResult.textContent = "尚未作答";
     });
-    renderTabs();
+
+    renderLevelTabs();
+    renderWeekTabs();
     renderQuiz();
   </script>
   </main>

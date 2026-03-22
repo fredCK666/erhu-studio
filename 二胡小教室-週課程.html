@@ -316,7 +316,7 @@
     const nextWeek = Math.min(10, week + 1);
     const prevLink = document.getElementById("prevWeekLink");
     const nextLink = document.getElementById("nextWeekLink");
-    document.getElementById("quizLink").href = "./二胡小教室-小測驗.html?level=" + level;
+    document.getElementById("quizLink").href = "./二胡小教室-小測驗.html?level=" + level + "&week=" + week;
     prevLink.href = "./二胡小教室-週課程.html?level=" + level + "&week=" + prevWeek;
     nextLink.href = "./二胡小教室-週課程.html?level=" + level + "&week=" + nextWeek;
     if (week === 1) prevLink.textContent = "已經是第一週";
