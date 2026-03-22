@@ -237,10 +237,13 @@
   }
 
   .status-chip {
-    background: var(--info-soft);
-    color: var(--info);
-    font-size: 15px;
-    padding: 10px 14px;
+    min-width: 116px;
+    justify-content: center;
+    background: linear-gradient(135deg, #d7ebff, #bfdcff);
+    color: #0b57b7;
+    font-size: 18px;
+    padding: 14px 18px;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
   }
 
   .double {
@@ -358,6 +361,19 @@
     gap: 8px;
   }
 
+  .status-kicker {
+    display: inline-flex;
+    align-items: center;
+    width: fit-content;
+    padding: 7px 11px;
+    border-radius: 999px;
+    background: rgba(255, 179, 0, 0.14);
+    color: #9a6100;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+  }
+
   .status-id {
     font-size: 14px;
     color: var(--muted);
@@ -383,9 +399,20 @@
   }
 
   .timeline-item {
+    position: relative;
     display: flex;
     gap: 14px;
     align-items: flex-start;
+  }
+
+  .timeline-item:not(:last-child)::after {
+    content: "";
+    position: absolute;
+    left: 6px;
+    top: 28px;
+    bottom: -14px;
+    width: 2px;
+    background: linear-gradient(180deg, rgba(255, 179, 0, 0.42), rgba(255, 224, 178, 0));
   }
 
   .timeline-copy {
@@ -410,10 +437,16 @@
   .timeline-dot {
     width: 14px;
     height: 14px;
+    flex: 0 0 14px;
     border-radius: 50%;
     background: var(--brand-deep);
     margin-top: 8px;
     box-shadow: 0 0 0 8px rgba(255, 179, 0, 0.16);
+  }
+
+  .timeline-item.destination .timeline-dot {
+    background: #ef6c00;
+    box-shadow: 0 0 0 8px rgba(239, 108, 0, 0.12);
   }
 
   .driver-box {
@@ -460,6 +493,13 @@
     display: grid;
     gap: 12px;
     margin-top: 4px;
+    padding-top: 4px;
+  }
+
+  .status-actions button {
+    min-height: 56px;
+    border-radius: 18px;
+    font-size: 18px;
   }
 
   .stars {
@@ -1149,6 +1189,7 @@
             <div class="status-card">
               <div class="status-header">
                 <div class="status-meta">
+                  <span class="status-kicker">LIVE RIDE</span>
                   <h3 class="card-title">目前行程</h3>
                   <div class="status-id">訂單編號<strong id="ride-id">-</strong></div>
                 </div>
@@ -1163,7 +1204,7 @@
                     <div class="muted" id="ride-route-from">-</div>
                   </div>
                 </div>
-                <div class="timeline-item">
+                <div class="timeline-item destination">
                   <span class="timeline-dot"></span>
                   <div class="timeline-copy">
                     <strong>目的地</strong>
