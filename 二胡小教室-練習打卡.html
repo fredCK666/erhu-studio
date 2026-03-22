@@ -42,12 +42,16 @@
     </header>
     <section class="panel">
       <h1>分級每週打卡</h1>
-      <p>初級、中級、高級各自分開打卡。你切換等級後，勾選的內容會各自保存在不同紀錄，不會互相覆蓋，登入不同學生也會分開保存。</p>
+      <p>初級、中級、高級各自分開打卡。你切換等級後，勾選的內容會各自保存在不同紀錄，不會互相覆蓋，登入不同學生也會透過 Firebase 分開同步保存。</p>
       <div class="tabs" id="levelTabs"></div>
       <div class="tracker-grid" id="trackerGrid"></div>
       <div class="summary" id="trackerSummary">目前完成 0 / 10 週</div>
       <button class="button" id="resetTrackerButton" type="button">清除目前等級打卡</button>
     </section>
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+  <script src="./firebase-init.js"></script>
   <script src="./auth.js"></script>
   <script>
     window.ErhuAuth.requireAuth();
@@ -75,8 +79,9 @@
     const trackerGrid = document.getElementById("trackerGrid");
     const trackerSummary = document.getElementById("trackerSummary");
 
-    function storageKey() {
-      return window.ErhuAuth.getScopedStorageKey("erhu-practice-tracker-" + currentLevel);
+    function trackerRef() {
+      const user = window.ErhuAuth.getCurrentUser();
+      return window.ErhuFirebase.db.collection("students").doc(user.uid).collection("trackers").doc(currentLevel);
     }
 
     function renderTabs() {
@@ -91,8 +96,9 @@
       });
     }
 
-    function renderTracker() {
-      const saved = JSON.parse(localStorage.getItem(storageKey()) || "{}");
+    async function renderTracker() {
+      const snapshot = await trackerRef().get();
+      const saved = snapshot.exists ? snapshot.data() : {};
       trackerGrid.innerHTML = "";
       courseTracks[currentLevel].items.forEach((text, index) => {
         const wrap = document.createElement("div");
@@ -111,12 +117,13 @@
       });
     }
 
-    function saveTracker() {
+    async function saveTracker() {
       const state = {};
       trackerGrid.querySelectorAll("[data-track]").forEach((checkbox) => {
         state[checkbox.dataset.track] = checkbox.checked;
       });
-      localStorage.setItem(storageKey(), JSON.stringify(state));
+      state.updatedAt = firebase.firestore.FieldValue.serverTimestamp();
+      await trackerRef().set(state, { merge: true });
       updateSummary();
     }
 
@@ -143,8 +150,10 @@
       saveTracker();
     });
 
-    renderTabs();
-    setLevel("beginner");
+    window.ErhuAuth.onReady(function () {
+      renderTabs();
+      setLevel("beginner");
+    });
   </script>
   </main>
 </body>

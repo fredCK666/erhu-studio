@@ -66,6 +66,10 @@
       </div>
       <div class="result" id="quizResult">尚未作答</div>
     </section>
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+  <script src="./firebase-init.js"></script>
   <script src="./auth.js"></script>
   <script>
     window.ErhuAuth.requireAuth();
@@ -165,17 +169,19 @@
       history.replaceState(null, "", "./二胡小教室-小測驗.html?level=" + currentLevel + "&week=" + currentWeek);
     }
 
-    function scoreStorageKey() {
-      return window.ErhuAuth.getScopedStorageKey("erhu-quiz-score-" + currentLevel + "-week-" + currentWeek);
+    function scoreRef() {
+      const user = window.ErhuAuth.getCurrentUser();
+      return window.ErhuFirebase.db.collection("students").doc(user.uid).collection("quizScores").doc(currentLevel + "_week_" + currentWeek);
     }
 
-    function renderScoreHistory() {
+    async function renderScoreHistory() {
       const user = window.ErhuAuth.getCurrentUser() || "目前學生";
-      const saved = JSON.parse(localStorage.getItem(scoreStorageKey()) || "null");
-      if (!saved) {
+      const snapshot = await scoreRef().get();
+      if (!snapshot.exists) {
         scoreHistory.textContent = user + "｜尚未留下這一週的測驗紀錄";
         return;
       }
+      const saved = snapshot.data();
       scoreHistory.textContent = user + "｜上次分數：" + saved.lastScore + " / " + saved.total + "｜最佳分數：" + saved.bestScore + " / " + saved.total;
     }
 
@@ -209,7 +215,7 @@
       }
     }
 
-    function renderQuiz() {
+    async function renderQuiz() {
       const course = weeklyData[currentLevel];
       const weekData = course.weeks[currentWeek - 1];
       const questions = buildWeekQuiz(currentLevel, currentWeek - 1);
@@ -218,7 +224,7 @@
       quizIntro.textContent = "這一份是 " + course.label + "第 " + currentWeek + " 週的 10 題測驗，題目直接對應本週的學習主題、重點與任務。";
       quizMeta.textContent = weekData.title + "｜" + weekData.description;
       updateUrl();
-      renderScoreHistory();
+      await renderScoreHistory();
       document.querySelectorAll(".tab").forEach((tab, index) => {
         const key = Object.keys(weeklyData)[index];
         tab.classList.toggle("active", key === currentLevel);
@@ -250,7 +256,7 @@
       window.currentQuestions = questions;
     }
 
-    document.getElementById("submitQuizButton").addEventListener("click", () => {
+    document.getElementById("submitQuizButton").addEventListener("click", async () => {
       let score = 0;
       let answered = 0;
       window.currentQuestions.forEach((item) => {
@@ -278,14 +284,18 @@
         quizResult.textContent = "你還有題目沒作答，先全部選完再送出。";
         return;
       }
-      const previous = JSON.parse(localStorage.getItem(scoreStorageKey()) || "null");
+      const previousSnapshot = await scoreRef().get();
+      const previous = previousSnapshot.exists ? previousSnapshot.data() : null;
       const bestScore = previous ? Math.max(previous.bestScore, score) : score;
-      localStorage.setItem(scoreStorageKey(), JSON.stringify({
+      await scoreRef().set({
+        level: currentLevel,
+        week: currentWeek,
         lastScore: score,
         bestScore: bestScore,
-        total: window.currentQuestions.length
-      }));
-      renderScoreHistory();
+        total: window.currentQuestions.length,
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      }, { merge: true });
+      await renderScoreHistory();
       quizResult.textContent = "你的分數是 " + score + " / " + window.currentQuestions.length + "。"
         + (score === window.currentQuestions.length ? " 全對，這一週重點已掌握。" : " 建議回去複習這一週內容，再做一次。");
     });
@@ -300,9 +310,11 @@
       quizResult.textContent = "尚未作答";
     });
 
-    renderLevelTabs();
-    renderWeekTabs();
-    renderQuiz();
+    window.ErhuAuth.onReady(function () {
+      renderLevelTabs();
+      renderWeekTabs();
+      renderQuiz();
+    });
   </script>
   </main>
 </body>

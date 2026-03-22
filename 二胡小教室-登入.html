@@ -41,7 +41,7 @@
     </header>
     <section class="hero">
       <h1>先登入再開始學習</h1>
-      <p>請先輸入姓名與密碼登入。如果還沒有帳號，可以從登入表單下方進到註冊頁面建立新的學生帳號。</p>
+      <p>請先輸入姓名與密碼登入。如果還沒有帳號，可以從登入表單下方進到註冊頁面建立新的學生帳號。現在登入資料與學習紀錄會同步到 Firebase。</p>
     </section>
     <section class="grid">
       <article class="card">
@@ -50,7 +50,7 @@
           <li>先輸入姓名與密碼登入。</li>
           <li>還沒註冊時，再按下方入口前往註冊。</li>
           <li>同一台裝置可以註冊多個不同姓名帳號。</li>
-          <li>這個版本會把帳號資料存在你目前使用的瀏覽器。</li>
+          <li>現在改成 Firebase，同一個學生可跨裝置登入。</li>
         </ul>
       </article>
       <article class="card">
@@ -74,12 +74,15 @@
       </article>
     </section>
   </main>
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+  <script src="./firebase-init.js"></script>
   <script src="./auth.js"></script>
   <script>
-    const accounts = window.ErhuAuth.getAccounts();
     const params = new URLSearchParams(window.location.search);
     const next = params.get("next") || "./二胡小教室.html";
-    let currentMode = accounts.length ? "login" : "register";
+    let currentMode = "login";
     const modeBadge = document.getElementById("modeBadge");
     const modeStatus = document.getElementById("modeStatus");
     const modeHint = document.getElementById("modeHint");
@@ -90,16 +93,14 @@
     const switchText = document.getElementById("switchText");
     const switchModeButton = document.getElementById("switchModeButton");
 
+    window.ErhuAuth.redirectIfAuthenticated(next);
+
     function renderMode() {
       const loggedInUser = window.ErhuAuth.getCurrentUser();
       if (currentMode === "login") {
         modeBadge.textContent = "登入";
-        modeStatus.textContent = accounts.length
-          ? "請輸入已註冊的姓名與密碼登入。"
-          : "目前還沒有帳號，你可以先按下方入口前往註冊。";
-        modeHint.textContent = accounts.length
-          ? "如果你已經註冊過，直接輸入自己的姓名和密碼即可。"
-          : "目前還沒有任何帳號。";
+        modeStatus.textContent = "請輸入已註冊的姓名與密碼登入。";
+        modeHint.textContent = "如果你已經註冊過，直接輸入自己的姓名和密碼即可。";
         submitButton.textContent = "登入";
         switchText.textContent = "還沒註冊？";
         switchModeButton.textContent = "前往註冊";
@@ -120,7 +121,7 @@
       renderMode();
     });
 
-    submitButton.addEventListener("click", () => {
+    submitButton.addEventListener("click", async () => {
       const name = nameInput.value.trim();
       const password = passwordInput.value.trim();
       if (!name || !password) {
@@ -130,10 +131,12 @@
       const result = currentMode === "login"
         ? window.ErhuAuth.login(name, password)
         : window.ErhuAuth.register(name, password);
-      formMessage.textContent = result.ok
+      formMessage.textContent = "處理中...";
+      const finalResult = await result;
+      formMessage.textContent = finalResult.ok
         ? (currentMode === "login" ? "登入成功，正在進入課程入口。" : "註冊成功，正在進入課程入口。")
-        : result.message;
-      if (result.ok) {
+        : finalResult.message;
+      if (finalResult.ok) {
         window.location.href = next;
       }
     });

@@ -1,128 +1,136 @@
 (function () {
-  const ACCOUNT_KEY = "erhu-auth-account";
-  const ACCOUNTS_KEY = "erhu-auth-accounts";
-  const SESSION_KEY = "erhu-auth-session";
-
-  function readJson(key) {
-    try {
-      return JSON.parse(localStorage.getItem(key) || "null");
-    } catch (error) {
-      return null;
-    }
+  function getAuth() {
+    return window.ErhuFirebase.auth;
   }
 
-  function writeJson(key, value) {
-    localStorage.setItem(key, JSON.stringify(value));
-  }
-
-  function migrateAccounts() {
-    const legacy = readJson(ACCOUNT_KEY);
-    const accounts = readJson(ACCOUNTS_KEY);
-    if (!accounts && legacy) {
-      writeJson(ACCOUNTS_KEY, [legacy]);
-    }
-  }
-
-  function getAccounts() {
-    migrateAccounts();
-    return readJson(ACCOUNTS_KEY) || [];
-  }
-
-  function getAccount() {
-    const accounts = getAccounts();
-    return accounts[0] || null;
-  }
-
-  function findAccount(name) {
-    return getAccounts().find(function (account) {
-      return account.name === name;
-    }) || null;
-  }
-
-  function getSession() {
-    return readJson(SESSION_KEY);
-  }
-
-  function register(name, password) {
-    if (findAccount(name)) {
-      return { ok: false, message: "這個姓名已經註冊過，請直接登入或換一個姓名。" };
-    }
-    const accounts = getAccounts();
-    accounts.push({ name: name, password: password });
-    writeJson(ACCOUNTS_KEY, accounts);
-    writeJson(SESSION_KEY, { name: name });
-    return { ok: true };
-  }
-
-  function login(name, password) {
-    const account = findAccount(name);
-    if (!getAccounts().length) {
-      return { ok: false, message: "目前還沒有帳號，請先註冊。" };
-    }
-    if (!account || account.password !== password) {
-      return { ok: false, message: "姓名或密碼不正確。" };
-    }
-    writeJson(SESSION_KEY, { name: name });
-    return { ok: true };
-  }
-
-  function getCurrentUser() {
-    const session = getSession();
-    if (!session) return null;
-    const account = findAccount(session.name);
-    if (!account) return null;
-    return account.name;
-  }
-
-  function logout() {
-    localStorage.removeItem(SESSION_KEY);
-    window.location.href = "./二胡小教室-登入.html";
-  }
-
-  function getScopedStorageKey(baseKey) {
-    const user = getCurrentUser();
-    return user ? baseKey + "-" + user : baseKey;
+  function getDb() {
+    return window.ErhuFirebase.db;
   }
 
   function nextUrl() {
     return window.location.pathname.split("/").pop() + window.location.search;
   }
 
+  function encodeNameToEmail(name) {
+    const bytes = new TextEncoder().encode(name.trim());
+    const hex = Array.from(bytes).map(function (byte) {
+      return byte.toString(16).padStart(2, "0");
+    }).join("");
+    return "u_" + hex + "@erhu-auth.local";
+  }
+
+  async function saveStudentProfile(user, displayName) {
+    await getDb().collection("students").doc(user.uid).set({
+      displayName: displayName,
+      updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    }, { merge: true });
+  }
+
+  async function register(name, password) {
+    try {
+      const credential = await getAuth().createUserWithEmailAndPassword(encodeNameToEmail(name), password);
+      await credential.user.updateProfile({ displayName: name });
+      await saveStudentProfile(credential.user, name);
+      return { ok: true };
+    } catch (error) {
+      if (error.code === "auth/email-already-in-use") {
+        return { ok: false, message: "這個姓名已經註冊過，請直接登入或換一個姓名。" };
+      }
+      if (error.code === "auth/weak-password") {
+        return { ok: false, message: "密碼至少需要 6 個字元。" };
+      }
+      return { ok: false, message: "註冊失敗，請稍後再試。" };
+    }
+  }
+
+  async function login(name, password) {
+    try {
+      const credential = await getAuth().signInWithEmailAndPassword(encodeNameToEmail(name), password);
+      if (!credential.user.displayName) {
+        await credential.user.updateProfile({ displayName: name });
+      }
+      await saveStudentProfile(credential.user, name);
+      return { ok: true };
+    } catch (error) {
+      if (error.code === "auth/invalid-credential" || error.code === "auth/user-not-found" || error.code === "auth/wrong-password") {
+        return { ok: false, message: "姓名或密碼不正確。" };
+      }
+      return { ok: false, message: "登入失敗，請稍後再試。" };
+    }
+  }
+
+  function getCurrentUser() {
+    const user = getAuth().currentUser;
+    if (!user) return null;
+    return {
+      uid: user.uid,
+      displayName: user.displayName || "學生"
+    };
+  }
+
+  async function logout() {
+    await getAuth().signOut();
+    window.location.href = "./二胡小教室-登入.html";
+  }
+
+  function getScopedStorageKey(baseKey) {
+    const user = getCurrentUser();
+    return user ? baseKey + "-" + user.uid : baseKey;
+  }
+
   function requireAuth() {
-    if (getCurrentUser()) return true;
-    const loginUrl = "./二胡小教室-登入.html?next=" + encodeURIComponent(nextUrl());
-    window.location.replace(loginUrl);
-    return false;
+    getAuth().onAuthStateChanged(function (user) {
+      if (user) return;
+      const loginUrl = "./二胡小教室-登入.html?next=" + encodeURIComponent(nextUrl());
+      if (window.location.pathname.indexOf("二胡小教室-登入.html") === -1) {
+        window.location.replace(loginUrl);
+      }
+    });
   }
 
   function redirectIfAuthenticated(defaultUrl) {
-    if (!getCurrentUser()) return;
-    const params = new URLSearchParams(window.location.search);
-    const next = params.get("next");
-    window.location.replace(next || defaultUrl || "./二胡小教室.html");
+    getAuth().onAuthStateChanged(function (user) {
+      if (!user) return;
+      const params = new URLSearchParams(window.location.search);
+      const next = params.get("next");
+      window.location.replace(next || defaultUrl || "./二胡小教室.html");
+    });
+  }
+
+  function onReady(callback) {
+    getAuth().onAuthStateChanged(function (user) {
+      if (!user) return;
+      callback({
+        uid: user.uid,
+        displayName: user.displayName || "學生"
+      });
+    });
   }
 
   function attachAuthUI() {
     const topbar = document.querySelector(".topbar");
-    if (!topbar || document.getElementById("authArea")) return;
-    const user = getCurrentUser();
-    if (!user) return;
-    const authArea = document.createElement("div");
-    authArea.id = "authArea";
-    authArea.style.display = "flex";
-    authArea.style.alignItems = "center";
-    authArea.style.gap = "10px";
-    authArea.style.flexWrap = "wrap";
-    authArea.innerHTML =
-      "<span style=\"color:#69584d;font-weight:700;\">目前登入：" + user + "</span>" +
-      "<button type=\"button\" id=\"logoutButton\" style=\"border:1px solid rgba(123,77,45,0.18);background:rgba(123,77,45,0.08);color:#7b4d2d;border-radius:999px;padding:10px 14px;font-weight:800;cursor:pointer;\">登出</button>";
-    topbar.appendChild(authArea);
-    document.getElementById("logoutButton").addEventListener("click", logout);
+    if (!topbar) return;
+    getAuth().onAuthStateChanged(function (user) {
+      const existing = document.getElementById("authArea");
+      if (existing) existing.remove();
+      if (!user) return;
+      const authArea = document.createElement("div");
+      authArea.id = "authArea";
+      authArea.style.display = "flex";
+      authArea.style.alignItems = "center";
+      authArea.style.gap = "10px";
+      authArea.style.flexWrap = "wrap";
+      authArea.innerHTML =
+        "<span style=\"color:#69584d;font-weight:700;\">目前登入：" + (user.displayName || "學生") + "</span>" +
+        "<button type=\"button\" id=\"logoutButton\" style=\"border:1px solid rgba(123,77,45,0.18);background:rgba(123,77,45,0.08);color:#7b4d2d;border-radius:999px;padding:10px 14px;font-weight:800;cursor:pointer;\">登出</button>";
+      topbar.appendChild(authArea);
+      document.getElementById("logoutButton").addEventListener("click", function () {
+        logout();
+      });
+    });
   }
 
   window.ErhuAuth = {
-    getAccount,
-    getAccounts,
     getCurrentUser,
     getScopedStorageKey,
     register,
@@ -130,6 +138,7 @@
     logout,
     requireAuth,
     redirectIfAuthenticated,
+    onReady,
     attachAuthUI
   };
 })();
