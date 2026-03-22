@@ -28,6 +28,7 @@
     .options { display:grid; gap:10px; margin-top:12px; }
     .option { display:flex; gap:10px; align-items:start; padding:12px 14px; border-radius:14px; border:1px solid var(--line); background:rgba(255,255,255,0.78); }
     .meta { margin:18px 0 22px; padding:16px 18px; border-radius:18px; background:rgba(123,77,45,0.08); color:var(--muted); }
+    .score-history { margin:0 0 18px; padding:14px 16px; border-radius:18px; background:rgba(123,77,45,0.08); color:var(--wood); font-weight:800; }
     .feedback { margin-top:12px; font-weight:800; }
     .feedback.correct { color:#4f7d35; }
     .feedback.incorrect { color:#ba5d3c; }
@@ -57,6 +58,7 @@
     </section>
     <section class="panel" style="padding:24px;">
       <div class="meta" id="quizMeta"></div>
+      <div class="score-history" id="scoreHistory">尚未留下測驗紀錄</div>
       <div class="quiz-grid" id="quizContainer"></div>
       <div class="controls">
         <button class="button" id="submitQuizButton" type="button">送出測驗</button>
@@ -131,6 +133,7 @@
     const pageTitle = document.getElementById("pageTitle");
     const quizIntro = document.getElementById("quizIntro");
     const quizMeta = document.getElementById("quizMeta");
+    const scoreHistory = document.getElementById("scoreHistory");
     const quizContainer = document.getElementById("quizContainer");
     const quizResult = document.getElementById("quizResult");
     const levelTabs = document.getElementById("levelTabs");
@@ -160,6 +163,20 @@
 
     function updateUrl() {
       history.replaceState(null, "", "./二胡小教室-小測驗.html?level=" + currentLevel + "&week=" + currentWeek);
+    }
+
+    function scoreStorageKey() {
+      return window.ErhuAuth.getScopedStorageKey("erhu-quiz-score-" + currentLevel + "-week-" + currentWeek);
+    }
+
+    function renderScoreHistory() {
+      const user = window.ErhuAuth.getCurrentUser() || "目前學生";
+      const saved = JSON.parse(localStorage.getItem(scoreStorageKey()) || "null");
+      if (!saved) {
+        scoreHistory.textContent = user + "｜尚未留下這一週的測驗紀錄";
+        return;
+      }
+      scoreHistory.textContent = user + "｜上次分數：" + saved.lastScore + " / " + saved.total + "｜最佳分數：" + saved.bestScore + " / " + saved.total;
     }
 
     function renderLevelTabs() {
@@ -201,6 +218,7 @@
       quizIntro.textContent = "這一份是 " + course.label + "第 " + currentWeek + " 週的 10 題測驗，題目直接對應本週的學習主題、重點與任務。";
       quizMeta.textContent = weekData.title + "｜" + weekData.description;
       updateUrl();
+      renderScoreHistory();
       document.querySelectorAll(".tab").forEach((tab, index) => {
         const key = Object.keys(weeklyData)[index];
         tab.classList.toggle("active", key === currentLevel);
@@ -260,6 +278,14 @@
         quizResult.textContent = "你還有題目沒作答，先全部選完再送出。";
         return;
       }
+      const previous = JSON.parse(localStorage.getItem(scoreStorageKey()) || "null");
+      const bestScore = previous ? Math.max(previous.bestScore, score) : score;
+      localStorage.setItem(scoreStorageKey(), JSON.stringify({
+        lastScore: score,
+        bestScore: bestScore,
+        total: window.currentQuestions.length
+      }));
+      renderScoreHistory();
       quizResult.textContent = "你的分數是 " + score + " / " + window.currentQuestions.length + "。"
         + (score === window.currentQuestions.length ? " 全對，這一週重點已掌握。" : " 建議回去複習這一週內容，再做一次。");
     });

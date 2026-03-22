@@ -42,7 +42,7 @@
     </header>
     <section class="panel">
       <h1>分級每週打卡</h1>
-      <p>初級、中級、高級各自分開打卡。你切換等級後，勾選的內容會各自保存在不同紀錄，不會互相覆蓋。</p>
+      <p>初級、中級、高級各自分開打卡。你切換等級後，勾選的內容會各自保存在不同紀錄，不會互相覆蓋，登入不同學生也會分開保存。</p>
       <div class="tabs" id="levelTabs"></div>
       <div class="tracker-grid" id="trackerGrid"></div>
       <div class="summary" id="trackerSummary">目前完成 0 / 10 週</div>
@@ -76,7 +76,7 @@
     const trackerSummary = document.getElementById("trackerSummary");
 
     function storageKey() {
-      return "erhu-practice-tracker-" + currentLevel;
+      return window.ErhuAuth.getScopedStorageKey("erhu-practice-tracker-" + currentLevel);
     }
 
     function renderTabs() {
@@ -123,7 +123,8 @@
     function updateSummary() {
       const checkboxes = Array.from(trackerGrid.querySelectorAll("[data-track]"));
       const completed = checkboxes.filter((checkbox) => checkbox.checked).length;
-      trackerSummary.textContent = courseTracks[currentLevel].label + "目前完成 " + completed + " / " + checkboxes.length + " 週";
+      const user = window.ErhuAuth.getCurrentUser() || "目前學生";
+      trackerSummary.textContent = user + "｜" + courseTracks[currentLevel].label + "目前完成 " + completed + " / " + checkboxes.length + " 週";
     }
 
     function setLevel(levelKey) {

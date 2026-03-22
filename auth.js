@@ -79,6 +79,11 @@
     window.location.href = "./二胡小教室-登入.html";
   }
 
+  function getScopedStorageKey(baseKey) {
+    const user = getCurrentUser();
+    return user ? baseKey + "-" + user : baseKey;
+  }
+
   function nextUrl() {
     return window.location.pathname.split("/").pop() + window.location.search;
   }
@@ -119,6 +124,7 @@
     getAccount,
     getAccounts,
     getCurrentUser,
+    getScopedStorageKey,
     register,
     login,
     logout,
