@@ -51,7 +51,62 @@
     }
     h1 { margin: 16px 0 12px; font-size: clamp(34px, 6vw, 56px); line-height: 1.04; }
     .hero p { margin: 0; max-width: 720px; line-height: 1.85; color: rgba(255, 248, 241, 0.84); }
-    .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; margin-top: 22px; }
+    .featured-ai {
+      margin-top: 22px;
+      padding: 28px;
+      text-align: center;
+      border: 1px solid rgba(202, 133, 49, 0.16);
+      box-shadow: 0 24px 56px rgba(202, 133, 49, 0.18);
+      background:
+        radial-gradient(circle at top center, rgba(255, 220, 167, 0.48), transparent 32%),
+        linear-gradient(180deg, rgba(255, 248, 239, 0.98), rgba(255, 238, 210, 0.96));
+      border-radius: 30px;
+    }
+    .featured-ai h2 {
+      margin: 10px 0 12px;
+      font-size: clamp(30px, 4.5vw, 46px);
+      color: #4d2f15;
+    }
+    .featured-ai p {
+      margin: 0 auto;
+      max-width: 760px;
+      color: var(--muted);
+      line-height: 1.9;
+      font-size: 18px;
+    }
+    .featured-actions {
+      display: flex;
+      justify-content: center;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-top: 22px;
+    }
+    .button.primary {
+      min-width: 220px;
+      padding: 16px 24px;
+      font-size: 20px;
+      box-shadow: 0 18px 34px rgba(202, 133, 49, 0.28);
+    }
+    .helper-badge {
+      display: inline-flex;
+      margin-top: 16px;
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: rgba(123, 77, 45, 0.08);
+      color: var(--wood);
+      font-size: 14px;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+    }
+    .levels-title {
+      margin: 28px 0 0;
+      text-align: center;
+      color: var(--wood);
+      font-size: 15px;
+      font-weight: 900;
+      letter-spacing: 0.18em;
+    }
+    .grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; margin-top: 18px; }
     .card { padding: 24px; }
     .eyebrow {
       display: inline-flex;
@@ -87,6 +142,7 @@
     @media (max-width: 820px) {
       .grid { grid-template-columns: 1fr; }
       .hero, .card { padding: 22px; }
+      .featured-ai { padding: 22px; }
     }
   </style>
 </head>
@@ -98,9 +154,19 @@
     </header>
     <section class="hero">
       <div class="tag">ERHU LEARNING HUB</div>
-      <h1>二胡課程分級入口</h1>
-      <p>這裡開始分成初級、中級、高級三條 10 週課程線。每個等級都有自己的每週主題、練習任務、影片安排與打卡節奏，不會全部混在一起。</p>
+      <h1>AI 二胡學習入口</h1>
+      <p>這裡先把 AI 二胡助教放在主入口，你可以直接發問、找譜、找影片，再依照自己的程度回到初級、中級、高級 10 週課程線去練習。</p>
     </section>
+    <section class="featured-ai">
+      <div class="eyebrow">AI TUTOR</div>
+      <h2>先進 AI 助教，再進各級課程</h2>
+      <p>卡關時先問 AI 助教最直接。你可以問技巧問題、要某首曲子的二胡簡譜連結、找教學影片，之後再回到初級、中級、高級各自的每週訓練。</p>
+      <div class="featured-actions">
+        <a class="button primary" href="./二胡小教室-AI助教.html">進入 AI 助教</a>
+      </div>
+      <div class="helper-badge">AI 助教是這一頁的主要入口</div>
+    </section>
+    <div class="levels-title">LEVEL COURSES</div>
     <section class="grid">
       <article class="card">
         <div class="eyebrow">BEGINNER</div>
@@ -120,16 +186,10 @@
         <p>適合想把技巧整合成表現的人，重點放在控制力、音色設計、速度穩定與完整曲目演出。</p>
         <a class="button" href="./二胡小教室-高級.html">進入高級</a>
       </article>
-      <article class="card">
-        <div class="eyebrow">TOOLS</div>
-        <h2>通用學習工具</h2>
-        <p>這些工具頁可搭配三個等級一起使用，包括影片占位頁、每週打卡、週期檢核和 AI 二胡助教。</p>
-        <a class="button" href="./二胡小教室-AI助教.html">進入 AI 助教</a>
-      </article>
     </section>
     <section class="note">
       課程分級入口檔案：<code>二胡小教室.html</code><br />
-      三個等級都各自有 10 週內容，之後也可以再分別接上各自的影片。
+      這一頁現在會先引導到 AI 助教，再讓學生依程度進入初級、中級、高級課程。
     </section>
   </main>
   <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
