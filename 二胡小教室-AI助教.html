@@ -220,6 +220,13 @@
       font-size: 14px;
     }
 
+    .status {
+      margin-top: 8px;
+      color: var(--wood);
+      font-size: 13px;
+      font-weight: 800;
+    }
+
     .messages {
       flex: 1;
       min-height: 420px;
@@ -343,6 +350,7 @@
           <div>
             <h2>助教對話區</h2>
             <div class="meta" id="contextMeta">正在準備目前學生的對話紀錄。</div>
+            <div class="status" id="sourceStatus">目前來源：初始化中</div>
           </div>
         </div>
         <div class="messages" id="messages"></div>
@@ -432,9 +440,14 @@
     const messages = document.getElementById("messages");
     const quickList = document.getElementById("quickList");
     const contextMeta = document.getElementById("contextMeta");
+    const sourceStatus = document.getElementById("sourceStatus");
 
     let currentUser = null;
     let historyMessages = [];
+
+    function setSourceStatus(text) {
+      sourceStatus.textContent = "目前來源：" + text;
+    }
 
     function updateContextMeta() {
       const displayName = currentUser ? currentUser.displayName : "目前學生";
@@ -655,6 +668,7 @@
       if (!response.ok || !data.answer) {
         throw new Error(data && data.error ? data.error : "backend-failed");
       }
+      setSourceStatus("OpenAI 後端");
       return data.answer;
     }
 
@@ -697,6 +711,7 @@
           answer = await askBackendTutor(question);
         } catch (error) {
           console.error("askBackendTutor failed, fallback to local tutor", error);
+          setSourceStatus("本地備援（" + (error && error.message ? error.message : "unknown-error") + "）");
           answer = buildAnswer(question);
         }
         await addMessage("assistant", answer);
@@ -743,6 +758,7 @@
     weekSelect.value = String(getInitialWeek());
     updateQuickPrompts();
     updateContextMeta();
+    setSourceStatus("等待送出問題");
 
     window.ErhuAuth.onReady(async function (user) {
       currentUser = user;
