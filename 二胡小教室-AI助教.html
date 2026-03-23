@@ -214,7 +214,10 @@
 
     .resource-card.search-link-card,
     .resource-card.image-card {
-      background: rgba(255, 251, 245, 0.96);
+      padding: 0;
+      border: 0;
+      border-radius: 0;
+      background: transparent;
     }
 
     .resource-card strong {
@@ -452,10 +455,9 @@
       } else if (resource.kind === "video-search") {
         const imageSrc = resource.thumbnailUrl || buildPreviewSvg(resource.previewText || resource.title || "二胡影片", "video");
         preview = "<img class=\"resource-preview image\" src=\"" + imageSrc + "\" alt=\"" + escapeHtml(resource.title || "影片") + "\" />";
-      } else if (resource.kind === "search-link") {
-        preview = "<div class=\"resource-preview\" style=\"padding:20px;font-weight:800;color:#7d4b2b;\">沒有抓到合適真圖，先點下方搜尋</div>";
-      } else if (resource.kind === "image") {
-        preview = "<div class=\"resource-preview\" style=\"padding:18px 20px;font-weight:800;color:#7d4b2b;\">譜圖連結</div>";
+      }
+      if (resource.kind === "image" || resource.kind === "search-link") {
+        return "<div class=\"" + cardClass + "\"><a href=\"" + escapeHtml(resource.url || "#") + "\" target=\"_blank\" rel=\"noopener noreferrer\">" + escapeHtml(resource.title || "開啟") + "</a></div>";
       }
       return "<div class=\"" + cardClass + "\">" + preview + "<strong>" + escapeHtml(resource.label || "資源") + "</strong><a href=\"" + escapeHtml(resource.url || "#") + "\" target=\"_blank\" rel=\"noopener noreferrer\">" + escapeHtml(resource.title || "開啟") + "</a></div>";
     }
