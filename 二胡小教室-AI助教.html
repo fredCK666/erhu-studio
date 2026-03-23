@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>二胡小教室 | AI 二胡助教</title>
+  <style>
+    :root {
+      --ink: #1f1713;
+      --muted: #6b5d52;
+      --wood: #7d4b2b;
+      --gold: #f0ae3e;
+      --paper: rgba(255, 250, 244, 0.95);
+      --line: rgba(114, 75, 41, 0.08);
+      --shadow: 0 24px 56px rgba(61, 39, 24, 0.12);
+      --soft: rgba(255, 241, 218, 0.92);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(255, 207, 92, 0.34), transparent 22%),
+        radial-gradient(circle at 90% 12%, rgba(130, 157, 117, 0.18), transparent 20%),
+        linear-gradient(180deg, #fff4dd 0%, #fffdfa 38%, #f3e6d9 100%);
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    .shell {
+      width: min(1220px, calc(100% - 28px));
+      margin: 0 auto;
+      padding: 24px 0 42px;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 18px;
+      flex-wrap: wrap;
+      color: var(--muted);
+      font-weight: 700;
+    }
+
+    .brand {
+      color: var(--ink);
+      font-size: 22px;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+    }
+
+    .nav {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .hero,
+    .panel,
+    .chat-shell,
+    .tip-card {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      box-shadow: var(--shadow);
+    }
+
+    .hero {
+      padding: 28px;
+      margin-bottom: 18px;
+      background:
+        radial-gradient(circle at 100% 0%, rgba(255, 220, 166, 0.2), transparent 26%),
+        linear-gradient(145deg, rgba(48, 34, 24, 0.98), rgba(111, 72, 40, 0.92));
+      color: #fff8f1;
+    }
+
+    .hero h1 {
+      margin: 10px 0 12px;
+      font-size: clamp(30px, 5vw, 48px);
+    }
+
+    .hero p {
+      margin: 0;
+      max-width: 760px;
+      color: rgba(255, 248, 241, 0.84);
+      line-height: 1.85;
+    }
+
+    .tag {
+      display: inline-flex;
+      padding: 8px 12px;
+      border-radius: 999px;
+      background: rgba(255, 248, 241, 0.12);
+      font-size: 13px;
+      letter-spacing: 0.12em;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(280px, 0.92fr) minmax(0, 1.4fr);
+      gap: 18px;
+      align-items: start;
+    }
+
+    .panel,
+    .chat-shell,
+    .tip-card {
+      padding: 22px;
+    }
+
+    .panel h2,
+    .chat-head h2,
+    .tip-card h2 {
+      margin: 0 0 12px;
+      font-size: 24px;
+    }
+
+    .panel p,
+    .tip-card p,
+    .meta,
+    .hint,
+    .empty {
+      color: var(--muted);
+      line-height: 1.8;
+    }
+
+    .field {
+      margin-bottom: 14px;
+    }
+
+    .label {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--wood);
+      font-size: 14px;
+      font-weight: 900;
+    }
+
+    select,
+    textarea {
+      width: 100%;
+      border: 1px solid rgba(125, 75, 43, 0.14);
+      border-radius: 18px;
+      padding: 14px 16px;
+      font: inherit;
+      color: var(--ink);
+      background: #fffdf9;
+      outline: none;
+    }
+
+    textarea {
+      min-height: 124px;
+      resize: vertical;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .button-row,
+    .quick-list {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .button,
+    .chip {
+      border: 0;
+      border-radius: 999px;
+      font: inherit;
+      cursor: pointer;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 146px;
+      padding: 12px 16px;
+      background: linear-gradient(135deg, #ffd66b, #e7861d);
+      color: #4a2f18;
+      font-weight: 900;
+    }
+
+    .button.secondary {
+      background: rgba(125, 75, 43, 0.08);
+      color: var(--wood);
+    }
+
+    .chip {
+      padding: 10px 14px;
+      background: rgba(125, 75, 43, 0.08);
+      color: var(--wood);
+      font-weight: 800;
+    }
+
+    .chat-shell {
+      min-height: 720px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .chat-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: flex-start;
+      flex-wrap: wrap;
+    }
+
+    .meta {
+      font-size: 14px;
+    }
+
+    .messages {
+      flex: 1;
+      min-height: 420px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      padding: 6px 2px;
+    }
+
+    .message {
+      max-width: 88%;
+      padding: 16px 18px;
+      border-radius: 24px;
+      white-space: pre-wrap;
+      line-height: 1.8;
+      box-shadow: 0 14px 32px rgba(62, 40, 24, 0.08);
+    }
+
+    .message.user {
+      margin-left: auto;
+      background: linear-gradient(135deg, #ffd66b, #ed9e2f);
+      color: #422916;
+      border-bottom-right-radius: 8px;
+    }
+
+    .message.assistant {
+      background: linear-gradient(180deg, #fffaf2, #fff1df);
+      border: 1px solid rgba(125, 75, 43, 0.08);
+      border-bottom-left-radius: 8px;
+    }
+
+    .message small {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--wood);
+      font-weight: 900;
+      letter-spacing: 0.04em;
+    }
+
+    .empty {
+      padding: 22px;
+      border-radius: 22px;
+      background: rgba(255, 246, 232, 0.9);
+      border: 1px dashed rgba(125, 75, 43, 0.18);
+    }
+
+    .tip-card {
+      margin-top: 18px;
+      background: linear-gradient(180deg, rgba(255,248,238,0.96), rgba(255,237,211,0.94));
+    }
+
+    .tip-list {
+      margin: 0;
+      padding-left: 20px;
+      color: var(--muted);
+      line-height: 1.8;
+    }
+
+    @media (max-width: 980px) {
+      .layout { grid-template-columns: 1fr; }
+      .chat-shell { min-height: 0; }
+    }
+
+    @media (max-width: 640px) {
+      .row { grid-template-columns: 1fr; }
+      .message { max-width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <header class="topbar">
+      <div class="brand">二胡小教室</div>
+      <nav class="nav">
+        <a href="./erhu/">回首頁</a>
+        <a href="./二胡小教室.html">課程分級</a>
+        <a href="./二胡小教室-週課程.html">每週課程</a>
+        <a href="./二胡小教室-練習打卡.html">每週打卡</a>
+      </nav>
+    </header>
+
+    <section class="hero">
+      <div class="tag">AI ERHU COACH</div>
+      <h1>AI 二胡助教</h1>
+      <p>這一版會依照你網站裡的初級、中級、高級與每週訓練內容回答，適合學生練琴時即時提問。聊天紀錄會跟著登入學生同步保存到 Firebase。</p>
+    </section>
+
+    <section class="layout">
+      <aside>
+        <section class="panel">
+          <h2>練習上下文</h2>
+          <p>先選目前的課程等級與週次，AI 助教會優先用這個範圍回覆。學生也可以直接問：「我第 3 週內外弦切換一直卡住怎麼辦？」</p>
+          <div class="row">
+            <div class="field">
+              <label class="label" for="levelSelect">課程等級</label>
+              <select id="levelSelect"></select>
+            </div>
+            <div class="field">
+              <label class="label" for="weekSelect">目前週次</label>
+              <select id="weekSelect"></select>
+            </div>
+          </div>
+          <div class="field">
+            <label class="label" for="questionInput">想問助教什麼</label>
+            <textarea id="questionInput" placeholder="例如：我現在初級第 3 週，內外弦切換常常碰到另一條弦，應該怎麼練？"></textarea>
+          </div>
+          <div class="button-row">
+            <button class="button" id="askButton" type="button">送出問題</button>
+            <button class="button secondary" id="clearButton" type="button">清除聊天紀錄</button>
+          </div>
+        </section>
+
+        <section class="tip-card">
+          <h2>快速提問</h2>
+          <div class="quick-list" id="quickList"></div>
+        </section>
+      </aside>
+
+      <section class="chat-shell">
+        <div class="chat-head">
+          <div>
+            <h2>助教對話區</h2>
+            <div class="meta" id="contextMeta">正在準備目前學生的對話紀錄。</div>
+          </div>
+        </div>
+        <div class="messages" id="messages"></div>
+      </section>
+    </section>
+  </main>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+  <script src="./firebase-init.js?v=20260323b"></script>
+  <script src="./auth.js?v=20260323b"></script>
+  <script>
+    window.ErhuAuth.requireAuth();
+    window.ErhuAuth.attachAuthUI();
+
+    const courseData = {
+      beginner: {
+        label: "初級",
+        overview: "初級重點是姿勢、長弓、切弦、節奏、音準和第一段完整演奏。",
+        weeks: [
+          { title: "姿勢與持琴重整", description: "重整坐姿、琴筒位置、握弓與身體放鬆感。", focus: ["先把持琴與握弓位置放正", "觀察肩膀是否放鬆", "用鏡子檢查身體角度"], tasks: ["完成 5 次姿勢檢查", "錄 30 秒持琴姿勢影片", "確認右手握弓不僵硬"] },
+          { title: "基本長弓穩定", description: "練長弓平均、弓速控制與音色乾淨度。", focus: ["每個長弓要拉滿", "控制弓速平均", "避免音頭太重"], tasks: ["每天做 8 組長弓", "錄一段長音回聽", "穩定維持 4 拍長音"] },
+          { title: "內外弦切換", description: "建立切弦手感，讓弓路乾淨不混亂。", focus: ["切弦動作要小", "手肘轉換不要甩", "保持聲音連續"], tasks: ["完成 4 組切弦循環", "配拍器做慢速切換", "回聽是否有雜音"] },
+          { title: "節奏與短句", description: "用拍器把短句拉穩，建立拍點概念。", focus: ["句子先拆短", "拍點要穩", "短句收尾乾淨"], tasks: ["拍器下完成 8 小節", "每句至少重複 3 次", "避免中途停頓"] },
+          { title: "左手按音基礎", description: "加入按音和簡單音階，開始建立音準感。", focus: ["手指落點要穩", "每個音都先聽準", "按音後肩膀仍放鬆"], tasks: ["完成上下行音階 4 次", "記錄最不穩的兩個音", "練完回聽音準"] },
+          { title: "音階反覆校正", description: "反覆修正落點，讓耳朵和手指對齊。", focus: ["同一個音反覆確認", "先少量音再加長", "偏音要做記號"], tasks: ["每天做 2 輪音階校正", "錄音回聽 1 次", "標出偏高偏低位置"] },
+          { title: "分弓與連弓", description: "把常見弓法放進簡單樂句中練習。", focus: ["分弓要清楚", "連弓要順", "句子不要斷掉"], tasks: ["同一句做分弓版與連弓版", "比較音色差異", "完整錄一段"] },
+          { title: "基礎旋律整合", description: "開始把姿勢、節奏和音準放進旋律。", focus: ["保持完整旋律感", "音準與節奏同時顧", "不要只顧單點"], tasks: ["完成一段短旋律", "中途不停下", "錄音回看流暢度"] },
+          { title: "完整段落演奏", description: "連續拉完一段短曲，不中斷完成。", focus: ["演奏不能中斷", "先求完整", "錯音先做記號"], tasks: ["完整拉完一段", "記錄卡住的位置", "第二次再修正"] },
+          { title: "初級成果驗收", description: "錄下一段完整基礎演奏，作為初級收尾。", focus: ["從頭到尾完成", "維持姿勢與穩定", "留下成果版本"], tasks: ["錄一支完整版本", "聽一次並寫 3 個心得", "準備進入中級"] }
+        ]
+      },
+      intermediate: {
+        label: "中級",
+        overview: "中級重點是換把、揉弦、音色、弓法組合、速度和段落控制。",
+        weeks: [
+          { title: "換把定位重整", description: "重新整理換把的目標音與手位移動。", focus: ["換把前先聽到目標音", "手型不要整個塌掉", "慢速把路徑做乾淨"], tasks: ["同一個換把句做 6 次", "先唱再拉", "標記最常偏掉的位置"] },
+          { title: "揉弦穩定起步", description: "建立小幅度、可控制的揉弦動作。", focus: ["先求規律再求大", "手腕放鬆", "不要把音高揉散"], tasks: ["固定一個音做 30 秒揉弦", "分慢中兩種速度", "錄音比較前後穩定度"] },
+          { title: "音色控制訓練", description: "練習不同力度和接觸位置造成的音色差異。", focus: ["比較靠弓根與弓中差異", "壓力不要過度", "追求乾淨和厚度平衡"], tasks: ["同一句做 3 種音色版本", "記下最好聽的一版", "保持音頭乾淨"] },
+          { title: "弓法組合進階", description: "把分弓、連弓、重音放進更長的句子。", focus: ["弓法切換不要亂", "重音只放在需要的位置", "句子方向要一致"], tasks: ["拆成 2 小節練", "再連成 8 小節", "對照譜面做記號"] },
+          { title: "中速節奏穩定", description: "從慢速跨到中速，保持節奏與音準不散。", focus: ["速度提升要分段", "先穩後快", "拍點不能被技巧拖走"], tasks: ["每次加 4 到 6 BPM", "同一速度做 3 輪", "不穩就退回上一級"] },
+          { title: "段落與換氣感", description: "讓演奏不只正確，也開始有句子方向。", focus: ["想像句尾在哪裡", "每句要有出發和收束", "避免每音都一樣重"], tasks: ["每句先唱一次", "用弓速做起伏", "錄音檢查句尾是否自然"] },
+          { title: "耐力與不中斷演奏", description: "提升中段演奏耐力與注意力維持。", focus: ["練習中段專注不掉", "呼吸要穩", "小失誤也不要停"], tasks: ["連續拉兩遍中段", "第二遍也保持音準", "記錄最容易散掉的地方"] },
+          { title: "速度提升訓練", description: "逐步提高拍速，維持乾淨與穩定。", focus: ["每次只加一點點速度", "右手先放鬆", "左手落點要簡潔"], tasks: ["用拍器做階梯訓練", "保留一個安全速度", "每天只攻一個難句"] },
+          { title: "技巧整合到曲目", description: "把換把、揉弦、弓法整合進完整段落。", focus: ["不要技巧和音樂分家", "難句先拆再回曲目", "段落前後要接得順"], tasks: ["挑一段完整段落練", "標記技巧點", "做一版表情版本"] },
+          { title: "中級成果錄影", description: "完成一段具有表情和完整段落感的演奏。", focus: ["完整演奏不中斷", "表情和技術都要兼顧", "保留正式成果"], tasks: ["錄一支完成版", "寫下 3 個優點和 3 個待修正點", "準備進高級挑戰"] }
+        ]
+      },
+      advanced: {
+        label: "高級",
+        overview: "高級重點是高速控制、音色設計、段落層次、困難段修正與舞台完整度。",
+        weeks: [
+          { title: "高強度長弓控制", description: "重新提升弓速、弓壓與音色統一性。", focus: ["大音量也要乾淨", "弓壓與弓速一起管", "同一句前後音色一致"], tasks: ["長弓做強弱對比", "回聽是否爆音", "保留最穩版本"] },
+          { title: "快速換把與定位", description: "處理高速度下的手位準確與穩定。", focus: ["手指路徑要短", "換把前心裡先聽到音", "速度快也不能亂抓"], tasks: ["高速句拆成 2 音一組", "慢速對準後再加速", "記錄最常失準處"] },
+          { title: "複合弓法連接", description: "把複雜弓法放在高難度片段中完成。", focus: ["複合弓法要先拆開", "重音與連弓銜接自然", "肢體不要多餘"], tasks: ["拆練弓型", "回到原句整合", "錄影看手臂路徑"] },
+          { title: "揉弦與表情深化", description: "精修不同速度、不同情緒的揉弦效果。", focus: ["揉弦速度跟情緒一致", "不要每句都同一種揉法", "保留主旋律重點"], tasks: ["一段做 2 種情緒版本", "錄音比較差異", "選一種最適合的版本"] },
+          { title: "高速度節奏穩定", description: "在更高拍速下維持乾淨、準確與放鬆。", focus: ["快但不要緊", "拍點穩定優先", "手部動作縮小"], tasks: ["用分段衝速法", "保留一個成功速度", "失控就退回安全速度"] },
+          { title: "段落推進與層次", description: "設計樂句起伏、呼吸感和結構感。", focus: ["句子要有方向", "大段落不要平", "強弱變化要有理由"], tasks: ["譜上標註高點", "設計起伏弧線", "錄音檢查層次是否明顯"] },
+          { title: "困難段拆解修正", description: "鎖定最難片段，做精準拆解練習。", focus: ["只練最難 2 到 4 小節", "問題要拆到夠小", "修好再回原段"], tasks: ["列出卡關清單", "一天只攻一個主問題", "完成後回完整段落測試"] },
+          { title: "整首曲目連續演奏", description: "訓練從頭到尾不中斷完成曲目。", focus: ["整體體力分配", "中途失誤繼續走", "維持情緒連續"], tasks: ["完整跑一次全曲", "第二次修正卡點", "記錄尾段是否體力下降"] },
+          { title: "錄影回看與舞台修正", description: "用錄影檢查音色、動作與舞台完整度。", focus: ["看動作是否乾淨", "看舞台狀態是否穩", "音色與畫面一致"], tasks: ["錄正式版本", "列 5 個修正點", "重錄對照改善"] },
+          { title: "高級總驗收", description: "完成正式版本錄影，作為高級課程成果輸出。", focus: ["完整度第一", "細節穩定", "保留成果版本"], tasks: ["做正式錄影", "完成自我評估", "準備對外展示"] }
+        ]
+      }
+    };
+
+    const topicGuides = [
+      { keywords: ["姿勢", "持琴", "肩膀", "放鬆", "坐姿"], tips: ["先把肩膀和手肘放鬆，再開始拉弓，不要一開始就用力。", "坐姿先穩，琴筒與身體角度固定，右手才不會每次都重新找位置。"] },
+      { keywords: ["長弓", "弓速", "音色", "空弦"], tips: ["長弓要先追求弓速平均，再追求音量，音頭太重通常是起弓壓力過大。", "每天固定 4 拍或 8 拍長音，回聽是否前後段音色一致。"] },
+      { keywords: ["內外弦", "切弦", "碰弦"], tips: ["切弦不要用整隻手臂甩，先用小角度調整手肘，讓弓毛只剛好碰到目標弦。", "先慢速做內外弦交替，再加拍器，不要一開始就追求速度。"] },
+      { keywords: ["節奏", "拍子", "拍器", "短句"], tips: ["節奏不穩時先把句子切成 2 到 4 拍的小片段，拍器只做最小單位。", "先口唱拍點，再進入拉奏，身體會更容易抓住穩定脈搏。"] },
+      { keywords: ["音準", "按音", "音階", "偏高", "偏低"], tips: ["音準問題先不要一次修整首，先鎖定最容易偏掉的兩個音。", "每次按音前先在心裡唱出目標音，耳朵先到，手才容易到。"] },
+      { keywords: ["分弓", "連弓", "弓法"], tips: ["分弓先求每個音清楚分開，連弓再求弧線順，不要兩者一起亂掉。", "弓法組合練習要先脫離原曲，抽出一小句單獨反覆。"] },
+      { keywords: ["換把", "定位", "把位"], tips: ["換把時眼睛先看目標位置，耳朵先聽到要去的音，再移動手。", "高速換把要縮短動作路徑，先在慢速下把軌跡做乾淨。"] },
+      { keywords: ["揉弦", "表情"], tips: ["揉弦先求規律，幅度太大反而會讓音高失控。", "同一段旋律可以做兩種揉弦速度，找最符合情緒的一種。"] },
+      { keywords: ["速度", "快", "拍速"], tips: ["速度上不去時不要硬衝，先找到穩定成功的速度，再每次加 4 到 6 BPM。", "快的時候更要把右手動作縮小，否則節奏會先散。"] },
+      { keywords: ["段落", "樂句", "層次", "表現"], tips: ["每段都要知道句子往哪裡走，否則會變成每個音都一樣重。", "先唱出句子起伏，再用弓速和力度把層次做出來。"] },
+      { keywords: ["錄影", "舞台", "演出", "驗收"], tips: ["錄影時不要每次停下來修，先完整跑完，再從回看裡找問題。", "正式版本前先做兩輪模擬演出，讓體力和注意力習慣整段輸出。"] }
+    ];
+
+    const levelSelect = document.getElementById("levelSelect");
+    const weekSelect = document.getElementById("weekSelect");
+    const questionInput = document.getElementById("questionInput");
+    const askButton = document.getElementById("askButton");
+    const clearButton = document.getElementById("clearButton");
+    const messages = document.getElementById("messages");
+    const quickList = document.getElementById("quickList");
+    const contextMeta = document.getElementById("contextMeta");
+
+    let currentUser = null;
+    let historyMessages = [];
+
+    function updateContextMeta() {
+      const displayName = currentUser ? currentUser.displayName : "目前學生";
+      contextMeta.textContent = displayName + "｜目前預設 " + courseData[levelSelect.value].label + " 第 " + weekSelect.value + " 週";
+    }
+
+    function getInitialLevel() {
+      const params = new URLSearchParams(window.location.search);
+      const level = params.get("level");
+      return courseData[level] ? level : "beginner";
+    }
+
+    function getInitialWeek() {
+      const params = new URLSearchParams(window.location.search);
+      const week = Number(params.get("week") || "1");
+      return week >= 1 && week <= 10 ? week : 1;
+    }
+
+    function chatRef() {
+      return window.ErhuFirebase.db.collection("students").doc(currentUser.uid).collection("aiChats").doc("main");
+    }
+
+    function populateLevelOptions() {
+      Object.entries(courseData).forEach(function (entry) {
+        const key = entry[0];
+        const value = entry[1];
+        const option = document.createElement("option");
+        option.value = key;
+        option.textContent = value.label;
+        levelSelect.appendChild(option);
+      });
+    }
+
+    function populateWeekOptions() {
+      weekSelect.innerHTML = "";
+      for (let week = 1; week <= 10; week += 1) {
+        const option = document.createElement("option");
+        option.value = String(week);
+        option.textContent = "第 " + week + " 週";
+        weekSelect.appendChild(option);
+      }
+    }
+
+    function updateUrlState() {
+      const params = new URLSearchParams();
+      params.set("level", levelSelect.value);
+      params.set("week", weekSelect.value);
+      history.replaceState(null, "", "./二胡小教室-AI助教.html?" + params.toString());
+    }
+
+    function currentWeekData() {
+      return courseData[levelSelect.value].weeks[Number(weekSelect.value) - 1];
+    }
+
+    function updateQuickPrompts() {
+      const weekData = currentWeekData();
+      const quickPrompts = [
+        "我現在" + courseData[levelSelect.value].label + "第 " + weekSelect.value + " 週，" + weekData.title + "要先練哪三個重點？",
+        weekData.title + "最容易出錯的地方是什麼？",
+        "請幫我設計今天 15 分鐘的" + weekData.title + "練習流程",
+        "如果我" + weekData.title + "一直不穩，應該怎麼拆開練？"
+      ];
+      quickList.innerHTML = "";
+      quickPrompts.forEach(function (text) {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "chip";
+        button.textContent = text;
+        button.addEventListener("click", function () {
+          questionInput.value = text;
+          questionInput.focus();
+        });
+        quickList.appendChild(button);
+      });
+    }
+
+    function escapeHtml(text) {
+      return text
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+    }
+
+    function renderMessages() {
+      if (!historyMessages.length) {
+        messages.innerHTML = "<div class=\"empty\">你可以直接問目前週次的練習問題，例如：<br>1. 我第 3 週內外弦切換一直卡住怎麼辦？<br>2. 請幫我安排今天 15 分鐘的練習順序。<br>3. 這一週最重要的學習重點是什麼？</div>";
+        return;
+      }
+      messages.innerHTML = historyMessages.map(function (item) {
+        const author = item.role === "assistant" ? "AI 助教" : "你";
+        return "<div class=\"message " + item.role + "\"><small>" + author + "</small>" + escapeHtml(item.text) + "</div>";
+      }).join("");
+      messages.scrollTop = messages.scrollHeight;
+    }
+
+    function buildSearchCorpus(levelKey, weekIndex) {
+      const weekData = courseData[levelKey].weeks[weekIndex];
+      return [courseData[levelKey].label, weekData.title, weekData.description]
+        .concat(weekData.focus)
+        .concat(weekData.tasks)
+        .join(" ");
+    }
+
+    function detectLevel(question) {
+      if (question.indexOf("高級") !== -1) return "advanced";
+      if (question.indexOf("中級") !== -1) return "intermediate";
+      if (question.indexOf("初級") !== -1) return "beginner";
+      return levelSelect.value;
+    }
+
+    function detectWeek(question) {
+      const match = question.match(/第\s*([1-9]|10)\s*週/);
+      if (match) return Number(match[1]);
+      return Number(weekSelect.value);
+    }
+
+    function detectTopicTips(question) {
+      return topicGuides.filter(function (guide) {
+        return guide.keywords.some(function (keyword) {
+          return question.indexOf(keyword) !== -1;
+        });
+      });
+    }
+
+    function findBestWeek(levelKey, question) {
+      let bestWeek = Number(weekSelect.value);
+      let bestScore = -1;
+      courseData[levelKey].weeks.forEach(function (week, index) {
+        const corpus = buildSearchCorpus(levelKey, index);
+        let score = 0;
+        question.split(/[\s，。！？、,.!?]+/).filter(Boolean).forEach(function (token) {
+          if (token.length > 1 && corpus.indexOf(token) !== -1) score += token.length;
+        });
+        if (score > bestScore) {
+          bestScore = score;
+          bestWeek = index + 1;
+        }
+      });
+      return bestWeek;
+    }
+
+    function buildPracticePlan(weekData, topicTips) {
+      const plan = [
+        "1. 先用 3 分鐘把今天主題的最基本動作做慢速確認。",
+        "2. 再用 6 分鐘專攻本週最容易失誤的 1 到 2 個片段。",
+        "3. 最後用 5 分鐘把本週句子完整跑一遍，錄音或回聽一次。"
+      ];
+      if (topicTips.length) {
+        plan.push("4. 今天特別注意：" + topicTips[0].tips[0]);
+      }
+      if (weekData.tasks[0]) {
+        plan.push("5. 本週任務先完成：" + weekData.tasks[0] + "。");
+      }
+      return plan;
+    }
+
+    function buildAnswer(question) {
+      const levelKey = detectLevel(question);
+      const detectedWeek = detectWeek(question);
+      const bestWeek = findBestWeek(levelKey, question);
+      const weekNumber = detectedWeek >= 1 && detectedWeek <= 10 ? detectedWeek : bestWeek;
+      const weekData = courseData[levelKey].weeks[weekNumber - 1];
+      const topicTips = detectTopicTips(question);
+      const focusText = weekData.focus.slice(0, 3).map(function (item, index) {
+        return (index + 1) + ". " + item;
+      }).join("\n");
+      const taskText = weekData.tasks.slice(0, 2).map(function (item, index) {
+        return (index + 1) + ". " + item;
+      }).join("\n");
+      const guideText = topicTips.length
+        ? topicTips.slice(0, 2).map(function (guide) {
+            return "• " + guide.tips[0];
+          }).join("\n")
+        : "• 先把速度降到自己完全能控制的程度，再慢慢加回去。\n• 問題不要一次全修，先選一個最明顯的點處理。";
+      const planText = buildPracticePlan(weekData, topicTips).join("\n");
+
+      return [
+        "你這個問題，我會先對準 " + courseData[levelKey].label + "第 " + weekNumber + " 週的「" + weekData.title + "」來看。",
+        "",
+        "這週的核心重點：",
+        focusText,
+        "",
+        "你現在可以先這樣修：",
+        guideText,
+        "",
+        "今天的練習順序建議：",
+        planText,
+        "",
+        "本週先完成的任務：",
+        taskText,
+        "",
+        "如果你願意，我下一題可以直接幫你拆成更細，例如「每天 10 分鐘怎麼練」或「這一週最常犯的錯誤有哪些」。"
+      ].join("\n");
+    }
+
+    async function saveHistory() {
+      const trimmed = historyMessages.slice(-24);
+      await chatRef().set({
+        messages: trimmed,
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      }, { merge: true });
+    }
+
+    async function loadHistory() {
+      const snapshot = await chatRef().get();
+      const saved = snapshot.exists && Array.isArray(snapshot.data().messages) ? snapshot.data().messages : [];
+      historyMessages = saved;
+      renderMessages();
+    }
+
+    async function addMessage(role, text) {
+      historyMessages.push({
+        role: role,
+        text: text,
+        createdAt: new Date().toISOString(),
+        level: levelSelect.value,
+        week: Number(weekSelect.value)
+      });
+      renderMessages();
+      await saveHistory();
+    }
+
+    async function submitQuestion() {
+      const question = questionInput.value.trim();
+      if (!question || !currentUser) return;
+      askButton.disabled = true;
+      askButton.textContent = "回覆中...";
+      try {
+        await addMessage("user", question);
+        const answer = buildAnswer(question);
+        await addMessage("assistant", answer);
+        questionInput.value = "";
+      } finally {
+        askButton.disabled = false;
+        askButton.textContent = "送出問題";
+      }
+    }
+
+    async function clearHistory() {
+      if (!currentUser) return;
+      historyMessages = [];
+      renderMessages();
+      await chatRef().set({
+        messages: [],
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      }, { merge: true });
+    }
+
+    levelSelect.addEventListener("change", function () {
+      updateUrlState();
+      updateQuickPrompts();
+      updateContextMeta();
+    });
+
+    weekSelect.addEventListener("change", function () {
+      updateUrlState();
+      updateQuickPrompts();
+      updateContextMeta();
+    });
+
+    askButton.addEventListener("click", submitQuestion);
+    clearButton.addEventListener("click", clearHistory);
+    questionInput.addEventListener("keydown", function (event) {
+      if ((event.metaKey || event.ctrlKey) && event.key === "Enter") {
+        submitQuestion();
+      }
+    });
+
+    populateLevelOptions();
+    populateWeekOptions();
+    levelSelect.value = getInitialLevel();
+    weekSelect.value = String(getInitialWeek());
+    updateQuickPrompts();
+    updateContextMeta();
+
+    window.ErhuAuth.onReady(async function (user) {
+      currentUser = user;
+      updateContextMeta();
+      await loadHistory();
+    });
+  </script>
+</body>
+</html>

@@ -195,6 +195,7 @@
         <a id="backLevelLink" href="./二胡小教室.html">回課程頁</a>
         <a href="./二胡小教室-影片.html">影片工具</a>
         <a href="./二胡小教室-練習打卡.html">每週打卡</a>
+        <a id="aiLinkTop" href="./二胡小教室-AI助教.html">AI 助教</a>
       </nav>
     </header>
 
@@ -216,6 +217,7 @@
         <div class="actions">
           <a class="button secondary" id="prevWeekLink" href="#">上一週</a>
           <a class="button secondary" id="quizLink" href="./二胡小教室-小測驗.html">學習測驗</a>
+          <a class="button secondary" id="aiLink" href="./二胡小教室-AI助教.html">AI 助教</a>
           <a class="button" id="nextWeekLink" href="#">下一週</a>
         </div>
       </article>
@@ -324,6 +326,8 @@
     const prevLink = document.getElementById("prevWeekLink");
     const nextLink = document.getElementById("nextWeekLink");
     document.getElementById("quizLink").href = "./二胡小教室-小測驗.html?level=" + level + "&week=" + week;
+    document.getElementById("aiLink").href = "./二胡小教室-AI助教.html?level=" + level + "&week=" + week;
+    document.getElementById("aiLinkTop").href = "./二胡小教室-AI助教.html?level=" + level + "&week=" + week;
     prevLink.href = "./二胡小教室-週課程.html?level=" + level + "&week=" + prevWeek;
     nextLink.href = "./二胡小教室-週課程.html?level=" + level + "&week=" + nextWeek;
     if (week === 1) prevLink.textContent = "已經是第一週";
