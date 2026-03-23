@@ -55,12 +55,6 @@ const courseData = {
   }
 };
 
-function cors(response) {
-  response.set("Access-Control-Allow-Origin", "*");
-  response.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
-  response.set("Access-Control-Allow-Methods", "POST, OPTIONS");
-}
-
 function normalizeLevel(level) {
   return courseData[level] ? level : "beginner";
 }
@@ -117,8 +111,7 @@ function buildMessages(body, knowledge) {
   ]);
 }
 
-exports.askErhuTutor = onRequest({ region: "asia-east1", secrets: ["OPENAI_API_KEY"] }, async (request, response) => {
-  cors(response);
+exports.askErhuTutor = onRequest({ region: "asia-east1", secrets: ["OPENAI_API_KEY"], cors: true }, async (request, response) => {
   if (request.method === "OPTIONS") {
     response.status(204).send("");
     return;
