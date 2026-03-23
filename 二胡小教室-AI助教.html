@@ -242,6 +242,7 @@
       aspect-ratio: auto;
       object-fit: cover;
       display: block;
+      cursor: zoom-in;
     }
 
     .resource-preview.video {
@@ -257,6 +258,71 @@
       color: var(--muted);
       font-size: 18px;
       line-height: 1.9;
+    }
+
+    .lightbox {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      background: rgba(16, 11, 8, 0.82);
+      z-index: 50;
+    }
+
+    .lightbox.open {
+      display: flex;
+    }
+
+    .lightbox-stage {
+      position: relative;
+      width: min(1200px, calc(100vw - 48px));
+      max-height: calc(100vh - 48px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .lightbox-image {
+      max-width: 100%;
+      max-height: calc(100vh - 96px);
+      border-radius: 18px;
+      box-shadow: 0 24px 54px rgba(0, 0, 0, 0.28);
+      background: #fff;
+    }
+
+    .lightbox-button {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 56px;
+      height: 56px;
+      border: 0;
+      border-radius: 999px;
+      background: rgba(255, 248, 241, 0.92);
+      color: #4a2f18;
+      font-size: 28px;
+      font-weight: 900;
+      cursor: pointer;
+    }
+
+    .lightbox-button.prev { left: -18px; }
+    .lightbox-button.next { right: -18px; }
+
+    .lightbox-close {
+      position: absolute;
+      top: 18px;
+      right: 18px;
+      width: 52px;
+      height: 52px;
+      border: 0;
+      border-radius: 999px;
+      background: rgba(255, 248, 241, 0.92);
+      color: #4a2f18;
+      font-size: 24px;
+      font-weight: 900;
+      cursor: pointer;
     }
 
     @media (max-width: 860px) {
@@ -281,6 +347,9 @@
       .resource-card.image-card {
         width: 100%;
       }
+
+      .lightbox-button.prev { left: 6px; }
+      .lightbox-button.next { right: 6px; }
     }
   </style>
 </head>
@@ -315,6 +384,15 @@
     </section>
   </main>
 
+  <div class="lightbox" id="lightbox">
+    <button class="lightbox-close" id="lightboxClose" type="button">×</button>
+    <div class="lightbox-stage">
+      <button class="lightbox-button prev" id="lightboxPrev" type="button">‹</button>
+      <img class="lightbox-image" id="lightboxImage" alt="譜圖放大檢視" />
+      <button class="lightbox-button next" id="lightboxNext" type="button">›</button>
+    </div>
+  </div>
+
   <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
@@ -330,10 +408,17 @@
     const messages = document.getElementById("messages");
     const contextMeta = document.getElementById("contextMeta");
     const sourceStatus = document.getElementById("sourceStatus");
+    const lightbox = document.getElementById("lightbox");
+    const lightboxImage = document.getElementById("lightboxImage");
+    const lightboxPrev = document.getElementById("lightboxPrev");
+    const lightboxNext = document.getElementById("lightboxNext");
+    const lightboxClose = document.getElementById("lightboxClose");
 
     let currentUser = null;
     let historyMessages = [];
     let learningProfile = null;
+    let lightboxImages = [];
+    let lightboxIndex = 0;
 
     function setSourceStatus(text) {
       sourceStatus.textContent = "目前來源：" + text;
@@ -376,7 +461,7 @@
         preview = "<iframe class=\"resource-preview video\" src=\"" + escapeHtml(resource.embedUrl) + "\" title=\"" + escapeHtml(resource.title || "影片") + "\" allow=\"accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share\" allowfullscreen></iframe>";
       } else if (resource.kind === "image") {
         const imageSrc = resource.imageUrl || buildPreviewSvg(resource.previewText || resource.title || "二胡簡譜", "image");
-        preview = "<img class=\"resource-preview image\" src=\"" + imageSrc + "\" alt=\"" + escapeHtml(resource.title || "圖片") + "\" />";
+        preview = "<img class=\"resource-preview image\" data-lightbox-image=\"" + escapeHtml(imageSrc) + "\" src=\"" + imageSrc + "\" alt=\"" + escapeHtml(resource.title || "圖片") + "\" />";
       } else if (resource.kind === "video-search") {
         const imageSrc = resource.thumbnailUrl || buildPreviewSvg(resource.previewText || resource.title || "二胡影片", "video");
         preview = "<img class=\"resource-preview image\" src=\"" + imageSrc + "\" alt=\"" + escapeHtml(resource.title || "影片") + "\" />";
@@ -398,7 +483,36 @@
           : "";
         return "<div class=\"message " + item.role + "\"><small>" + author + "</small>" + escapeHtml(item.text) + resourcesHtml + "</div>";
       }).join("");
+      bindLightboxImages();
       messages.scrollTop = messages.scrollHeight;
+    }
+
+    function openLightbox(index) {
+      lightboxIndex = index;
+      lightboxImage.src = lightboxImages[lightboxIndex];
+      lightbox.classList.add("open");
+    }
+
+    function closeLightbox() {
+      lightbox.classList.remove("open");
+      lightboxImage.removeAttribute("src");
+    }
+
+    function moveLightbox(step) {
+      if (!lightboxImages.length) return;
+      lightboxIndex = (lightboxIndex + step + lightboxImages.length) % lightboxImages.length;
+      lightboxImage.src = lightboxImages[lightboxIndex];
+    }
+
+    function bindLightboxImages() {
+      lightboxImages = Array.from(messages.querySelectorAll("[data-lightbox-image]")).map(function (image) {
+        return image.dataset.lightboxImage;
+      });
+      Array.from(messages.querySelectorAll("[data-lightbox-image]")).forEach(function (image, index) {
+        image.addEventListener("click", function () {
+          openLightbox(index);
+        });
+      });
     }
 
     async function loadLearningProfile() {
@@ -550,10 +664,27 @@
 
     askButton.addEventListener("click", submitQuestion);
     clearButton.addEventListener("click", clearHistory);
+    lightboxPrev.addEventListener("click", function () { moveLightbox(-1); });
+    lightboxNext.addEventListener("click", function () { moveLightbox(1); });
+    lightboxClose.addEventListener("click", closeLightbox);
+    lightbox.addEventListener("click", function (event) {
+      if (event.target === lightbox) {
+        closeLightbox();
+      }
+    });
     questionInput.addEventListener("keydown", function (event) {
       if ((event.metaKey || event.ctrlKey) && event.key === "Enter") {
         submitQuestion();
       }
+      if (event.key === "Escape") {
+        closeLightbox();
+      }
+    });
+    document.addEventListener("keydown", function (event) {
+      if (!lightbox.classList.contains("open")) return;
+      if (event.key === "ArrowLeft") moveLightbox(-1);
+      if (event.key === "ArrowRight") moveLightbox(1);
+      if (event.key === "Escape") closeLightbox();
     });
 
     updateContextMeta();

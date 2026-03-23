@@ -133,7 +133,7 @@ async function buildMediaResources(question) {
       const bestImages = (imageResults.results || [])
         .filter((item) => item && (item.image || item.thumbnail) && item.url)
         .sort((left, right) => (right.width || 0) * (right.height || 0) - (left.width || 0) * (left.height || 0))
-        .slice(0, 4);
+        .slice(0, 6);
       bestImages.forEach((bestImage, index) => {
         resources.push({
           kind: "image",
