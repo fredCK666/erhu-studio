@@ -1,5 +1,7 @@
+const DDG = require("duck-duck-scrape");
 const OpenAI = require("openai");
 const { onRequest } = require("firebase-functions/v2/https");
+const yts = require("yt-search");
 
 const courseData = {
   beginner: {
@@ -52,36 +54,6 @@ const courseData = {
   }
 };
 
-const mediaCatalog = [
-  {
-    keywords: ["賽馬", "赛马"],
-    title: "賽馬",
-    video: {
-      title: "《賽馬》二胡演奏",
-      embedUrl: "https://www.youtube.com/embed/cpzQlNCoc04",
-      url: "https://www.youtube.com/watch?v=cpzQlNCoc04",
-      thumbnailUrl: "https://i.ytimg.com/vi/cpzQlNCoc04/hqdefault.jpg"
-    },
-    scoreSearch: "賽馬 二胡 簡譜"
-  },
-  {
-    keywords: ["二泉映月"],
-    title: "二泉映月",
-    video: {
-      title: "二泉映月（二胡）",
-      embedUrl: "https://www.youtube.com/embed/DI5709n0Pik",
-      url: "https://www.youtube.com/watch?v=DI5709n0Pik",
-      thumbnailUrl: "https://i.ytimg.com/vi/DI5709n0Pik/hqdefault.jpg"
-    },
-    scoreSearch: "二泉映月 二胡 簡譜"
-  }
-];
-
-function findMediaEntry(question) {
-  const q = String(question || "");
-  return mediaCatalog.find((entry) => entry.keywords.some((keyword) => q.includes(keyword))) || null;
-}
-
 function normalizeLevel(level) {
   return courseData[level] ? level : "beginner";
 }
@@ -108,54 +80,117 @@ function buildKnowledge(level, week) {
 
 function extractMediaTopic(question) {
   const cleaned = String(question || "")
+    .replace(/給我看/g, "")
     .replace(/給我/g, "")
     .replace(/請給我/g, "")
+    .replace(/請給/g, "")
     .replace(/幫我找/g, "")
+    .replace(/幫我看/g, "")
     .replace(/我要/g, "")
+    .replace(/想看/g, "")
+    .replace(/有沒有/g, "")
+    .replace(/點擊率最高的/g, "")
+    .replace(/觀看數最高的/g, "")
+    .replace(/最熱門的/g, "")
+    .replace(/二胡教學影片/g, "")
+    .replace(/教學影片/g, "")
+    .replace(/影片/g, "")
+    .replace(/簡譜/g, "")
+    .replace(/樂譜/g, "")
+    .replace(/圖片/g, "")
+    .replace(/照片/g, "")
+    .replace(/譜/g, "")
     .replace(/二胡/g, "")
-    .replace(/簡譜|樂譜|譜|圖片|影片|video|youtube/gi, "")
+    .replace(/video|youtube/gi, "")
     .replace(/[？?。!！]/g, "")
     .trim();
   return cleaned || "二胡教學";
 }
 
-function buildMediaResources(question) {
+function wantsImage(question) {
+  return /簡譜|樂譜|譜|圖片|照片/.test(String(question || ""));
+}
+
+function wantsVideo(question) {
+  return /教學影片|影片|video|youtube/.test(String(question || ""));
+}
+
+function shouldUseCourseContext(question) {
+  return /初級|中級|高級|第\s*([1-9]|10)\s*週|訓練|課程|打卡|測驗/.test(String(question || ""));
+}
+
+async function buildMediaResources(question) {
   const q = String(question || "");
   const topic = extractMediaTopic(q);
-  const entry = findMediaEntry(q);
   const resources = [];
-  if (/簡譜|樂譜|譜|圖片/.test(q)) {
-    const imageSearchText = entry ? entry.scoreSearch : topic + " 二胡 簡譜";
-    const imageQuery = encodeURIComponent(imageSearchText);
-    resources.push({
-      kind: "image",
-      label: "簡譜圖片",
-      title: (entry ? entry.title : topic) + " 二胡簡譜",
-      previewText: (entry ? entry.title : topic) + " 二胡簡譜",
-      url: "https://www.google.com/search?tbm=isch&q=" + imageQuery
-    });
-  }
-  if (/影片|video|youtube|演奏/.test(q)) {
-    if (entry && entry.video) {
-      resources.push({
-        kind: "video",
-        label: "相關影片",
-        title: entry.video.title,
-        url: entry.video.url,
-        embedUrl: entry.video.embedUrl,
-        thumbnailUrl: entry.video.thumbnailUrl
+
+  if (wantsImage(q)) {
+    try {
+      const imageResults = await DDG.searchImages(topic + " 二胡 簡譜", {
+        safeSearch: DDG.SafeSearchType.STRICT,
+        locale: "zh-TW"
       });
-    } else {
-      const videoQuery = encodeURIComponent(topic + " 二胡");
-      resources.push({
-        kind: "video-search",
-        label: "相關影片",
-        title: topic + " 二胡影片",
-        previewText: topic + " 二胡影片",
-        url: "https://www.youtube.com/results?search_query=" + videoQuery
-      });
+      const bestImage = (imageResults.results || [])
+        .filter((item) => item && item.image && item.url)
+        .sort((left, right) => (right.width || 0) * (right.height || 0) - (left.width || 0) * (left.height || 0))[0];
+      if (bestImage) {
+        resources.push({
+          kind: "image",
+          label: "相關簡譜圖片",
+          title: bestImage.title || (topic + " 二胡簡譜"),
+          imageUrl: bestImage.image,
+          thumbnailUrl: bestImage.thumbnail,
+          url: bestImage.url,
+          source: bestImage.source
+        });
+      }
+    } catch (error) {
+      console.error("searchImages failed", error);
     }
   }
+
+  if (wantsVideo(q)) {
+    try {
+      const videoResults = await yts(topic + " 二胡 教學");
+      const bestVideo = (videoResults.videos || [])
+        .filter((item) => item && item.videoId && item.url)
+        .sort((left, right) => (right.views || 0) - (left.views || 0))[0];
+      if (bestVideo) {
+        resources.push({
+          kind: "video",
+          label: "熱門教學影片",
+          title: bestVideo.title,
+          url: bestVideo.url,
+          embedUrl: "https://www.youtube.com/embed/" + bestVideo.videoId,
+          thumbnailUrl: bestVideo.image || bestVideo.thumbnail,
+          viewCount: bestVideo.views || 0
+        });
+      }
+    } catch (error) {
+      console.error("yt-search failed", error);
+    }
+  }
+
+  if (!resources.length && wantsImage(q)) {
+    resources.push({
+      kind: "image",
+      label: "相關簡譜圖片",
+      title: topic + " 二胡簡譜",
+      previewText: topic + " 二胡簡譜",
+      url: "https://www.google.com/search?tbm=isch&q=" + encodeURIComponent(topic + " 二胡 簡譜")
+    });
+  }
+
+  if (!resources.length && wantsVideo(q)) {
+    resources.push({
+      kind: "video-search",
+      label: "相關影片",
+      title: topic + " 二胡教學影片",
+      previewText: topic + " 二胡教學影片",
+      url: "https://www.youtube.com/results?search_query=" + encodeURIComponent(topic + " 二胡 教學")
+    });
+  }
+
   return resources;
 }
 
@@ -174,13 +209,26 @@ function buildMessages(body, knowledge) {
     ? currentQuiz.weakWeeks.join("、")
     : "目前沒有明顯弱項週次資料";
 
-  return [
+  const systemMessages = [
     {
       role: "system",
       content:
-        "你是二胡小教室的 AI 助教。回答請使用繁體中文，語氣像耐心的二胡老師，內容要具體、直接、可練習。不要胡亂編造不存在的課程資訊，只能優先根據提供的課程內容回答。若學生問得很廣，也要先回到目前等級與週次，提供 3 到 5 個可立即執行的練習建議。請優先參考學生自己的打卡和測驗狀況，做出個人化建議，而不是每次都給同一套答案。如果學生在問簡譜、圖片或影片，回答中要直接告訴他可以看下方提供的相關資源連結。"
+        "你是二胡小教室的 AI 助教。回答請使用繁體中文。先直接回答使用者問題本身，不要每次都硬套初級、中級、高級或固定模板。只有當問題明確提到等級、週次、課程、訓練內容時，才引用課程資訊。若學生在問簡譜、圖片或影片，回答要簡短直接，並提醒他看下方顯示的相關圖片或影片。"
     },
     {
+      role: "system",
+      content:
+        "目前學生學習摘要：" +
+        "\n學生姓名：" + (studentProfile.displayName || "未提供") +
+        "\n本等級打卡完成週數：" + (typeof currentTracker === "number" ? currentTracker + "/10" : "尚無資料") +
+        "\n本等級最近一次測驗：" + (currentQuiz && currentQuiz.last != null ? currentQuiz.last + "/10" : "尚無資料") +
+        "\n本等級最佳測驗：" + (currentQuiz && currentQuiz.best != null ? currentQuiz.best + "/10" : "尚無資料") +
+        "\n本等級較弱週次：" + weakWeeks
+    }
+  ];
+
+  if (shouldUseCourseContext(body.question)) {
+    systemMessages.push({
       role: "system",
       content:
         "目前課程上下文：" +
@@ -191,19 +239,10 @@ function buildMessages(body, knowledge) {
         "\n本週描述：" + knowledge.description +
         "\n本週重點：" + knowledge.focus.join("、") +
         "\n本週任務：" + knowledge.tasks.join("、")
-    },
-    {
-      role: "system",
-      content:
-        "目前學生學習摘要：" +
-        "\n學生姓名：" + (studentProfile.displayName || "未提供") +
-        "\n本等級打卡完成週數：" + (typeof currentTracker === "number" ? currentTracker + "/10" : "尚無資料") +
-        "\n本等級最近一次測驗：" + (currentQuiz && currentQuiz.last != null ? currentQuiz.last + "/10" : "尚無資料") +
-        "\n本等級最佳測驗：" + (currentQuiz && currentQuiz.best != null ? currentQuiz.best + "/10" : "尚無資料") +
-        "\n本等級較弱週次：" + weakWeeks +
-        "\n回答時請把這些資料轉成具體建議，例如：若打卡少，就提醒先補基本練習；若最近測驗偏低，就優先補觀念和慢速拆解。"
-    }
-  ].concat(historyMessages).concat([
+    });
+  }
+
+  return systemMessages.concat(historyMessages).concat([
     {
       role: "user",
       content: String(body.question || "").trim()
@@ -250,10 +289,12 @@ exports.askErhuTutor = onRequest({ region: "asia-east1", secrets: ["OPENAI_API_K
       ? completion.choices[0].message.content.trim()
       : "";
 
+    const resources = await buildMediaResources(request.body.question);
+
     response.json({
       answer: text || "目前沒有拿到有效回覆，請再問一次。",
       source: "openai",
-      resources: buildMediaResources(request.body.question)
+      resources: resources
     });
   } catch (error) {
     console.error("askErhuTutor failed", error);

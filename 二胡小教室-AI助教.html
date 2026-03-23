@@ -757,41 +757,24 @@
     }
 
     function buildAnswer(question) {
+      if (/簡譜|樂譜|譜|圖片|影片|youtube|video/i.test(question)) {
+        return "我先幫你整理和這個問題直接相關的圖片或影片資源，你可以看下方顯示的內容。";
+      }
       const levelKey = detectLevel(question);
       const detectedWeek = detectWeek(question);
       const bestWeek = findBestWeek(levelKey, question);
       const weekNumber = detectedWeek >= 1 && detectedWeek <= 10 ? detectedWeek : bestWeek;
       const weekData = courseData[levelKey].weeks[weekNumber - 1];
       const topicTips = detectTopicTips(question);
-      const focusText = weekData.focus.slice(0, 3).map(function (item, index) {
-        return (index + 1) + ". " + item;
-      }).join("\n");
-      const taskText = weekData.tasks.slice(0, 2).map(function (item, index) {
-        return (index + 1) + ". " + item;
-      }).join("\n");
-      const guideText = topicTips.length
-        ? topicTips.slice(0, 2).map(function (guide) {
-            return "• " + guide.tips[0];
-          }).join("\n")
-        : "• 先把速度降到自己完全能控制的程度，再慢慢加回去。\n• 問題不要一次全修，先選一個最明顯的點處理。";
-      const planText = buildPracticePlan(weekData, topicTips).join("\n");
-
+      const directTip = topicTips.length
+        ? topicTips[0].tips[0]
+        : "先把速度放慢到你完全能控制，再只修一個最明顯的問題。";
       return [
-        "你這個問題，我會先對準 " + courseData[levelKey].label + "第 " + weekNumber + " 週的「" + weekData.title + "」來看。",
+        "我先直接回答你的問題。",
         "",
-        "這週的核心重點：",
-        focusText,
-        "",
-        "你現在可以先這樣修：",
-        guideText,
-        "",
-        "今天的練習順序建議：",
-        planText,
-        "",
-        "本週先完成的任務：",
-        taskText,
-        "",
-        "如果你願意，我下一題可以直接幫你拆成更細，例如「每天 10 分鐘怎麼練」或「這一週最常犯的錯誤有哪些」。"
+        "和你現在這個主題最接近的是「" + weekData.title + "」。",
+        "你可以先做這件事：" + directTip,
+        "如果你要，我也可以再幫你拆成 10 分鐘練習流程。"
       ].join("\n");
     }
 
