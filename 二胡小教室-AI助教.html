@@ -194,14 +194,15 @@
     }
 
     .resource-card {
-      width: min(320px, 100%);
+      width: 100%;
       padding: 12px 14px;
       border-radius: 20px;
       background: rgba(125, 75, 43, 0.08);
       border: 1px solid rgba(125, 75, 43, 0.1);
     }
 
-    .resource-card.video-card {
+    .resource-card.video-card,
+    .resource-card.image-card {
       width: 100%;
       max-width: none;
       padding: 14px;
@@ -229,7 +230,9 @@
     }
 
     .resource-preview.image {
-      aspect-ratio: 4 / 3;
+      width: 100%;
+      max-height: 820px;
+      aspect-ratio: auto;
       object-fit: cover;
       display: block;
     }
@@ -354,7 +357,9 @@
     }
 
     function renderResource(resource) {
-      const cardClass = resource.kind === "video" ? "resource-card video-card" : "resource-card";
+      let cardClass = "resource-card";
+      if (resource.kind === "video") cardClass += " video-card";
+      if (resource.kind === "image") cardClass += " image-card";
       let preview = "";
       if (resource.kind === "video" && resource.embedUrl) {
         preview = "<iframe class=\"resource-preview video\" src=\"" + escapeHtml(resource.embedUrl) + "\" title=\"" + escapeHtml(resource.title || "影片") + "\" allow=\"accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share\" allowfullscreen></iframe>";
