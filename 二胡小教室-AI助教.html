@@ -282,7 +282,7 @@
 
     .resource-card {
       min-width: 180px;
-      max-width: 240px;
+      max-width: 280px;
       padding: 12px 14px;
       border-radius: 18px;
       background: rgba(125, 75, 43, 0.08);
@@ -299,6 +299,26 @@
       color: #4a2f18;
       font-weight: 800;
       text-decoration: underline;
+    }
+
+    .resource-preview {
+      width: 100%;
+      border: 0;
+      border-radius: 14px;
+      overflow: hidden;
+      margin-bottom: 10px;
+      background: rgba(255, 255, 255, 0.7);
+    }
+
+    .resource-preview.image {
+      aspect-ratio: 4 / 3;
+      object-fit: cover;
+      display: block;
+    }
+
+    .resource-preview.video {
+      aspect-ratio: 16 / 9;
+      display: block;
     }
 
     .empty {
@@ -630,6 +650,34 @@
         .replace(/'/g, "&#39;");
     }
 
+    function buildPreviewSvg(text, variant) {
+      const background = variant === "video" ? "#f3d6a5" : "#f6e6c9";
+      const accent = variant === "video" ? "#8a4a1c" : "#7d4b2b";
+      const svg = "<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"800\" height=\"600\" viewBox=\"0 0 800 600\">" +
+        "<rect width=\"800\" height=\"600\" rx=\"36\" fill=\"" + background + "\"/>" +
+        "<circle cx=\"690\" cy=\"110\" r=\"72\" fill=\"#f7c361\" fill-opacity=\"0.75\"/>" +
+        "<rect x=\"72\" y=\"110\" width=\"656\" height=\"380\" rx=\"28\" fill=\"#fff8ef\"/>" +
+        "<text x=\"96\" y=\"188\" fill=\"" + accent + "\" font-size=\"42\" font-family=\"Noto Sans TC, sans-serif\" font-weight=\"700\">二胡小教室</text>" +
+        "<text x=\"96\" y=\"280\" fill=\"#33231a\" font-size=\"56\" font-family=\"Noto Sans TC, sans-serif\" font-weight=\"800\">" + escapeHtml(text) + "</text>" +
+        "<text x=\"96\" y=\"352\" fill=\"#6b5d52\" font-size=\"30\" font-family=\"Noto Sans TC, sans-serif\">點下方連結可看更多相關資源</text>" +
+        "</svg>";
+      return "data:image/svg+xml;charset=UTF-8," + encodeURIComponent(svg);
+    }
+
+    function renderResource(resource) {
+      let preview = "";
+      if (resource.kind === "video" && resource.embedUrl) {
+        preview = "<iframe class=\"resource-preview video\" src=\"" + escapeHtml(resource.embedUrl) + "\" title=\"" + escapeHtml(resource.title || "影片") + "\" allow=\"accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share\" allowfullscreen></iframe>";
+      } else if (resource.kind === "image") {
+        const imageSrc = resource.imageUrl || buildPreviewSvg(resource.previewText || resource.title || "二胡簡譜", "image");
+        preview = "<img class=\"resource-preview image\" src=\"" + imageSrc + "\" alt=\"" + escapeHtml(resource.title || "圖片") + "\" />";
+      } else if (resource.kind === "video-search") {
+        const imageSrc = resource.thumbnailUrl || buildPreviewSvg(resource.previewText || resource.title || "二胡影片", "video");
+        preview = "<img class=\"resource-preview image\" src=\"" + imageSrc + "\" alt=\"" + escapeHtml(resource.title || "影片") + "\" />";
+      }
+      return "<div class=\"resource-card\">" + preview + "<strong>" + escapeHtml(resource.label || "資源") + "</strong><a href=\"" + escapeHtml(resource.url || "#") + "\" target=\"_blank\" rel=\"noopener noreferrer\">" + escapeHtml(resource.title || "開啟") + "</a></div>";
+    }
+
     function renderMessages() {
       if (!historyMessages.length) {
         messages.innerHTML = "<div class=\"empty\">你可以直接問目前週次的練習問題，例如：<br>1. 我第 3 週內外弦切換一直卡住怎麼辦？<br>2. 請幫我安排今天 15 分鐘的練習順序。<br>3. 這一週最重要的學習重點是什麼？</div>";
@@ -639,7 +687,7 @@
         const author = item.role === "assistant" ? "AI 助教" : "你";
         const resourcesHtml = Array.isArray(item.resources) && item.resources.length
           ? "<div class=\"resource-list\">" + item.resources.map(function (resource) {
-              return "<div class=\"resource-card\"><strong>" + escapeHtml(resource.label || "資源") + "</strong><a href=\"" + escapeHtml(resource.url || "#") + "\" target=\"_blank\" rel=\"noopener noreferrer\">" + escapeHtml(resource.title || "開啟") + "</a></div>";
+              return renderResource(resource);
             }).join("") + "</div>"
           : "";
         return "<div class=\"message " + item.role + "\"><small>" + author + "</small>" + escapeHtml(item.text) + resourcesHtml + "</div>";

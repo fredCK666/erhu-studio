@@ -52,6 +52,36 @@ const courseData = {
   }
 };
 
+const mediaCatalog = [
+  {
+    keywords: ["賽馬", "赛马"],
+    title: "賽馬",
+    video: {
+      title: "《賽馬》二胡演奏",
+      embedUrl: "https://www.youtube.com/embed/cpzQlNCoc04",
+      url: "https://www.youtube.com/watch?v=cpzQlNCoc04",
+      thumbnailUrl: "https://i.ytimg.com/vi/cpzQlNCoc04/hqdefault.jpg"
+    },
+    scoreSearch: "賽馬 二胡 簡譜"
+  },
+  {
+    keywords: ["二泉映月"],
+    title: "二泉映月",
+    video: {
+      title: "二泉映月（二胡）",
+      embedUrl: "https://www.youtube.com/embed/DI5709n0Pik",
+      url: "https://www.youtube.com/watch?v=DI5709n0Pik",
+      thumbnailUrl: "https://i.ytimg.com/vi/DI5709n0Pik/hqdefault.jpg"
+    },
+    scoreSearch: "二泉映月 二胡 簡譜"
+  }
+];
+
+function findMediaEntry(question) {
+  const q = String(question || "");
+  return mediaCatalog.find((entry) => entry.keywords.some((keyword) => q.includes(keyword))) || null;
+}
+
 function normalizeLevel(level) {
   return courseData[level] ? level : "beginner";
 }
@@ -92,32 +122,39 @@ function extractMediaTopic(question) {
 function buildMediaResources(question) {
   const q = String(question || "");
   const topic = extractMediaTopic(q);
+  const entry = findMediaEntry(q);
   const resources = [];
   if (/簡譜|樂譜|譜|圖片/.test(q)) {
-    const imageQuery = encodeURIComponent(topic + " 二胡 簡譜");
+    const imageSearchText = entry ? entry.scoreSearch : topic + " 二胡 簡譜";
+    const imageQuery = encodeURIComponent(imageSearchText);
     resources.push({
-      label: "相關簡譜圖片",
-      title: topic + " 二胡簡譜圖片",
+      kind: "image",
+      label: "簡譜圖片",
+      title: (entry ? entry.title : topic) + " 二胡簡譜",
+      previewText: (entry ? entry.title : topic) + " 二胡簡譜",
       url: "https://www.google.com/search?tbm=isch&q=" + imageQuery
-    });
-    resources.push({
-      label: "更多圖片搜尋",
-      title: topic + " 二胡樂譜圖片",
-      url: "https://www.bing.com/images/search?q=" + imageQuery
     });
   }
   if (/影片|video|youtube|演奏/.test(q)) {
-    const videoQuery = encodeURIComponent(topic + " 二胡");
-    resources.push({
-      label: "相關影片",
-      title: topic + " 二胡 YouTube",
-      url: "https://www.youtube.com/results?search_query=" + videoQuery
-    });
-    resources.push({
-      label: "更多演奏影片",
-      title: topic + " 二胡 演奏影片",
-      url: "https://search.bilibili.com/all?keyword=" + encodeURIComponent(topic + " 二胡 演奏")
-    });
+    if (entry && entry.video) {
+      resources.push({
+        kind: "video",
+        label: "相關影片",
+        title: entry.video.title,
+        url: entry.video.url,
+        embedUrl: entry.video.embedUrl,
+        thumbnailUrl: entry.video.thumbnailUrl
+      });
+    } else {
+      const videoQuery = encodeURIComponent(topic + " 二胡");
+      resources.push({
+        kind: "video-search",
+        label: "相關影片",
+        title: topic + " 二胡影片",
+        previewText: topic + " 二胡影片",
+        url: "https://www.youtube.com/results?search_query=" + videoQuery
+      });
+    }
   }
   return resources;
 }
