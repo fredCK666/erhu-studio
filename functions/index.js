@@ -76,6 +76,52 @@ function buildKnowledge(level, week) {
   };
 }
 
+function extractMediaTopic(question) {
+  const cleaned = String(question || "")
+    .replace(/給我/g, "")
+    .replace(/請給我/g, "")
+    .replace(/幫我找/g, "")
+    .replace(/我要/g, "")
+    .replace(/二胡/g, "")
+    .replace(/簡譜|樂譜|譜|圖片|影片|video|youtube/gi, "")
+    .replace(/[？?。!！]/g, "")
+    .trim();
+  return cleaned || "二胡教學";
+}
+
+function buildMediaResources(question) {
+  const q = String(question || "");
+  const topic = extractMediaTopic(q);
+  const resources = [];
+  if (/簡譜|樂譜|譜|圖片/.test(q)) {
+    const imageQuery = encodeURIComponent(topic + " 二胡 簡譜");
+    resources.push({
+      label: "相關簡譜圖片",
+      title: topic + " 二胡簡譜圖片",
+      url: "https://www.google.com/search?tbm=isch&q=" + imageQuery
+    });
+    resources.push({
+      label: "更多圖片搜尋",
+      title: topic + " 二胡樂譜圖片",
+      url: "https://www.bing.com/images/search?q=" + imageQuery
+    });
+  }
+  if (/影片|video|youtube|演奏/.test(q)) {
+    const videoQuery = encodeURIComponent(topic + " 二胡");
+    resources.push({
+      label: "相關影片",
+      title: topic + " 二胡 YouTube",
+      url: "https://www.youtube.com/results?search_query=" + videoQuery
+    });
+    resources.push({
+      label: "更多演奏影片",
+      title: topic + " 二胡 演奏影片",
+      url: "https://search.bilibili.com/all?keyword=" + encodeURIComponent(topic + " 二胡 演奏")
+    });
+  }
+  return resources;
+}
+
 function buildMessages(body, knowledge) {
   const recentHistory = Array.isArray(body.history) ? body.history.slice(-6) : [];
   const historyMessages = recentHistory
@@ -95,7 +141,7 @@ function buildMessages(body, knowledge) {
     {
       role: "system",
       content:
-        "你是二胡小教室的 AI 助教。回答請使用繁體中文，語氣像耐心的二胡老師，內容要具體、直接、可練習。不要胡亂編造不存在的課程資訊，只能優先根據提供的課程內容回答。若學生問得很廣，也要先回到目前等級與週次，提供 3 到 5 個可立即執行的練習建議。請優先參考學生自己的打卡和測驗狀況，做出個人化建議，而不是每次都給同一套答案。"
+        "你是二胡小教室的 AI 助教。回答請使用繁體中文，語氣像耐心的二胡老師，內容要具體、直接、可練習。不要胡亂編造不存在的課程資訊，只能優先根據提供的課程內容回答。若學生問得很廣，也要先回到目前等級與週次，提供 3 到 5 個可立即執行的練習建議。請優先參考學生自己的打卡和測驗狀況，做出個人化建議，而不是每次都給同一套答案。如果學生在問簡譜、圖片或影片，回答中要直接告訴他可以看下方提供的相關資源連結。"
     },
     {
       role: "system",
@@ -169,7 +215,8 @@ exports.askErhuTutor = onRequest({ region: "asia-east1", secrets: ["OPENAI_API_K
 
     response.json({
       answer: text || "目前沒有拿到有效回覆，請再問一次。",
-      source: "openai"
+      source: "openai",
+      resources: buildMediaResources(request.body.question)
     });
   } catch (error) {
     console.error("askErhuTutor failed", error);

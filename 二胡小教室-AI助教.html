@@ -273,6 +273,34 @@
       letter-spacing: 0.04em;
     }
 
+    .resource-list {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+
+    .resource-card {
+      min-width: 180px;
+      max-width: 240px;
+      padding: 12px 14px;
+      border-radius: 18px;
+      background: rgba(125, 75, 43, 0.08);
+      border: 1px solid rgba(125, 75, 43, 0.1);
+    }
+
+    .resource-card strong {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--wood);
+    }
+
+    .resource-card a {
+      color: #4a2f18;
+      font-weight: 800;
+      text-decoration: underline;
+    }
+
     .empty {
       padding: 22px;
       border-radius: 22px;
@@ -609,7 +637,12 @@
       }
       messages.innerHTML = historyMessages.map(function (item) {
         const author = item.role === "assistant" ? "AI 助教" : "你";
-        return "<div class=\"message " + item.role + "\"><small>" + author + "</small>" + escapeHtml(item.text) + "</div>";
+        const resourcesHtml = Array.isArray(item.resources) && item.resources.length
+          ? "<div class=\"resource-list\">" + item.resources.map(function (resource) {
+              return "<div class=\"resource-card\"><strong>" + escapeHtml(resource.label || "資源") + "</strong><a href=\"" + escapeHtml(resource.url || "#") + "\" target=\"_blank\" rel=\"noopener noreferrer\">" + escapeHtml(resource.title || "開啟") + "</a></div>";
+            }).join("") + "</div>"
+          : "";
+        return "<div class=\"message " + item.role + "\"><small>" + author + "</small>" + escapeHtml(item.text) + resourcesHtml + "</div>";
       }).join("");
       messages.scrollTop = messages.scrollHeight;
     }
@@ -741,7 +774,10 @@
             throw new Error(data && data.error ? data.error : "backend-failed");
           }
           setSourceStatus("OpenAI 後端");
-          return data.answer;
+          return {
+            text: data.answer,
+            resources: Array.isArray(data.resources) ? data.resources : []
+          };
         } catch (error) {
           lastError = error;
         }
@@ -764,10 +800,11 @@
       renderMessages();
     }
 
-    async function addMessage(role, text) {
+    async function addMessage(role, text, resources) {
       historyMessages.push({
         role: role,
         text: text,
+        resources: resources || [],
         createdAt: new Date().toISOString(),
         level: levelSelect.value,
         week: Number(weekSelect.value)
@@ -783,15 +820,15 @@
       askButton.textContent = "回覆中...";
       try {
         await addMessage("user", question);
-        let answer = "";
+        let answer = null;
         try {
           answer = await askBackendTutor(question);
         } catch (error) {
           console.error("askBackendTutor failed, fallback to local tutor", error);
           setSourceStatus("本地備援（" + (error && error.message ? error.message : "unknown-error") + "）");
-          answer = buildAnswer(question);
+          answer = { text: buildAnswer(question), resources: [] };
         }
-        await addMessage("assistant", answer);
+        await addMessage("assistant", answer.text, answer.resources);
         questionInput.value = "";
       } finally {
         askButton.disabled = false;
