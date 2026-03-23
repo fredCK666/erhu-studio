@@ -186,8 +186,8 @@
     }
 
     .resource-list {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      display: flex;
+      flex-direction: column;
       gap: 12px;
       margin-top: 14px;
       width: 100%;
@@ -202,13 +202,19 @@
     }
 
     .resource-card.video-card,
-    .resource-card.image-card {
+    .resource-card.image-card,
+    .resource-card.search-link-card {
       max-width: none;
       padding: 14px;
     }
 
     .resource-card.video-card {
       width: 100%;
+    }
+
+    .resource-card.search-link-card,
+    .resource-card.image-card {
+      background: rgba(255, 251, 245, 0.96);
     }
 
     .resource-card strong {
@@ -230,15 +236,6 @@
       overflow: hidden;
       margin-bottom: 10px;
       background: rgba(255, 255, 255, 0.7);
-    }
-
-    .resource-preview.image {
-      width: 100%;
-      aspect-ratio: 3 / 4;
-      object-fit: contain;
-      display: block;
-      cursor: zoom-in;
-      background: #fff;
     }
 
     .resource-preview.video {
@@ -338,10 +335,6 @@
       .message {
         max-width: 100%;
         font-size: 17px;
-      }
-
-      .resource-list {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
       }
 
       .lightbox-button.prev { left: 6px; }
@@ -452,17 +445,17 @@
       let cardClass = "resource-card";
       if (resource.kind === "video") cardClass += " video-card";
       if (resource.kind === "image") cardClass += " image-card";
+      if (resource.kind === "search-link") cardClass += " search-link-card";
       let preview = "";
       if (resource.kind === "video" && resource.embedUrl) {
         preview = "<iframe class=\"resource-preview video\" src=\"" + escapeHtml(resource.embedUrl) + "\" title=\"" + escapeHtml(resource.title || "影片") + "\" allow=\"accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share\" allowfullscreen></iframe>";
-      } else if (resource.kind === "image") {
-        const imageSrc = resource.imageUrl || resource.thumbnailUrl || "";
-        preview = "<img class=\"resource-preview image\" data-lightbox-image=\"" + escapeHtml(imageSrc) + "\" src=\"" + imageSrc + "\" alt=\"" + escapeHtml(resource.title || "圖片") + "\" />";
       } else if (resource.kind === "video-search") {
         const imageSrc = resource.thumbnailUrl || buildPreviewSvg(resource.previewText || resource.title || "二胡影片", "video");
         preview = "<img class=\"resource-preview image\" src=\"" + imageSrc + "\" alt=\"" + escapeHtml(resource.title || "影片") + "\" />";
       } else if (resource.kind === "search-link") {
         preview = "<div class=\"resource-preview\" style=\"padding:20px;font-weight:800;color:#7d4b2b;\">沒有抓到合適真圖，先點下方搜尋</div>";
+      } else if (resource.kind === "image") {
+        preview = "<div class=\"resource-preview\" style=\"padding:18px 20px;font-weight:800;color:#7d4b2b;\">譜圖連結</div>";
       }
       return "<div class=\"" + cardClass + "\">" + preview + "<strong>" + escapeHtml(resource.label || "資源") + "</strong><a href=\"" + escapeHtml(resource.url || "#") + "\" target=\"_blank\" rel=\"noopener noreferrer\">" + escapeHtml(resource.title || "開啟") + "</a></div>";
     }
@@ -481,7 +474,6 @@
           : "";
         return "<div class=\"message " + item.role + "\"><small>" + author + "</small>" + escapeHtml(item.text) + resourcesHtml + "</div>";
       }).join("");
-      bindLightboxImages();
       messages.scrollTop = messages.scrollHeight;
     }
 

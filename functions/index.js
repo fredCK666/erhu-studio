@@ -325,9 +325,9 @@ exports.askErhuTutor = onRequest({ region: "asia-east1", secrets: ["OPENAI_API_K
     let answer = text || "目前沒有拿到有效回覆，請再問一次。";
 
     if (wantsImage(question) && resources.some((item) => item.kind === "image")) {
-      answer = "我幫你找了相關的二胡譜圖，直接看下面的圖片就可以。";
+      answer = "我幫你找了相關的二胡譜圖連結，直接點下面的連結就可以看。";
     } else if (wantsImage(question)) {
-      answer = "我這次沒有抓到合適的真實譜圖，你可以先點下面的圖片搜尋，我再幫你換別的關鍵字找。";
+      answer = "我這次沒有抓到合適的譜圖連結，你可以先點下面的圖片搜尋，我再幫你換別的關鍵字找。";
     } else if (wantsVideo(question) && resources.some((item) => item.kind === "video")) {
       answer = "我幫你找了相關的教學影片，直接看下面的影片就可以。";
     } else if (wantsVideo(question)) {
