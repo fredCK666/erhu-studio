@@ -65,8 +65,8 @@
       min-height: calc(100vh - 120px);
       display: flex;
       flex-direction: column;
-      padding: 28px;
-      gap: 18px;
+      padding: 28px 28px 18px;
+      gap: 14px;
     }
 
     .chat-head h1 {
@@ -91,6 +91,11 @@
       grid-template-columns: minmax(0, 1fr) auto auto;
       gap: 12px;
       align-items: end;
+      padding-top: 12px;
+      border-top: 1px solid rgba(125, 75, 43, 0.08);
+      background: linear-gradient(180deg, rgba(255,250,244,0), rgba(255,250,244,0.96) 20%);
+      position: sticky;
+      bottom: 0;
     }
 
     .label {
@@ -276,6 +281,8 @@
         <div class="status" id="sourceStatus">目前來源：初始化中</div>
       </div>
 
+      <div class="messages" id="messages"></div>
+
       <div class="composer">
         <div>
           <label class="label" for="questionInput">要問什麼問題</label>
@@ -284,8 +291,6 @@
         <button class="button primary" id="askButton" type="button">送出問題</button>
         <button class="button secondary" id="clearButton" type="button">清除聊天紀錄</button>
       </div>
-
-      <div class="messages" id="messages"></div>
     </section>
   </main>
 
