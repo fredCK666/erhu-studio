@@ -16,6 +16,9 @@
   window.ErhuFirebase = {
     app: firebase.app(),
     auth: firebase.auth(),
-    db: firebase.firestore()
+    db: firebase.firestore(),
+    projectId: firebaseConfig.projectId,
+    functionsRegion: "asia-east1",
+    functionsBaseUrl: "https://asia-east1-" + firebaseConfig.projectId + ".cloudfunctions.net"
   };
 })();

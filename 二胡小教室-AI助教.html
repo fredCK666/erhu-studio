@@ -632,6 +632,32 @@
       ].join("\n");
     }
 
+    async function askBackendTutor(question) {
+      const user = window.ErhuFirebase.auth.currentUser;
+      if (!user) {
+        throw new Error("missing-user");
+      }
+      const token = await user.getIdToken();
+      const response = await fetch(window.ErhuFirebase.functionsBaseUrl + "/askErhuTutor", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer " + token
+        },
+        body: JSON.stringify({
+          question: question,
+          level: levelSelect.value,
+          week: Number(weekSelect.value),
+          history: historyMessages
+        })
+      });
+      const data = await response.json();
+      if (!response.ok || !data.answer) {
+        throw new Error(data && data.error ? data.error : "backend-failed");
+      }
+      return data.answer;
+    }
+
     async function saveHistory() {
       const trimmed = historyMessages.slice(-24);
       await chatRef().set({
@@ -666,7 +692,13 @@
       askButton.textContent = "回覆中...";
       try {
         await addMessage("user", question);
-        const answer = buildAnswer(question);
+        let answer = "";
+        try {
+          answer = await askBackendTutor(question);
+        } catch (error) {
+          console.error("askBackendTutor failed, fallback to local tutor", error);
+          answer = buildAnswer(question);
+        }
         await addMessage("assistant", answer);
         questionInput.value = "";
       } finally {

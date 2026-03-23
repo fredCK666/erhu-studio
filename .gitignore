@@ -1,3 +1,5 @@
 .idea/
 __pycache__/
 firebase-config.js
+.firebaserc
+functions/node_modules/
