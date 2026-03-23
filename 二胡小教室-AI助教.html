@@ -646,11 +646,9 @@
     }
 
     async function askBackendTutor(question) {
-      const user = window.ErhuFirebase.auth.currentUser;
-      if (!user) {
+      if (!currentUser) {
         throw new Error("missing-user");
       }
-      const token = await user.getIdToken();
       const payload = JSON.stringify({
         question: question,
         level: levelSelect.value,
@@ -664,8 +662,7 @@
           const response = await fetch(urls[index], {
             method: "POST",
             headers: {
-              "Content-Type": "application/json",
-              "Authorization": "Bearer " + token
+              "Content-Type": "application/json"
             },
             body: payload
           });

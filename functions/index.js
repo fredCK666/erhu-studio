@@ -1,8 +1,5 @@
-const admin = require("firebase-admin");
 const OpenAI = require("openai");
 const { onRequest } = require("firebase-functions/v2/https");
-
-admin.initializeApp();
 
 const courseData = {
   beginner: {
@@ -118,19 +115,6 @@ exports.askErhuTutor = onRequest({ region: "asia-east1", secrets: ["OPENAI_API_K
   }
   if (request.method !== "POST") {
     response.status(405).json({ error: "method-not-allowed" });
-    return;
-  }
-
-  const authHeader = request.get("Authorization") || "";
-  if (!authHeader.startsWith("Bearer ")) {
-    response.status(401).json({ error: "missing-auth-token" });
-    return;
-  }
-
-  try {
-    await admin.auth().verifyIdToken(authHeader.slice(7));
-  } catch (error) {
-    response.status(401).json({ error: "invalid-auth-token" });
     return;
   }
 
