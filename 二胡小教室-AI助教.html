@@ -203,9 +203,16 @@
 
     .resource-card.video-card,
     .resource-card.image-card {
-      width: 100%;
       max-width: none;
       padding: 14px;
+    }
+
+    .resource-card.video-card {
+      width: 100%;
+    }
+
+    .resource-card.image-card {
+      width: calc(50% - 6px);
     }
 
     .resource-card strong {
@@ -269,6 +276,10 @@
       .message {
         max-width: 100%;
         font-size: 17px;
+      }
+
+      .resource-card.image-card {
+        width: 100%;
       }
     }
   </style>

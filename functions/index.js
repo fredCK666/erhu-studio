@@ -130,20 +130,21 @@ async function buildMediaResources(question) {
         safeSearch: DDG.SafeSearchType.STRICT,
         locale: "zh-TW"
       });
-      const bestImage = (imageResults.results || [])
-        .filter((item) => item && item.image && item.url)
-        .sort((left, right) => (right.width || 0) * (right.height || 0) - (left.width || 0) * (left.height || 0))[0];
-      if (bestImage) {
+      const bestImages = (imageResults.results || [])
+        .filter((item) => item && (item.image || item.thumbnail) && item.url)
+        .sort((left, right) => (right.width || 0) * (right.height || 0) - (left.width || 0) * (left.height || 0))
+        .slice(0, 4);
+      bestImages.forEach((bestImage, index) => {
         resources.push({
           kind: "image",
-          label: "相關簡譜圖片",
+          label: index === 0 ? "相關簡譜圖片" : "更多譜圖",
           title: bestImage.title || (topic + " 二胡簡譜"),
-          imageUrl: bestImage.image,
+          imageUrl: bestImage.image || bestImage.thumbnail,
           thumbnailUrl: bestImage.thumbnail,
           url: bestImage.url,
           source: bestImage.source
         });
-      }
+      });
     } catch (error) {
       console.error("searchImages failed", error);
     }
