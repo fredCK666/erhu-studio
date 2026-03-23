@@ -119,6 +119,45 @@ function shouldUseCourseContext(question) {
   return /初級|中級|高級|第\s*([1-9]|10)\s*週|訓練|課程|打卡|測驗/.test(String(question || ""));
 }
 
+function dedupeResources(items, keyGetter) {
+  const seen = new Set();
+  return items.filter((item) => {
+    const key = keyGetter(item);
+    if (!key || seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
+async function searchScoreImages(topic) {
+  const queries = [
+    topic + " 二胡簡譜",
+    topic + " 二胡 譜",
+    topic + " 簡譜",
+    topic + " 樂譜"
+  ];
+  const allResults = [];
+
+  for (const query of queries) {
+    try {
+      const imageResults = await DDG.searchImages(query, {
+        safeSearch: DDG.SafeSearchType.OFF,
+        locale: "zh-TW"
+      });
+      allResults.push(...(imageResults.results || []));
+    } catch (error) {
+      console.error("searchImages failed", query, error);
+    }
+  }
+
+  return dedupeResources(
+    allResults
+      .filter((item) => item && (item.image || item.thumbnail) && item.url)
+      .sort((left, right) => (right.width || 0) * (right.height || 0) - (left.width || 0) * (left.height || 0)),
+    (item) => item.image || item.thumbnail || item.url
+  ).slice(0, 6);
+}
+
 async function buildMediaResources(question) {
   const q = String(question || "");
   const topic = extractMediaTopic(q);
@@ -126,14 +165,7 @@ async function buildMediaResources(question) {
 
   if (wantsImage(q)) {
     try {
-      const imageResults = await DDG.searchImages(topic + " 二胡 簡譜", {
-        safeSearch: DDG.SafeSearchType.STRICT,
-        locale: "zh-TW"
-      });
-      const bestImages = (imageResults.results || [])
-        .filter((item) => item && (item.image || item.thumbnail) && item.url)
-        .sort((left, right) => (right.width || 0) * (right.height || 0) - (left.width || 0) * (left.height || 0))
-        .slice(0, 6);
+      const bestImages = await searchScoreImages(topic);
       bestImages.forEach((bestImage, index) => {
         resources.push({
           kind: "image",
@@ -146,7 +178,7 @@ async function buildMediaResources(question) {
         });
       });
     } catch (error) {
-      console.error("searchImages failed", error);
+      console.error("searchScoreImages failed", error);
     }
   }
 
@@ -174,10 +206,9 @@ async function buildMediaResources(question) {
 
   if (!resources.length && wantsImage(q)) {
     resources.push({
-      kind: "image",
-      label: "相關簡譜圖片",
+      kind: "search-link",
+      label: "圖片搜尋",
       title: topic + " 二胡簡譜",
-      previewText: topic + " 二胡簡譜",
       url: "https://www.google.com/search?tbm=isch&q=" + encodeURIComponent(topic + " 二胡 簡譜")
     });
   }
@@ -291,9 +322,20 @@ exports.askErhuTutor = onRequest({ region: "asia-east1", secrets: ["OPENAI_API_K
       : "";
 
     const resources = await buildMediaResources(request.body.question);
+    let answer = text || "目前沒有拿到有效回覆，請再問一次。";
+
+    if (wantsImage(question) && resources.some((item) => item.kind === "image")) {
+      answer = "我幫你找了相關的二胡譜圖，直接看下面的圖片就可以。";
+    } else if (wantsImage(question)) {
+      answer = "我這次沒有抓到合適的真實譜圖，你可以先點下面的圖片搜尋，我再幫你換別的關鍵字找。";
+    } else if (wantsVideo(question) && resources.some((item) => item.kind === "video")) {
+      answer = "我幫你找了相關的教學影片，直接看下面的影片就可以。";
+    } else if (wantsVideo(question)) {
+      answer = "我這次沒有抓到合適的影片，你可以先點下面的影片搜尋，我再幫你換別的關鍵字找。";
+    }
 
     response.json({
-      answer: text || "目前沒有拿到有效回覆，請再問一次。",
+      answer: answer,
       source: "openai",
       resources: resources
     });
