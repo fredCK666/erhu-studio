@@ -81,12 +81,21 @@ function buildMessages(body, knowledge) {
   const historyMessages = recentHistory
     .filter((item) => item && (item.role === "user" || item.role === "assistant") && item.text)
     .map((item) => ({ role: item.role, content: item.text }));
+  const studentProfile = body.studentProfile || {};
+  const trackerSummary = studentProfile.trackerSummary || {};
+  const quizSummary = studentProfile.quizSummary || {};
+  const currentLevelKey = normalizeLevel(body.level);
+  const currentTracker = trackerSummary[currentLevelKey];
+  const currentQuiz = quizSummary[currentLevelKey];
+  const weakWeeks = currentQuiz && Array.isArray(currentQuiz.weakWeeks) && currentQuiz.weakWeeks.length
+    ? currentQuiz.weakWeeks.join("、")
+    : "目前沒有明顯弱項週次資料";
 
   return [
     {
       role: "system",
       content:
-        "你是二胡小教室的 AI 助教。回答請使用繁體中文，語氣像耐心的二胡老師，內容要具體、直接、可練習。不要胡亂編造不存在的課程資訊，只能優先根據提供的課程內容回答。若學生問得很廣，也要先回到目前等級與週次，提供 3 到 5 個可立即執行的練習建議。"
+        "你是二胡小教室的 AI 助教。回答請使用繁體中文，語氣像耐心的二胡老師，內容要具體、直接、可練習。不要胡亂編造不存在的課程資訊，只能優先根據提供的課程內容回答。若學生問得很廣，也要先回到目前等級與週次，提供 3 到 5 個可立即執行的練習建議。請優先參考學生自己的打卡和測驗狀況，做出個人化建議，而不是每次都給同一套答案。"
     },
     {
       role: "system",
@@ -99,6 +108,17 @@ function buildMessages(body, knowledge) {
         "\n本週描述：" + knowledge.description +
         "\n本週重點：" + knowledge.focus.join("、") +
         "\n本週任務：" + knowledge.tasks.join("、")
+    },
+    {
+      role: "system",
+      content:
+        "目前學生學習摘要：" +
+        "\n學生姓名：" + (studentProfile.displayName || "未提供") +
+        "\n本等級打卡完成週數：" + (typeof currentTracker === "number" ? currentTracker + "/10" : "尚無資料") +
+        "\n本等級最近一次測驗：" + (currentQuiz && currentQuiz.last != null ? currentQuiz.last + "/10" : "尚無資料") +
+        "\n本等級最佳測驗：" + (currentQuiz && currentQuiz.best != null ? currentQuiz.best + "/10" : "尚無資料") +
+        "\n本等級較弱週次：" + weakWeeks +
+        "\n回答時請把這些資料轉成具體建議，例如：若打卡少，就提醒先補基本練習；若最近測驗偏低，就優先補觀念和慢速拆解。"
     }
   ].concat(historyMessages).concat([
     {

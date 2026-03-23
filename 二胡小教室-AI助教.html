@@ -227,6 +227,13 @@
       font-weight: 800;
     }
 
+    .learning-status {
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
     .messages {
       flex: 1;
       min-height: 420px;
@@ -351,6 +358,7 @@
             <h2>助教對話區</h2>
             <div class="meta" id="contextMeta">正在準備目前學生的對話紀錄。</div>
             <div class="status" id="sourceStatus">目前來源：初始化中</div>
+            <div class="learning-status" id="learningStatus">正在讀取你的學習進度。</div>
           </div>
         </div>
         <div class="messages" id="messages"></div>
@@ -441,12 +449,18 @@
     const quickList = document.getElementById("quickList");
     const contextMeta = document.getElementById("contextMeta");
     const sourceStatus = document.getElementById("sourceStatus");
+    const learningStatus = document.getElementById("learningStatus");
 
     let currentUser = null;
     let historyMessages = [];
+    let learningProfile = null;
 
     function setSourceStatus(text) {
       sourceStatus.textContent = "目前來源：" + text;
+    }
+
+    function setLearningStatus(text) {
+      learningStatus.textContent = text;
     }
 
     function updateContextMeta() {
@@ -500,6 +514,61 @@
 
     function currentWeekData() {
       return courseData[levelSelect.value].weeks[Number(weekSelect.value) - 1];
+    }
+
+    async function loadLearningProfile() {
+      if (!currentUser) return null;
+      const studentRef = window.ErhuFirebase.db.collection("students").doc(currentUser.uid);
+      const trackerSnapshot = await studentRef.collection("trackers").get();
+      const quizSnapshot = await studentRef.collection("quizScores").get();
+      const trackerSummary = {};
+      trackerSnapshot.forEach(function (doc) {
+        const data = doc.data() || {};
+        const completedWeeks = Object.keys(data).filter(function (key) {
+          return key.indexOf("week_") === 0 && data[key];
+        }).length;
+        trackerSummary[doc.id] = completedWeeks;
+      });
+      const quizSummary = {};
+      quizSnapshot.forEach(function (doc) {
+        const data = doc.data() || {};
+        const match = doc.id.match(/^(beginner|intermediate|advanced)_week_(\d+)$/);
+        if (!match) return;
+        const levelKey = match[1];
+        if (!quizSummary[levelKey]) {
+          quizSummary[levelKey] = { best: 0, last: null, weakWeeks: [] };
+        }
+        if (typeof data.bestScore === "number" && data.bestScore > quizSummary[levelKey].best) {
+          quizSummary[levelKey].best = data.bestScore;
+        }
+        if (typeof data.lastScore === "number") {
+          quizSummary[levelKey].last = data.lastScore;
+          if (data.lastScore < 8) {
+            quizSummary[levelKey].weakWeeks.push("第 " + match[2] + " 週 " + data.lastScore + "/10");
+          }
+        }
+      });
+      return {
+        displayName: currentUser.displayName,
+        trackerSummary: trackerSummary,
+        quizSummary: quizSummary
+      };
+    }
+
+    function renderLearningStatus() {
+      if (!learningProfile) {
+        setLearningStatus("目前還沒有抓到你的學習進度。");
+        return;
+      }
+      const levelKey = levelSelect.value;
+      const trackerText = learningProfile.trackerSummary[levelKey] != null
+        ? courseData[levelKey].label + "打卡完成 " + learningProfile.trackerSummary[levelKey] + "/10 週"
+        : courseData[levelKey].label + "還沒有打卡紀錄";
+      const quizInfo = learningProfile.quizSummary[levelKey];
+      const quizText = quizInfo
+        ? "｜最近測驗 " + (quizInfo.last == null ? "尚未作答" : quizInfo.last + "/10") + "｜最佳 " + quizInfo.best + "/10"
+        : "｜目前還沒有測驗成績";
+      setLearningStatus("學習摘要：" + trackerText + quizText);
     }
 
     function updateQuickPrompts() {
@@ -653,7 +722,8 @@
         question: question,
         level: levelSelect.value,
         week: Number(weekSelect.value),
-        history: historyMessages
+        history: historyMessages,
+        studentProfile: learningProfile
       });
       const urls = [window.ErhuFirebase.askTutorUrl, window.ErhuFirebase.askTutorFallbackUrl].filter(Boolean);
       let lastError = null;
@@ -743,12 +813,14 @@
       updateUrlState();
       updateQuickPrompts();
       updateContextMeta();
+      renderLearningStatus();
     });
 
     weekSelect.addEventListener("change", function () {
       updateUrlState();
       updateQuickPrompts();
       updateContextMeta();
+      renderLearningStatus();
     });
 
     askButton.addEventListener("click", submitQuestion);
@@ -766,10 +838,13 @@
     updateQuickPrompts();
     updateContextMeta();
     setSourceStatus("等待送出問題");
+    setLearningStatus("正在讀取你的學習進度。");
 
     window.ErhuAuth.onReady(async function (user) {
       currentUser = user;
       updateContextMeta();
+      learningProfile = await loadLearningProfile();
+      renderLearningStatus();
       await loadHistory();
     });
   </script>
