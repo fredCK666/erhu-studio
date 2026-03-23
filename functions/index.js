@@ -108,7 +108,7 @@ function buildMessages(body, knowledge) {
   ]);
 }
 
-exports.askErhuTutor = onRequest({ region: "asia-east1", secrets: ["OPENAI_API_KEY"], cors: true }, async (request, response) => {
+exports.askErhuTutor = onRequest({ region: "asia-east1", secrets: ["OPENAI_API_KEY"], cors: true, invoker: "public" }, async (request, response) => {
   if (request.method === "OPTIONS") {
     response.status(204).send("");
     return;
