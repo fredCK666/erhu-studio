@@ -190,6 +190,7 @@
       gap: 12px;
       flex-wrap: wrap;
       margin-top: 14px;
+      width: 100%;
     }
 
     .resource-card {
@@ -198,6 +199,12 @@
       border-radius: 20px;
       background: rgba(125, 75, 43, 0.08);
       border: 1px solid rgba(125, 75, 43, 0.1);
+    }
+
+    .resource-card.video-card {
+      width: 100%;
+      max-width: none;
+      padding: 14px;
     }
 
     .resource-card strong {
@@ -347,6 +354,7 @@
     }
 
     function renderResource(resource) {
+      const cardClass = resource.kind === "video" ? "resource-card video-card" : "resource-card";
       let preview = "";
       if (resource.kind === "video" && resource.embedUrl) {
         preview = "<iframe class=\"resource-preview video\" src=\"" + escapeHtml(resource.embedUrl) + "\" title=\"" + escapeHtml(resource.title || "影片") + "\" allow=\"accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share\" allowfullscreen></iframe>";
@@ -357,7 +365,7 @@
         const imageSrc = resource.thumbnailUrl || buildPreviewSvg(resource.previewText || resource.title || "二胡影片", "video");
         preview = "<img class=\"resource-preview image\" src=\"" + imageSrc + "\" alt=\"" + escapeHtml(resource.title || "影片") + "\" />";
       }
-      return "<div class=\"resource-card\">" + preview + "<strong>" + escapeHtml(resource.label || "資源") + "</strong><a href=\"" + escapeHtml(resource.url || "#") + "\" target=\"_blank\" rel=\"noopener noreferrer\">" + escapeHtml(resource.title || "開啟") + "</a></div>";
+      return "<div class=\"" + cardClass + "\">" + preview + "<strong>" + escapeHtml(resource.label || "資源") + "</strong><a href=\"" + escapeHtml(resource.url || "#") + "\" target=\"_blank\" rel=\"noopener noreferrer\">" + escapeHtml(resource.title || "開啟") + "</a></div>";
     }
 
     function renderMessages() {
