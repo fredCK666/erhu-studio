@@ -19,6 +19,7 @@
     db: firebase.firestore(),
     projectId: firebaseConfig.projectId,
     functionsRegion: "asia-east1",
-    functionsBaseUrl: "https://asia-east1-" + firebaseConfig.projectId + ".cloudfunctions.net"
+    functionsBaseUrl: "https://asia-east1-" + firebaseConfig.projectId + ".cloudfunctions.net",
+    askTutorUrl: "https://askerhututor-jbvhjct63a-de.a.run.app"
   };
 })();

@@ -638,7 +638,7 @@
         throw new Error("missing-user");
       }
       const token = await user.getIdToken();
-      const response = await fetch(window.ErhuFirebase.functionsBaseUrl + "/askErhuTutor", {
+      const response = await fetch(window.ErhuFirebase.askTutorUrl || (window.ErhuFirebase.functionsBaseUrl + "/askErhuTutor"), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
