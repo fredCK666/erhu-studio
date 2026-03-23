@@ -20,6 +20,7 @@
     projectId: firebaseConfig.projectId,
     functionsRegion: "asia-east1",
     functionsBaseUrl: "https://asia-east1-" + firebaseConfig.projectId + ".cloudfunctions.net",
-    askTutorUrl: "https://askerhututor-jbvhjct63a-de.a.run.app"
+    askTutorUrl: "https://asia-east1-" + firebaseConfig.projectId + ".cloudfunctions.net/askErhuTutor",
+    askTutorFallbackUrl: "https://askerhututor-jbvhjct63a-de.a.run.app"
   };
 })();

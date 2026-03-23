@@ -651,25 +651,35 @@
         throw new Error("missing-user");
       }
       const token = await user.getIdToken();
-      const response = await fetch(window.ErhuFirebase.askTutorUrl || (window.ErhuFirebase.functionsBaseUrl + "/askErhuTutor"), {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": "Bearer " + token
-        },
-        body: JSON.stringify({
-          question: question,
-          level: levelSelect.value,
-          week: Number(weekSelect.value),
-          history: historyMessages
-        })
+      const payload = JSON.stringify({
+        question: question,
+        level: levelSelect.value,
+        week: Number(weekSelect.value),
+        history: historyMessages
       });
-      const data = await response.json();
-      if (!response.ok || !data.answer) {
-        throw new Error(data && data.error ? data.error : "backend-failed");
+      const urls = [window.ErhuFirebase.askTutorUrl, window.ErhuFirebase.askTutorFallbackUrl].filter(Boolean);
+      let lastError = null;
+      for (let index = 0; index < urls.length; index += 1) {
+        try {
+          const response = await fetch(urls[index], {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "Authorization": "Bearer " + token
+            },
+            body: payload
+          });
+          const data = await response.json();
+          if (!response.ok || !data.answer) {
+            throw new Error(data && data.error ? data.error : "backend-failed");
+          }
+          setSourceStatus("OpenAI 後端");
+          return data.answer;
+        } catch (error) {
+          lastError = error;
+        }
       }
-      setSourceStatus("OpenAI 後端");
-      return data.answer;
+      throw lastError || new Error("backend-failed");
     }
 
     async function saveHistory() {
