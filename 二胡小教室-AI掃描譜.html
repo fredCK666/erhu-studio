@@ -393,7 +393,7 @@
   </style>
 <link rel="stylesheet" href="./erhu-refined.css?v=20260928" />
 <script src="./erhu-quality.js?v=20260928"></script>
-<script src="./score-renderer.js?v=20260928"></script></head>
+<script src="./score-renderer.js?v=20260928"></script><link rel="stylesheet" href="./erhu-studio-ui.css?v=20260928b"><script defer src="./erhu-studio-ui.js?v=20260928b"></script></head>
 <body class="erhu-site">
   <main class="shell">
     <header class="topbar">
@@ -410,7 +410,7 @@
     <section class="hero">
       <div class="eyebrow">AI SCORE SCANNER</div>
       <h1>AI 掃描譜</h1>
-      <p>學生可以上傳想練的簡譜圖片，AI 先辨識成可編輯譜面；保存後可以進譜面編輯器細修，也可以直接到 AI 跟譜練音準。</p>
+      <p>從紙上的樂句，整理成自己的練習譜。先辨識，再對照原稿核查。</p>
     </section>
 
     <section class="grid">
@@ -430,7 +430,7 @@
             <label for="imageInput">譜面截圖或照片，最多 4 張</label>
             <input id="imageInput" type="file" accept="image/png,image/jpeg,image/webp" multiple />
           </div>
-          <div class="muted">圖片會先在瀏覽器縮小，再送去 AI 掃描。掃描結果仍建議進編輯器細修一次。</div>
+          <div class="muted">請上傳清晰、平整的簡譜。辨識後需核對音符、節奏與記號。</div>
           <div class="file-list" id="fileList"></div>
         </div>
         <div class="button-row">
