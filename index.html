@@ -3,7 +3,20 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>二胡教學小教室</title>
+  <title>AI 二胡考級檢定訓練</title>
+  <meta name="description" content="AI 二胡考級檢定訓練提供 AI 助教、AI 練習規劃師、AI 掃描譜、AI 音準跟譜、AI 級數回報與比賽展示路線，協助依級數準備二胡檢定。" />
+  <meta name="theme-color" content="#fff0cc" />
+  <link rel="canonical" href="https://erhu-auth.web.app/" />
+  <link rel="manifest" href="./site.webmanifest" />
+  <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+  <meta property="og:type" content="website" />
+  <meta property="og:locale" content="zh_TW" />
+  <meta property="og:title" content="AI 二胡考級檢定訓練" />
+  <meta property="og:description" content="登入後可使用 AI 助教、AI 練習規劃師、AI 掃描譜、AI 音準跟譜與 AI 級數回報，搭配初級到高級的十級考級檢定課程、測驗與打卡。" />
+  <meta property="og:url" content="https://erhu-auth.web.app/" />
+  <meta property="og:image" content="https://erhu-auth.web.app/assets/scores/level1-lian-gong-yu-fu-dian.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="stylesheet" href="./erhu-theme.css?v=20260327f" />
   <style>
     :root {
       --ink: #211711;
@@ -42,6 +55,15 @@
       padding: 24px 0 42px;
     }
 
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+    }
+
     .frame {
       position: relative;
       overflow: hidden;
@@ -77,11 +99,15 @@
       z-index: -1;
     }
 
+    .topbar .brand,
     .brand {
       font-size: 15px;
       font-weight: 900;
       letter-spacing: 0.22em;
       color: var(--wood);
+    }
+
+    .brand {
       margin-bottom: 18px;
     }
 
@@ -148,27 +174,118 @@
       background: linear-gradient(180deg, rgba(255,255,255,0.96), rgba(255,241,220,0.92));
       border: 1px solid rgba(125, 75, 43, 0.08);
       box-shadow: 0 10px 24px rgba(53, 34, 22, 0.06);
-      font-size: clamp(20px, 2vw, 27px);
+      font-size: clamp(18px, 1.8vw, 24px);
       font-weight: 900;
       line-height: 1.34;
-      white-space: nowrap;
+      white-space: normal;
+      text-wrap: balance;
     }
 
     .headline {
       margin: 0;
-      font-size: clamp(42px, 5.8vw, 76px);
+      font-size: clamp(34px, 5vw, 68px);
       line-height: 1.08;
       font-weight: 900;
-      white-space: nowrap;
+      white-space: normal;
+      text-wrap: balance;
     }
 
     .subhead {
       margin: 18px auto 0;
-      max-width: 1120px;
+      max-width: 860px;
       color: var(--muted);
-      font-size: clamp(21px, 2.3vw, 30px);
-      line-height: 1.55;
+      font-size: clamp(18px, 2vw, 28px);
+      line-height: 1.6;
       text-wrap: balance;
+    }
+
+    .hero-actions {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 26px;
+    }
+
+    .hero-cta {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 52px;
+      padding: 14px 22px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, var(--amber), var(--orange));
+      color: #4a2f18;
+      text-decoration: none;
+      font-weight: 900;
+      box-shadow: 0 16px 32px rgba(221, 134, 24, 0.26);
+      transition: transform 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .hero-cta.secondary {
+      background: rgba(255, 255, 255, 0.78);
+      border: 1px solid rgba(125, 75, 43, 0.1);
+      color: var(--wood);
+      box-shadow: 0 12px 24px rgba(53, 34, 22, 0.08);
+    }
+
+    .hero-cta:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 20px 38px rgba(221, 134, 24, 0.32);
+    }
+
+    .hero-proof {
+      margin: 32px auto 0;
+      max-width: 980px;
+      overflow: hidden;
+      border-radius: 28px;
+      border: 1px solid rgba(125, 75, 43, 0.12);
+      background: #fffaf4;
+      box-shadow: 0 20px 44px rgba(58, 35, 17, 0.12);
+      text-align: left;
+    }
+
+    .hero-proof img {
+      display: block;
+      width: 100%;
+      aspect-ratio: 1095 / 623;
+      object-fit: cover;
+      object-position: center top;
+      background: #fffaf4;
+    }
+
+    .proof-caption {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 14px;
+      align-items: center;
+      padding: 16px 18px;
+      color: #5d5147;
+      font-weight: 800;
+    }
+
+    .proof-caption strong {
+      display: block;
+      color: var(--wood);
+      font-size: 18px;
+    }
+
+    .proof-metrics {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .proof-metrics span {
+      display: inline-flex;
+      padding: 8px 10px;
+      border-radius: 999px;
+      background: rgba(124, 175, 87, 0.14);
+      color: #4e7438;
+      font-size: 13px;
+      font-weight: 900;
+      white-space: nowrap;
     }
 
     .urgency {
@@ -213,7 +330,7 @@
 
     .course-strip {
       display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
       gap: 16px;
       margin-top: 38px;
     }
@@ -238,6 +355,10 @@
       background: linear-gradient(180deg, rgba(255,238,230,0.98), rgba(248,205,189,0.94));
     }
 
+    .course-card:nth-child(4) {
+      background: linear-gradient(180deg, rgba(244,236,225,0.98), rgba(224,205,182,0.94));
+    }
+
     .course-card strong {
       display: block;
       margin-bottom: 8px;
@@ -257,6 +378,20 @@
       line-height: 1.8;
       font-size: 16px;
       font-weight: 600;
+    }
+
+    .course-card .card-action {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 16px;
+      padding: 12px 16px;
+      border-radius: 999px;
+      background: rgba(82, 51, 31, 0.9);
+      color: #fff8f1;
+      text-decoration: none;
+      font-weight: 900;
+      box-shadow: 0 10px 22px rgba(52, 34, 21, 0.14);
     }
 
     .teaching-strip {
@@ -358,6 +493,15 @@
       background: linear-gradient(135deg, rgba(245,238,255,0.98), rgba(220,211,248,0.94));
     }
 
+    .ad-card:nth-child(5) {
+      background: linear-gradient(135deg, rgba(232,245,245,0.98), rgba(186,218,218,0.94));
+    }
+
+    .ad-card:nth-child(6) {
+      background: linear-gradient(135deg, rgba(255,245,230,0.98), rgba(232,206,176,0.94));
+    }
+
+
     .ad-card strong {
       display: block;
       margin-bottom: 8px;
@@ -372,6 +516,52 @@
       line-height: 1.7;
       font-size: 15px;
       font-weight: 600;
+    }
+
+    .reference-strip {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+      margin-top: 18px;
+      text-align: left;
+    }
+
+    .reference-card {
+      overflow: hidden;
+      border-radius: 22px;
+      border: 1px solid rgba(110, 77, 51, 0.08);
+      background: rgba(255,255,255,0.82);
+      box-shadow: 0 12px 24px rgba(52, 34, 21, 0.05);
+    }
+
+    .reference-card img {
+      display: block;
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+      background: #fffaf4;
+    }
+
+    .reference-card strong,
+    .reference-card span {
+      display: block;
+      padding: 0 16px;
+    }
+
+    .reference-card strong {
+      padding-top: 14px;
+      color: var(--wood);
+      font-size: 16px;
+      font-weight: 900;
+    }
+
+    .reference-card span {
+      padding-top: 6px;
+      padding-bottom: 16px;
+      color: #60544b;
+      line-height: 1.55;
+      font-size: 14px;
+      font-weight: 700;
     }
 
     .cta-wrap {
@@ -570,7 +760,8 @@
       .course-strip,
       .teaching-strip,
       .lesson-grid,
-      .ad-strip {
+      .ad-strip,
+      .reference-strip {
         grid-template-columns: 1fr;
       }
 
@@ -596,15 +787,28 @@
         border-radius: 26px;
       }
 
+      .proof-caption {
+        grid-template-columns: 1fr;
+      }
+
+      .proof-metrics {
+        justify-content: flex-start;
+      }
+
       .cta {
         min-width: 0;
         width: 100%;
       }
     }
   </style>
+<link rel="stylesheet" href="./erhu-refined.css?v=20260928" />
+<script src="./erhu-quality.js?v=20260928"></script>
 </head>
-<body>
+<body class="erhu-site homepage">
   <main class="shell">
+    <header class="topbar">
+      <div class="brand">二胡小教室</div>
+    </header>
     <section class="frame">
       <div class="erhu-motif" aria-hidden="true">
         <div class="neck"></div>
@@ -631,103 +835,177 @@
       <div class="brand">ERHU STUDIO</div>
 
       <div class="hero">
-        <div class="promo-ribbon">AI 二胡教學｜即時問答助教｜找譜找影片一次完成</div>
+        <div class="promo-ribbon">AI 二胡考級檢定訓練｜十級課程｜從跟譜到回報一站完成</div>
 
         <div class="hero-badges">
           <span class="hero-badge">AI 即時問答</span>
-          <span class="hero-badge">教學影片推薦</span>
-          <span class="hero-badge">譜圖與資源搜尋</span>
+          <span class="hero-badge">AI 練習規劃</span>
+          <span class="hero-badge">AI 音準跟譜</span>
+          <span class="hero-badge">AI 級數回報</span>
         </div>
 
-        <h1>AI 二胡教學小教室</h1>
+        <h1>AI 二胡考級檢定訓練</h1>
 
         <div class="feature-row">
-          <div class="feature">問 AI 就能直接得到練習方向</div>
-          <div class="feature">想找譜、找影片、找重點都更快</div>
-          <div class="feature">從入門到進階都有完整訓練路線</div>
+          <div class="feature">選級數，進指定曲與自選曲</div>
+          <div class="feature">照 AI 規劃練今天的重點</div>
+          <div class="feature">跟譜拉完，回看音準與弱點</div>
         </div>
 
-        <p class="headline">像有一位隨時在線的 AI 二胡老師</p>
-        <p class="subhead">登入後可以直接問 AI 二胡助教，找簡譜、找教學影片、問技巧卡點，並搭配初級到高級的 10 週訓練、測驗與打卡一起學。</p>
+        <p class="headline">把二胡考級拆成今天能練的一步</p>
+        <p class="subhead">從初級到高級十級課程出發，先選級數，再用 AI 助教、練習規劃、掃描譜、音準跟譜和級數回報，把每次練習留下來。</p>
+
+        <div class="hero-actions">
+          <a class="hero-cta" href="./二胡小教室-登入.html">開始學習</a>
+          <a class="hero-cta secondary" href="./二胡小教室.html#course-levels">先看課程分級</a>
+          <a class="hero-cta secondary" href="./二胡小教室-AI體驗.html">免登入看五大功能</a>
+        </div>
+
+        <figure class="hero-proof">
+          <img src="./assets/scores/level1-lian-gong-yu-fu-dian.png" alt="二胡小教室第一級連弓與附點音符練習譜面預覽" width="1095" height="623" />
+          <figcaption class="proof-caption">
+            <span><strong>站內譜面會直接接到 AI 音準跟譜</strong>掃描譜、編輯器、跟譜練習和級數回報會串在同一個學習流程裡。</span>
+            <span class="proof-metrics">
+              <span>十級課程</span>
+              <span>逐音音準</span>
+              <span>練習紀錄</span>
+            </span>
+          </figcaption>
+        </figure>
 
         <div class="urgency">
-          <span class="urgency-badge">現在就能開始問 AI</span>
-          <span class="urgency-badge">卡關時直接得到回覆</span>
-          <span class="urgency-badge">打開就能找譜找影片</span>
+          <span class="urgency-badge">現在就能開始用 AI 練二胡</span>
+          <span class="urgency-badge">每次練習都有 AI 幫你接住</span>
+          <span class="urgency-badge">從發問到回報都在同一站完成</span>
         </div>
 
         <div class="levels">
           <span class="level">AI 助教</span>
-          <span class="level">每週訓練</span>
-          <span class="level">學習紀錄</span>
+          <span class="level">AI 規劃師</span>
+          <span class="level">AI 掃描譜</span>
+          <span class="level">AI 音準跟譜</span>
+          <span class="level">AI 級數回報</span>
+          <span class="level">比賽展示</span>
         </div>
 
         <div class="course-strip">
           <article class="course-card">
             <strong>AI TUTOR</strong>
             <h2>直接問 AI 二胡助教</h2>
-            <p>不懂的地方直接提問，技巧、姿勢、節奏、音準和練習安排都可以即時問答，不用等下一次上課。</p>
+            <p>不懂的地方直接提問，技巧、姿勢、節奏、音準和練習卡點都能即時問答，不用等下一次上課。</p>
+            <a class="card-action" href="./二胡小教室-AI助教.html">進入 AI 助教</a>
           </article>
           <article class="course-card">
-            <strong>SMART SEARCH</strong>
-            <h2>譜和影片一起找</h2>
-            <p>想看某一首曲子的二胡簡譜或教學影片，可以直接問 AI，快速拿到相關連結與可播放資源。</p>
+            <strong>AI PRACTICE PLANNER</strong>
+            <h2>AI 幫你排今天的練習</h2>
+            <p>依照目前等級、級數和卡關點，直接生成今天的練習流程，知道先練什麼、再練什麼。</p>
+            <a class="card-action" href="./二胡小教室-AI練習規劃師.html">進入 AI 規劃師</a>
           </article>
           <article class="course-card">
-            <strong>LEARNING PATH</strong>
-            <h2>AI 配合課程往前推</h2>
-            <p>AI 助教不只是聊天，還能搭配你每週訓練、測驗和打卡，讓學習更連貫，不會學到一半卡住。</p>
+            <strong>AI SCORE SCANNER</strong>
+            <h2>上傳圖片，AI 先掃成可練的譜</h2>
+            <p>把想練的簡譜截圖或照片上傳，AI 先轉成站內譜面，再進編輯器細修，最後直接拿去跟譜抓音準。</p>
+            <a class="card-action" href="./二胡小教室-AI掃描譜.html">進入 AI 掃描譜</a>
+          </article>
+          <article class="course-card">
+            <strong>AI PITCH GUIDE</strong>
+            <h2>跟著譜跑，當場抓音準</h2>
+            <p>直接照著級數音階練習演奏，AI 會逐音偵測音準，拉完就能看到哪些音過關、哪些音要回去慢練。</p>
+            <a class="card-action" href="./二胡小教室-AI音準評分.html?v=20260609v">進入 AI 音準跟譜</a>
+          </article>
+          <article class="course-card">
+            <strong>AI WEEKLY REPORT</strong>
+            <h2>把本級練習整理成回報</h2>
+            <p>AI 會整合打卡、測驗和音準練習紀錄，整理目前可核對的紀錄與下一步建議，資料不足時會明確說明。</p>
+            <a class="card-action" href="./二胡小教室-AI錯音複習師.html?v=20260409a">進入 AI 級數回報師</a>
           </article>
         </div>
 
         <div class="teaching-strip">
           <article class="teaching-card">
             <span class="section-label">AI LEARNING FLOW</span>
-            <h3>從發問、找資源，到自己拉出來</h3>
-            <p>這個首頁現在主打的是 AI 教學流程。你可以先問 AI 問題，再看它幫你整理的譜和影片，接著回到每週訓練、打卡和測驗，把練習真正落地，不只是看完就算了。</p>
+            <h3>從發問、練習、抓音準，到級數回顧</h3>
+            <p>這個首頁主打的是 AI 學音樂流程。你可以先問 AI 問題，再讓 AI 排練習、照著 AI 譜面直接演奏，最後用 AI 回報把整級表現整理清楚。</p>
           </article>
 
           <article class="lesson-card">
             <span class="section-label">AI CAN HELP</span>
-            <h3>AI 助教常幫你處理的問題</h3>
+            <h3>這幾個 AI 會幫你做的事</h3>
             <div class="lesson-grid">
               <div class="lesson-chip">技巧問答</div>
-              <div class="lesson-chip">找譜</div>
-              <div class="lesson-chip">找影片</div>
               <div class="lesson-chip">安排練習</div>
+              <div class="lesson-chip">逐音抓音準</div>
+              <div class="lesson-chip">整理級數回報</div>
               <div class="lesson-chip">看測驗弱點</div>
-              <div class="lesson-chip">追蹤進度</div>
+              <div class="lesson-chip">追蹤練習進度</div>
             </div>
+          </article>
+        </div>
+
+        <div class="reference-strip" aria-label="考級資料預覽">
+          <article class="reference-card">
+            <img src="./assets/exam-level-groups.png" alt="二胡檢定初級中級高級分級總覽" width="269" height="207" loading="lazy" />
+            <strong>先看自己在哪個級別</strong>
+            <span>初級、中級、高級入口清楚分開，不會一進站就迷路。</span>
+          </article>
+          <article class="reference-card">
+            <img src="./assets/exam-levels-1-5.png" alt="二胡檢定第一級到第五級曲目資料" width="775" height="733" loading="lazy" />
+            <strong>指定曲與自選曲對照</strong>
+            <span>每一級都能直接看到曲目、準備方向和下一步工具。</span>
+          </article>
+          <article class="reference-card">
+            <img src="./assets/exam-levels-6-10.png" alt="二胡檢定第六級到第十級曲目資料" width="846" height="762" loading="lazy" />
+            <strong>高級曲目也能分段準備</strong>
+            <span>第六級到第十級的技巧重點可接到規劃、測驗與回報。</span>
           </article>
         </div>
 
         <div class="ad-strip">
           <article class="ad-card">
             <strong>AI 助教隨時在線</strong>
-            <p>不管你是突然卡在內外弦、音準還是某一首曲子，登入後就能直接發問，不需要先去別的地方找答案。</p>
+            <p>不管你是卡在內外弦、節奏還是某個技巧細節，登入後就能直接問，像有一位隨時在線的二胡老師。</p>
           </article>
           <article class="ad-card">
-            <strong>問曲名就能找相關資源</strong>
-            <p>像「賽馬」、「茉莉花」這種曲子，可以直接要二胡簡譜或教學影片，讓找資料這件事變得很直接。</p>
+            <strong>AI 幫你把練習排清楚</strong>
+            <p>今天該先練哪個音、哪一級、幾分鐘最有效，AI 練習規劃師會直接幫你排出順序，不用自己猜。</p>
           </article>
           <article class="ad-card">
-            <strong>AI 配合你的學習紀錄</strong>
-            <p>打卡、測驗和帳號資料都能接在同一個系統裡，之後問問題也比較像在跟認識你的老師互動。</p>
+            <strong>AI 不是只聊天，還會抓音準</strong>
+            <p>跟著級數音階直接拉，系統會逐音判斷對不對，讓你當下就知道哪個音有問題，不用練完整首才回頭猜。</p>
           </article>
           <article class="ad-card">
-            <strong>課程不是被 AI 取代，是被 AI 放大</strong>
-            <p>初級、中級、高級的 10 週訓練還在，但現在多了 AI 助教幫你補上即時解答和資源整理，學習速度會更快。</p>
+            <strong>AI 幫你把這一級學習看清楚</strong>
+            <p>打卡、測驗和音準練習都會被整理成回報，讓你知道這一級進步在哪裡、下次該先補哪一段。</p>
+          </article>
+          <article class="ad-card">
+            <strong>比賽展示入口</strong>
+            <p>以掃描譜、譜面編輯、音準跟譜和級數回報作為主軸，完整呈現 AI 二胡考級訓練流程。</p>
+          </article>
+          <article class="ad-card">
+            <strong>AI 使用與隱私透明化</strong>
+            <p>網站清楚說明登入、麥克風、練習紀錄與 AI 回饋限制，讓作品在展示時更容易被理解與檢視。</p>
           </article>
         </div>
       </div>
 
       <div class="cta-wrap">
-        <a class="cta" href="./%E4%BA%8C%E8%83%A1%E5%B0%8F%E6%95%99%E5%AE%A4-%E7%99%BB%E5%85%A5.html">點我進入開始學習二胡吧！</a>
+        <a class="cta" href="./二胡小教室-比賽展示.html">先看比賽展示重點</a>
       </div>
-      <div class="cta-copy">現在就開始，讓 AI 幫你把二胡學習、找譜、找影片和每週訓練接在一起。</div>
+      <div class="cta-copy">從課程分級、AI 掃描譜、音準跟譜到級數回報，形成一條完整的二胡考級練習流程。</div>
     </section>
-
-    <div class="note">首頁網址路徑：<code>/</code></div>
-  </main>
+  <aside class="access-note">目前網站沒有付款或結帳流程。AI 功能需登入後使用；可先<a href="./二胡小教室-AI體驗.html">查看五大功能示範</a>，了解學習方式。</aside>
+</main>
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+  <script src="./firebase-init.js?v=20260928"></script>
+  <script src="./auth.js?v=20260928"></script>
+  <script>
+    window.ErhuAuth.attachAuthUI({
+      showGuestActions: true,
+      guestHref: "./二胡小教室-登入.html",
+      guestLabel: "登入"
+    });
+  </script>
 </body>
 </html>

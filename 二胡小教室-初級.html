@@ -3,74 +3,115 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>二胡小教室 | 初級 10 週課程</title>
+  <title>二胡小教室 | 初級檢定課程</title>
+  <meta name="description" content="二胡初級檢定課程整理第一級到第三級的指定曲、自選曲、準備重點與 AI 練習工具入口。" />
+  <link rel="canonical" href="https://erhu-auth.web.app/二胡小教室-初級.html" />
+  <link rel="manifest" href="./site.webmanifest" />
+  <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+  <meta property="og:type" content="website" />
+  <meta property="og:locale" content="zh_TW" />
+  <meta property="og:title" content="二胡小教室 | 初級檢定課程" />
+  <meta property="og:description" content="第一級到第三級的指定曲、自選曲與練習工具入口。" />
+  <meta property="og:url" content="https://erhu-auth.web.app/二胡小教室-初級.html" />
+  <meta property="og:image" content="https://erhu-auth.web.app/assets/scores/level1-lian-gong-yu-fu-dian.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="stylesheet" href="./erhu-theme.css?v=20260327f" />
   <style>
     :root { --ink:#211914; --muted:#69584d; --paper:rgba(255,250,244,0.92); --line:rgba(83,57,39,0.12); --wood:#7b4d2d; --shadow:0 22px 54px rgba(46,28,18,0.14); }
     * { box-sizing:border-box; }
     body { margin:0; color:var(--ink); font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif; background:linear-gradient(180deg,#f7efe3 0%,#fbf9f5 40%,#efe4d5 100%); }
     a { color:inherit; text-decoration:none; }
     .shell { width:min(1120px,calc(100% - 28px)); margin:0 auto; padding:24px 0 40px; }
-    .topbar { display:flex; justify-content:space-between; gap:16px; margin-bottom:18px; flex-wrap:wrap; }
-    .brand { font-size:22px; font-weight:800; letter-spacing:0.08em; }
-    .nav { display:flex; gap:14px; flex-wrap:wrap; color:var(--muted); font-weight:700; }
-    .hero,.week-card,.tools { background:var(--paper); border:1px solid var(--line); border-radius:28px; box-shadow:var(--shadow); }
+    .hero,.week-card,.tools,.chart-card { background:var(--paper); border:1px solid var(--line); border-radius:28px; box-shadow:var(--shadow); }
     .hero { padding:28px; margin-bottom:18px; }
     h1 { margin:0 0 10px; font-size:clamp(30px,5vw,46px); }
     p, li { color:var(--muted); line-height:1.8; }
     .weeks { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:16px; }
     .week-card { display:block; padding:20px; transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease; }
+    .week-card ul { margin:12px 0 0; padding-left:20px; color:var(--muted); }
     .tag { display:inline-flex; margin-bottom:10px; padding:6px 10px; border-radius:999px; background:rgba(123,77,45,0.1); color:var(--wood); font-size:13px; font-weight:800; }
     .week-card h2 { margin:0 0 10px; font-size:24px; }
     .week-card:hover { transform: translateY(-2px); border-color: rgba(123,77,45,0.24); }
+    .chart-card { margin-top:18px; padding:22px; }
+    .syllabus-list { display:grid; gap:14px; margin-top:14px; }
+    .syllabus-item { padding:18px; border-radius:20px; background:#fffdf8; border:1px solid rgba(123,77,45,0.1); }
+    .syllabus-item h3 { margin:0 0 10px; font-size:22px; }
+    .piece-row { margin-top:8px; color:var(--muted); line-height:1.8; }
+    .piece-row span { display:inline-block; margin-right:8px; color:var(--wood); font-weight:800; }
     .tools { margin-top:18px; padding:22px; }
     .tools a { color:var(--wood); font-weight:800; }
     @media (max-width:860px) { .weeks { grid-template-columns:1fr; } }
   </style>
+<link rel="stylesheet" href="./erhu-refined.css?v=20260928" />
+<script src="./erhu-quality.js?v=20260928"></script>
 </head>
-<body>
+<body class="erhu-site">
   <main class="shell">
     <header class="topbar">
       <div class="brand">二胡小教室</div>
       <nav class="nav">
         <a href="./">回首頁</a>
-        <a href="./二胡小教室.html">課程分級</a>
-        <a href="./二胡小教室-影片.html">影片工具</a>
-        <a href="./二胡小教室-練習打卡.html">每週打卡</a>
-        <a href="./二胡小教室-AI助教.html?level=beginner&amp;week=1">AI 助教</a>
+        <a href="./二胡小教室.html#course-levels">課程分級</a>
+        <a href="./二胡小教室-AI練習規劃師.html">AI 規劃</a>
+        <a href="./二胡小教室-練習打卡.html">檢定打卡</a>
       </nav>
+      <a class="tuner-shortcut" href="./二胡小教室-調音器.html">調音器</a>
     </header>
     <section class="hero">
-      <h1>初級 10 週課程</h1>
-      <p>從姿勢、長弓、切弦、音準開始，一路推進到第一段完整演奏。這條線是打底線，強調身體動作、耳朵和基本控制。</p>
+      <h1>初級檢定課程</h1>
+      <p>這一頁對應二胡檢定的初級級別，也就是第一級到第三級。每一級都先練指定曲，再從自選曲裡挑 1 首做完整準備。</p>
     </section>
-    <section class="weeks">
-      <a class="week-card" href="./二胡小教室-週課程.html?level=beginner&amp;week=1"><div class="tag">第 1 週</div><h2>姿勢與持琴重整</h2><p>重整坐姿、琴筒位置、握弓與身體放鬆感。</p></a>
-      <a class="week-card" href="./二胡小教室-週課程.html?level=beginner&amp;week=2"><div class="tag">第 2 週</div><h2>基本長弓穩定</h2><p>練長弓平均、弓速控制與音色乾淨度。</p></a>
-      <a class="week-card" href="./二胡小教室-週課程.html?level=beginner&amp;week=3"><div class="tag">第 3 週</div><h2>內外弦切換</h2><p>建立切弦手感，讓弓路乾淨不混亂。</p></a>
-      <a class="week-card" href="./二胡小教室-週課程.html?level=beginner&amp;week=4"><div class="tag">第 4 週</div><h2>節奏與短句</h2><p>用拍器把短句拉穩，建立拍點概念。</p></a>
-      <a class="week-card" href="./二胡小教室-週課程.html?level=beginner&amp;week=5"><div class="tag">第 5 週</div><h2>左手按音基礎</h2><p>加入按音和簡單音階，開始建立音準感。</p></a>
-      <a class="week-card" href="./二胡小教室-週課程.html?level=beginner&amp;week=6"><div class="tag">第 6 週</div><h2>音階反覆校正</h2><p>反覆修正落點，讓耳朵和手指對齊。</p></a>
-      <a class="week-card" href="./二胡小教室-週課程.html?level=beginner&amp;week=7"><div class="tag">第 7 週</div><h2>分弓與連弓</h2><p>把常見弓法放進簡單樂句中練習。</p></a>
-      <a class="week-card" href="./二胡小教室-週課程.html?level=beginner&amp;week=8"><div class="tag">第 8 週</div><h2>基礎旋律整合</h2><p>開始把姿勢、節奏和音準放進旋律。</p></a>
-      <a class="week-card" href="./二胡小教室-週課程.html?level=beginner&amp;week=9"><div class="tag">第 9 週</div><h2>完整段落演奏</h2><p>連續拉完一段短曲，不中斷完成。</p></a>
-      <a class="week-card" href="./二胡小教室-週課程.html?level=beginner&amp;week=10"><div class="tag">第 10 週</div><h2>初級成果驗收</h2><p>錄下一段完整基礎演奏，作為初級收尾。</p></a>
+    <section class="weeks" id="weeksContainer"></section>
+    <section class="chart-card">
+      <h2>初級三級課程安排</h2>
+      <p>這裡把第一級到第三級的指定曲、自選曲和準備方向整理成文字版，方便直接對照練習。</p>
+      <div class="syllabus-list" id="syllabusList"></div>
     </section>
     <section class="tools">
       搭配工具：
-      <a href="./二胡小教室-影片.html">影片頁</a>、
-      <a href="./二胡小教室-練習打卡.html">每週打卡</a>、
-      <a href="./二胡小教室-小測驗.html?level=beginner">週期檢核</a>、
-      <a href="./二胡小教室-AI助教.html?level=beginner&amp;week=1">AI 助教</a>
+      <a href="./二胡小教室-影片.html">示範教材</a>、
+      <a href="./二胡小教室-練習打卡.html">檢定打卡</a>、
+      <a href="./二胡小教室-小測驗.html?level=beginner">級數測驗</a>、
+      <a href="./二胡小教室-AI練習規劃師.html?level=beginner">AI 規劃</a>、
+      <a href="./二胡小教室-AI助教.html?level=beginner&amp;grade=1">AI 助教</a>
     </section>
   </main>
   <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
-  <script src="./firebase-init.js?v=20260323b"></script>
-  <script src="./auth.js?v=20260323b"></script>
+  <script src="./exam-course-data.js?v=20260505c"></script>
+  <script src="./exam-progress.js?v=20260519a"></script>
+  <script src="./firebase-init.js?v=20260928"></script>
+  <script src="./auth.js?v=20260928"></script>
   <script>
     window.ErhuAuth.requireAuth();
     window.ErhuAuth.attachAuthUI();
+
+    const course = window.ErhuExamData.levels.beginner;
+    const weeksContainer = document.getElementById("weeksContainer");
+    const syllabusList = document.getElementById("syllabusList");
+
+    course.grades.forEach(function (item, index) {
+      const card = document.createElement("a");
+      card.className = "week-card";
+      card.href = window.ErhuExamProgress.buildUrl("./二胡小教室-週課程.html", { level: "beginner", grade: index + 1 });
+      card.innerHTML =
+        "<div class=\"tag\">" + item.grade + "</div>" +
+        "<h2>" + item.shortTitle + "</h2>" +
+        "<p>" + item.description + "</p>" +
+        "<ul><li>指定曲：" + item.specified + "</li><li>自選曲：" + item.selected.join("、") + "</li></ul>";
+      weeksContainer.appendChild(card);
+
+      const entry = document.createElement("article");
+      entry.className = "syllabus-item";
+      entry.innerHTML =
+        "<h3>" + item.grade + "｜" + item.shortTitle + "</h3>" +
+        "<p>" + item.note + "</p>" +
+        "<div class=\"piece-row\"><span>指定曲</span>" + item.specified + "</div>" +
+        "<div class=\"piece-row\"><span>自選曲</span>" + item.selected.join("、") + "</div>" +
+        "<div class=\"piece-row\"><span>準備重點</span>" + item.focus.join(" / ") + "</div>";
+      syllabusList.appendChild(entry);
+    });
   </script>
 </body>
 </html>

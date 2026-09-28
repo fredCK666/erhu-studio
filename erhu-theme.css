@@ -1,0 +1,845 @@
+body.erhu-site {
+  position: relative;
+  overflow-x: hidden;
+  background:
+    radial-gradient(circle at 10% 10%, rgba(205, 158, 85, 0.2), transparent 18%),
+    radial-gradient(circle at 88% 14%, rgba(101, 62, 39, 0.14), transparent 20%),
+    radial-gradient(circle at 76% 88%, rgba(188, 151, 102, 0.12), transparent 18%),
+    linear-gradient(180deg, #efe1d2 0%, #faf4ed 42%, #e7d2bc 100%);
+}
+
+body.erhu-site .visually-hidden {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+body.erhu-site a:focus-visible,
+body.erhu-site button:focus-visible,
+body.erhu-site input:focus-visible,
+body.erhu-site select:focus-visible,
+body.erhu-site textarea:focus-visible {
+  outline: 3px solid rgba(36, 97, 170, 0.88);
+  outline-offset: 3px;
+  box-shadow: 0 0 0 6px rgba(36, 97, 170, 0.16);
+}
+
+body.erhu-site::before,
+body.erhu-site::after {
+  content: "";
+  position: fixed;
+  pointer-events: none;
+  z-index: 0;
+}
+
+body.erhu-site::before {
+  right: 88px;
+  top: 86px;
+  width: 7px;
+  height: 62vh;
+  border-radius: 999px;
+  background: linear-gradient(180deg, rgba(75, 44, 28, 0.42), rgba(125, 75, 43, 0.1));
+  box-shadow: 20px 0 0 rgba(108, 71, 49, 0.22);
+  transform: rotate(8deg);
+}
+
+body.erhu-site::after {
+  right: -54px;
+  top: 34%;
+  width: 230px;
+  height: 270px;
+  border-radius: 36px;
+  background:
+    linear-gradient(180deg, rgba(114, 73, 47, 0.28), rgba(77, 49, 31, 0.12)),
+    repeating-linear-gradient(145deg, rgba(255,255,255,0.08) 0 9px, rgba(98,66,45,0.12) 9px 18px);
+  border: 1px solid rgba(91, 58, 37, 0.16);
+  transform: rotate(10deg);
+  box-shadow: 0 28px 68px rgba(60, 36, 22, 0.16);
+}
+
+body.erhu-site .shell {
+  position: relative;
+  z-index: 1;
+}
+
+body.erhu-site .topbar {
+  position: relative;
+  display: grid !important;
+  grid-template-columns: max-content minmax(0, 1fr) max-content max-content !important;
+  grid-auto-flow: column !important;
+  align-items: center !important;
+  gap: 10px !important;
+  flex-wrap: nowrap !important;
+  padding: 14px 18px;
+  border-radius: 24px;
+  border: 1px solid rgba(98, 64, 43, 0.18);
+  background:
+    linear-gradient(180deg, rgba(255, 251, 247, 0.94), rgba(228, 213, 198, 0.94));
+  box-shadow: 0 20px 42px rgba(71, 43, 22, 0.1);
+  backdrop-filter: blur(10px);
+  font-family: "PingFang TC", "Microsoft JhengHei", "Noto Sans TC", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+body.erhu-site .topbar::after {
+  content: "";
+  position: absolute;
+  inset: auto 20px 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(123, 77, 45, 0.22), transparent);
+}
+
+body.erhu-site .brand {
+  color: #3d2516;
+  font-family: "PingFang TC", "Microsoft JhengHei", "Noto Sans TC", sans-serif;
+  font-size: 22px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.35);
+  grid-column: 1;
+  grid-row: 1;
+  justify-self: start;
+  white-space: nowrap;
+}
+
+body.erhu-site .nav,
+body.erhu-site .home-link,
+body.erhu-site .top-link {
+  color: #6a4c3b;
+}
+
+body.erhu-site .nav {
+  display: flex !important;
+  grid-column: 2;
+  grid-row: 1;
+  justify-self: center;
+  min-width: 0;
+  gap: 8px;
+  row-gap: 8px;
+  flex-wrap: wrap !important;
+  align-items: center;
+  justify-content: center;
+  white-space: normal;
+  overflow: visible;
+  scrollbar-width: none;
+}
+
+body.erhu-site .nav::-webkit-scrollbar {
+  display: none;
+}
+
+body.erhu-site .nav a,
+body.erhu-site .home-link,
+body.erhu-site .top-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  min-height: 36px;
+  padding: 7px 11px;
+  border-radius: 999px;
+  border: 1px solid rgba(100, 67, 47, 0.12);
+  background: linear-gradient(180deg, rgba(255, 250, 246, 0.96), rgba(233, 219, 205, 0.92));
+  font-family: "PingFang TC", "Microsoft JhengHei", "Noto Sans TC", sans-serif;
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.62),
+    0 10px 18px rgba(79, 53, 35, 0.08);
+  transition: transform 0.18s ease, background 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+body.erhu-site .home-link,
+body.erhu-site .top-link {
+  grid-column: 2;
+  grid-row: 1;
+  justify-self: center;
+}
+
+body.erhu-site #authArea {
+  grid-column: 4;
+  grid-row: 1;
+  justify-self: end;
+  width: max-content;
+  min-width: max-content;
+  white-space: nowrap;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 10px !important;
+  flex-wrap: nowrap !important;
+  font-family: "PingFang TC", "Microsoft JhengHei", "Noto Sans TC", sans-serif;
+}
+
+body.erhu-site .tuner-shortcut {
+  grid-column: 3;
+  grid-row: 1;
+  justify-self: end;
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  padding: 9px 16px;
+  border-radius: 999px;
+  border: 1px solid rgba(133, 82, 45, 0.2) !important;
+  background: linear-gradient(135deg, #bf8455, #8a5633) !important;
+  color: #fffaf5 !important;
+  font-family: "PingFang TC", "Microsoft JhengHei", "Noto Sans TC", sans-serif;
+  font-weight: 900 !important;
+  font-size: 15px;
+  line-height: 1;
+  letter-spacing: 0.02em;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.18),
+    0 12px 24px rgba(97, 61, 38, 0.18) !important;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+  text-decoration: none !important;
+  white-space: nowrap !important;
+}
+
+body.erhu-site .tuner-shortcut:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.18),
+    0 16px 28px rgba(97, 61, 38, 0.22);
+}
+
+body.erhu-site .tuner-shortcut.active {
+  background: linear-gradient(135deg, #8d5534, #5f3823);
+}
+
+body.erhu-site .topbar.topbar-reference {
+  grid-template-columns: max-content minmax(0, 1fr) max-content !important;
+  align-items: start !important;
+  row-gap: 18px !important;
+  padding-bottom: 54px;
+}
+
+body.erhu-site .topbar.topbar-reference .nav {
+  justify-self: start;
+  gap: 14px;
+  overflow: visible;
+}
+
+body.erhu-site .topbar.topbar-reference .nav a {
+  padding: 8px 16px;
+  font-size: 15px;
+  font-weight: 800;
+  letter-spacing: 0.01em;
+}
+
+body.erhu-site .topbar.topbar-reference .tuner-shortcut {
+  align-self: center;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  color: #3d2516 !important;
+  min-height: auto;
+  padding: 0 6px;
+  font-size: 16px;
+  font-weight: 900 !important;
+}
+
+body.erhu-site .topbar.topbar-reference #authArea {
+  position: absolute;
+  right: 18px;
+  bottom: 14px;
+  grid-column: auto;
+  grid-row: auto;
+}
+
+body.erhu-site .nav a:hover,
+body.erhu-site .home-link:hover,
+body.erhu-site .top-link:hover,
+body.erhu-site .button:hover,
+body.erhu-site .tab:hover,
+body.erhu-site .week-tab:hover,
+body.erhu-site .playlist-item:hover,
+body.erhu-site .week-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 30px rgba(90, 57, 35, 0.16);
+}
+
+body.erhu-site .hero,
+body.erhu-site .panel,
+body.erhu-site .card,
+body.erhu-site .note,
+body.erhu-site .featured-ai,
+body.erhu-site .week-card,
+body.erhu-site .tools,
+body.erhu-site .chat-shell,
+body.erhu-site .score-card,
+body.erhu-site .question,
+body.erhu-site .tracker-item,
+body.erhu-site .playlist-item,
+body.erhu-site .meta,
+body.erhu-site .score-history {
+  position: relative;
+  overflow: hidden;
+}
+
+body.erhu-site .hero::before,
+body.erhu-site .panel::before,
+body.erhu-site .card::before,
+body.erhu-site .featured-ai::before,
+body.erhu-site .chat-shell::before,
+body.erhu-site .score-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(135deg, rgba(255,255,255,0.14), transparent 34%),
+    repeating-linear-gradient(120deg, transparent 0 14px, rgba(123,77,45,0.026) 14px 28px);
+}
+
+body.erhu-site .hero,
+body.erhu-site .panel,
+body.erhu-site .card,
+body.erhu-site .note,
+body.erhu-site .featured-ai,
+body.erhu-site .tools,
+body.erhu-site .chat-shell,
+body.erhu-site .score-card {
+  border-color: rgba(123, 77, 45, 0.18);
+  box-shadow: 0 28px 62px rgba(64, 38, 20, 0.14);
+}
+
+body.erhu-site .hero,
+body.erhu-site .panel,
+body.erhu-site .card,
+body.erhu-site .tools,
+body.erhu-site .score-card,
+body.erhu-site .question {
+  background:
+    linear-gradient(180deg, rgba(255, 253, 249, 0.99), rgba(240, 230, 217, 0.97));
+}
+
+body.erhu-site .featured-ai {
+  background:
+    radial-gradient(circle at top center, rgba(117, 72, 45, 0.34), transparent 34%),
+    radial-gradient(circle at 50% 18%, rgba(226, 201, 167, 0.24), transparent 24%),
+    linear-gradient(180deg, rgba(248, 239, 229, 0.99), rgba(215, 187, 160, 0.98));
+  border-color: rgba(102, 64, 41, 0.24);
+  box-shadow:
+    0 30px 70px rgba(95, 60, 38, 0.18),
+    0 0 0 1px rgba(255, 245, 236, 0.6) inset;
+}
+
+body.erhu-site .featured-ai::after {
+  content: "";
+  position: absolute;
+  inset: 16px;
+  border-radius: 24px;
+  border: 1px solid rgba(255, 245, 227, 0.48);
+  pointer-events: none;
+}
+
+body.erhu-site .chat-shell {
+  background:
+    linear-gradient(180deg, rgba(255, 251, 246, 0.99), rgba(232, 219, 206, 0.97));
+  border-color: rgba(97, 65, 45, 0.16);
+  box-shadow: 0 30px 68px rgba(63, 41, 27, 0.14);
+}
+
+body.erhu-site .message.user {
+  background:
+    linear-gradient(135deg, #8d5a39, #5f3823);
+  color: #f8efe8;
+  box-shadow: 0 20px 42px rgba(86, 52, 32, 0.22);
+}
+
+body.erhu-site .message.assistant,
+body.erhu-site .resource-card,
+body.erhu-site .score-box,
+body.erhu-site .option,
+body.erhu-site .meta,
+body.erhu-site .score-history,
+body.erhu-site .tracker-item,
+body.erhu-site .playlist-item,
+body.erhu-site .week-card {
+  background:
+    linear-gradient(180deg, rgba(255, 252, 248, 0.99), rgba(237, 226, 214, 0.96));
+  border-color: rgba(101, 68, 47, 0.14);
+  box-shadow: 0 16px 32px rgba(64, 38, 20, 0.1);
+}
+
+body.erhu-site .week-card,
+body.erhu-site .playlist-item,
+body.erhu-site .tracker-item,
+body.erhu-site .question {
+  border: 1px solid rgba(123, 77, 45, 0.1);
+}
+
+body.erhu-site .panel p,
+body.erhu-site .tracker-item label,
+body.erhu-site .tracker-item strong,
+body.erhu-site .summary,
+body.erhu-site .status,
+body.erhu-site .score-history,
+body.erhu-site .meta,
+body.erhu-site .result,
+body.erhu-site .feedback {
+  color: #5a4030;
+}
+
+body.erhu-site .tracker-item strong,
+body.erhu-site .summary {
+  color: #7a5138;
+}
+
+body.erhu-site .tracker-item input {
+  accent-color: #7a5138;
+}
+
+body.erhu-site .button,
+body.erhu-site .tab,
+body.erhu-site .week-tab {
+  border: 1px solid rgba(126, 86, 45, 0.24);
+  background:
+    linear-gradient(135deg, #d8b06a, #8f5c35);
+  color: #fff9f2;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.18),
+    0 16px 28px rgba(110, 70, 34, 0.2);
+}
+
+body.erhu-site .button.secondary {
+  background:
+    linear-gradient(180deg, rgba(255,252,247,0.96), rgba(230,216,203,0.94));
+  color: #5f3d2a;
+}
+
+body.erhu-site .tab.active,
+body.erhu-site .week-tab.active,
+body.erhu-site .playlist-item.active {
+  background:
+    linear-gradient(135deg, #8d5a36, #5a341f);
+  color: #fff6f0;
+  border-color: rgba(91, 55, 34, 0.28);
+}
+
+body.erhu-site .tag,
+body.erhu-site .eyebrow,
+body.erhu-site .section-label,
+body.erhu-site .helper-badge,
+body.erhu-site .promo-ribbon,
+body.erhu-site .hero-badge,
+body.erhu-site .urgency-badge,
+body.erhu-site .level {
+  border: 1px solid rgba(123, 77, 45, 0.08);
+  box-shadow: 0 10px 20px rgba(72, 42, 21, 0.06);
+}
+
+body.erhu-site .tag,
+body.erhu-site .eyebrow,
+body.erhu-site .section-label,
+body.erhu-site .helper-badge {
+  background: linear-gradient(180deg, rgba(247, 236, 216, 0.98), rgba(222, 196, 156, 0.92));
+  color: #714829;
+}
+
+body.erhu-site .featured-ai .eyebrow,
+body.erhu-site .featured-ai .helper-badge {
+  background: linear-gradient(180deg, rgba(247, 238, 230, 0.98), rgba(214, 191, 169, 0.96));
+  color: #603924;
+  border-color: rgba(102, 64, 41, 0.14);
+  box-shadow: 0 12px 24px rgba(86, 54, 35, 0.12);
+}
+
+body.erhu-site .featured-ai h2 {
+  color: #3e2619;
+  text-shadow: 0 1px 0 rgba(255,255,255,0.35);
+}
+
+body.erhu-site .featured-ai p {
+  color: #614637;
+}
+
+body.erhu-site .featured-ai .button.primary {
+  background: linear-gradient(135deg, #8d5a39, #5a341f);
+  color: #fff6ef;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.16),
+    0 18px 32px rgba(86, 54, 35, 0.22);
+}
+
+body.erhu-site textarea,
+body.erhu-site input,
+body.erhu-site select {
+  border-color: rgba(123, 77, 45, 0.16);
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.98), rgba(252, 246, 238, 0.98));
+  box-shadow: inset 0 1px 2px rgba(98, 60, 34, 0.06);
+}
+
+body.erhu-site h1,
+body.erhu-site h2,
+body.erhu-site h3,
+body.erhu-site .headline {
+  color: #2f190d;
+  text-shadow: 0 1px 0 rgba(255,255,255,0.22);
+}
+
+body.erhu-site .note,
+body.erhu-site .public-note {
+  background:
+    linear-gradient(180deg, rgba(255, 251, 246, 0.9), rgba(241, 226, 209, 0.9));
+  border: 1px solid rgba(123, 77, 45, 0.12);
+  border-radius: 22px;
+  box-shadow: 0 16px 34px rgba(64, 38, 20, 0.08);
+}
+
+body.erhu-site .frame {
+  border-color: rgba(102, 65, 45, 0.16);
+  box-shadow: 0 34px 84px rgba(64, 38, 20, 0.16);
+}
+
+body.erhu-site .feature,
+body.erhu-site .course-card,
+body.erhu-site .ad-card,
+body.erhu-site .lesson-card,
+body.erhu-site .teaching-card {
+  border-color: rgba(123, 77, 45, 0.12);
+  box-shadow: 0 18px 34px rgba(85, 48, 19, 0.12);
+}
+
+body.erhu-site .feature {
+  background: linear-gradient(180deg, rgba(253, 248, 241, 0.98), rgba(232, 214, 190, 0.92));
+}
+
+body.erhu-site .hero-badge,
+body.erhu-site .promo-ribbon,
+body.erhu-site .urgency-badge,
+body.erhu-site .level,
+body.erhu-site .lesson-chip {
+  background: linear-gradient(180deg, rgba(247, 237, 219, 0.96), rgba(224, 195, 149, 0.9));
+  color: #6b4325;
+}
+
+body.erhu-site .chat-head h1,
+body.erhu-site .message small,
+body.erhu-site .label,
+body.erhu-site .status {
+  color: #5e3a28;
+}
+
+body.erhu-site .composer {
+  border-top-color: rgba(96, 61, 41, 0.12);
+  background: linear-gradient(180deg, rgba(255,252,248,0), rgba(233,220,208,0.96) 24%);
+}
+
+body.erhu-site textarea {
+  background: linear-gradient(180deg, rgba(255,252,248,0.98), rgba(239,228,218,0.98));
+}
+
+@media (max-width: 980px) {
+  body.erhu-site::before,
+  body.erhu-site::after {
+    opacity: 0.3;
+    right: -72px;
+  }
+
+  body.erhu-site .topbar {
+    grid-template-columns: max-content minmax(0, 1fr) max-content !important;
+    grid-auto-flow: row !important;
+    row-gap: 10px !important;
+  }
+
+  body.erhu-site .brand {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  body.erhu-site .nav {
+    grid-column: 1 / 3;
+    grid-row: 2;
+    justify-self: start;
+    justify-content: flex-start;
+  }
+
+  body.erhu-site .tuner-shortcut {
+    grid-column: 3;
+    grid-row: 2;
+    justify-self: end;
+  }
+
+  body.erhu-site #authArea {
+    grid-column: 3;
+    grid-row: 1;
+  }
+}
+
+@media (max-width: 720px) {
+  body.erhu-site::before,
+  body.erhu-site::after {
+    display: none;
+  }
+
+  body.erhu-site .topbar {
+    grid-template-columns: 1fr !important;
+    justify-items: start !important;
+    padding: 12px 14px;
+  }
+
+  body.erhu-site .brand,
+  body.erhu-site .nav,
+  body.erhu-site .tuner-shortcut,
+  body.erhu-site .home-link,
+  body.erhu-site .top-link,
+  body.erhu-site #authArea {
+    grid-column: auto;
+    justify-self: start;
+  }
+}
+
+body.erhu-site:not(.homepage) {
+  background:
+    radial-gradient(circle at 8% 10%, rgba(232, 191, 118, 0.22), transparent 18%),
+    radial-gradient(circle at 90% 12%, rgba(160, 115, 74, 0.12), transparent 18%),
+    radial-gradient(circle at 78% 88%, rgba(210, 170, 108, 0.12), transparent 18%),
+    linear-gradient(180deg, #f6ecdf 0%, #fdfaf4 42%, #ead7c2 100%);
+}
+
+body.erhu-site:not(.homepage)::before {
+  right: 86px;
+  top: 90px;
+  width: 6px;
+  height: 58vh;
+  background: linear-gradient(180deg, rgba(154, 112, 66, 0.24), rgba(118, 77, 47, 0.06));
+  box-shadow: 18px 0 0 rgba(210, 178, 132, 0.2);
+}
+
+body.erhu-site:not(.homepage)::after {
+  right: -40px;
+  top: 32%;
+  width: 220px;
+  height: 260px;
+  border-radius: 34px;
+  background:
+    linear-gradient(180deg, rgba(236, 215, 186, 0.18), rgba(147, 98, 61, 0.08)),
+    repeating-linear-gradient(145deg, rgba(255,255,255,0.1) 0 11px, rgba(169,128,84,0.08) 11px 22px);
+  border: 1px solid rgba(150, 104, 64, 0.12);
+  box-shadow: 0 24px 58px rgba(85, 55, 30, 0.1);
+}
+
+body.erhu-site:not(.homepage) .topbar {
+  border-color: rgba(146, 103, 63, 0.14);
+  background:
+    linear-gradient(180deg, rgba(255, 252, 248, 0.96), rgba(246, 235, 221, 0.94));
+  box-shadow: 0 18px 38px rgba(71, 43, 22, 0.08);
+}
+
+body.erhu-site:not(.homepage) .topbar::after {
+  background: linear-gradient(90deg, transparent, rgba(171, 127, 84, 0.22), transparent);
+}
+
+body.erhu-site:not(.homepage) .nav a,
+body.erhu-site:not(.homepage) .home-link,
+body.erhu-site:not(.homepage) .top-link {
+  background: linear-gradient(180deg, rgba(255, 252, 248, 0.98), rgba(243, 231, 216, 0.94));
+  border-color: rgba(160, 112, 72, 0.12);
+  color: #6f5038;
+}
+
+body.erhu-site:not(.homepage) .tuner-shortcut {
+  background: linear-gradient(135deg, #b87b4c, #7b4b2d) !important;
+  border-color: rgba(123, 77, 45, 0.22) !important;
+  color: #fffaf4 !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.18),
+    0 14px 26px rgba(101, 67, 43, 0.18) !important;
+}
+
+body.erhu-site:not(.homepage) .tuner-shortcut.active {
+  background: linear-gradient(135deg, #8a5332, #5a341f) !important;
+}
+
+body.erhu-site:not(.homepage) .hero,
+body.erhu-site:not(.homepage) .panel,
+body.erhu-site:not(.homepage) .card,
+body.erhu-site:not(.homepage) .note,
+body.erhu-site:not(.homepage) .week-card,
+body.erhu-site:not(.homepage) .tools,
+body.erhu-site:not(.homepage) .score-card,
+body.erhu-site:not(.homepage) .question,
+body.erhu-site:not(.homepage) .tracker-item,
+body.erhu-site:not(.homepage) .playlist-item,
+body.erhu-site:not(.homepage) .meta,
+body.erhu-site:not(.homepage) .score-history,
+body.erhu-site:not(.homepage) .resource-card,
+body.erhu-site:not(.homepage) .score-box,
+body.erhu-site:not(.homepage) .option,
+body.erhu-site:not(.homepage) .display,
+body.erhu-site:not(.homepage) .chapter-card,
+body.erhu-site:not(.homepage) .feature,
+body.erhu-site:not(.homepage) .course-card,
+body.erhu-site:not(.homepage) .ad-card,
+body.erhu-site:not(.homepage) .lesson-card,
+body.erhu-site:not(.homepage) .teaching-card {
+  border-color: rgba(157, 111, 70, 0.14);
+  background:
+    linear-gradient(180deg, rgba(255, 252, 248, 0.99), rgba(244, 232, 218, 0.96));
+  box-shadow: 0 22px 48px rgba(83, 53, 29, 0.1);
+}
+
+body.erhu-site:not(.homepage) .hero::before,
+body.erhu-site:not(.homepage) .panel::before,
+body.erhu-site:not(.homepage) .card::before,
+body.erhu-site:not(.homepage) .featured-ai::before,
+body.erhu-site:not(.homepage) .chat-shell::before,
+body.erhu-site:not(.homepage) .score-card::before {
+  background:
+    linear-gradient(135deg, rgba(255,255,255,0.16), transparent 34%),
+    repeating-linear-gradient(120deg, transparent 0 16px, rgba(176,133,90,0.022) 16px 32px);
+}
+
+body.erhu-site:not(.homepage) .featured-ai {
+  background:
+    radial-gradient(circle at top center, rgba(117, 76, 47, 0.18), transparent 34%),
+    radial-gradient(circle at 50% 16%, rgba(218, 185, 142, 0.2), transparent 22%),
+    linear-gradient(180deg, rgba(248, 240, 232, 0.99), rgba(225, 198, 172, 0.98));
+  border-color: rgba(108, 71, 45, 0.2);
+  box-shadow:
+    0 28px 62px rgba(95, 60, 38, 0.16),
+    0 0 0 1px rgba(255, 246, 238, 0.62) inset;
+}
+
+body.erhu-site:not(.homepage) .chat-shell {
+  background:
+    linear-gradient(180deg, rgba(255, 252, 248, 0.99), rgba(243, 231, 220, 0.97));
+  border-color: rgba(127, 88, 56, 0.16);
+}
+
+body.erhu-site:not(.homepage) .message.assistant {
+  background: linear-gradient(180deg, rgba(255, 250, 243, 0.99), rgba(243, 229, 213, 0.96));
+  border-color: rgba(148, 103, 64, 0.12);
+  color: #493326;
+}
+
+body.erhu-site:not(.homepage) .message.user,
+body.erhu-site:not(.homepage) .featured-ai .button.primary,
+body.erhu-site:not(.homepage) .chat-shell .button.primary {
+  background: linear-gradient(135deg, #cda37c, #9b6b45);
+  color: #fffaf6;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.14),
+    0 18px 34px rgba(101, 67, 43, 0.18);
+}
+
+body.erhu-site:not(.homepage) .button,
+body.erhu-site:not(.homepage) .tab,
+body.erhu-site:not(.homepage) .week-tab {
+  border-color: rgba(167, 121, 72, 0.2);
+  background: linear-gradient(135deg, #ebc57f, #b17745);
+  color: #54331f;
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.22),
+    0 14px 28px rgba(124, 83, 45, 0.16);
+}
+
+body.erhu-site:not(.homepage) .button.secondary,
+body.erhu-site:not(.homepage) .tab.secondary {
+  background: linear-gradient(180deg, rgba(249, 239, 229, 0.98), rgba(236, 217, 197, 0.96));
+  color: #6a4733;
+}
+
+body.erhu-site:not(.homepage) .tab.active,
+body.erhu-site:not(.homepage) .week-tab.active,
+body.erhu-site:not(.homepage) .playlist-item.active,
+body.erhu-site:not(.homepage) .chapter-card.active {
+  background: linear-gradient(135deg, rgba(255, 249, 242, 0.99), rgba(240, 224, 202, 0.96));
+  color: #4d3324;
+  border-color: rgba(167, 118, 73, 0.34);
+}
+
+body.erhu-site:not(.homepage) .tag,
+body.erhu-site:not(.homepage) .eyebrow,
+body.erhu-site:not(.homepage) .section-label,
+body.erhu-site:not(.homepage) .helper-badge,
+body.erhu-site:not(.homepage) .hero-badge,
+body.erhu-site:not(.homepage) .promo-ribbon,
+body.erhu-site:not(.homepage) .urgency-badge,
+body.erhu-site:not(.homepage) .level,
+body.erhu-site:not(.homepage) .lesson-chip,
+body.erhu-site:not(.homepage) .pill {
+  background: linear-gradient(180deg, rgba(248, 239, 223, 0.98), rgba(232, 205, 165, 0.9));
+  color: #6f472a;
+  border-color: rgba(167, 121, 72, 0.1);
+  box-shadow: 0 10px 20px rgba(72, 42, 21, 0.05);
+}
+
+body.erhu-site:not(.homepage) h1,
+body.erhu-site:not(.homepage) h2,
+body.erhu-site:not(.homepage) h3,
+body.erhu-site:not(.homepage) .headline,
+body.erhu-site:not(.homepage) strong,
+body.erhu-site:not(.homepage) .score-title {
+  color: #2e1d12;
+  text-shadow: none;
+}
+
+body.erhu-site:not(.homepage) p,
+body.erhu-site:not(.homepage) li,
+body.erhu-site:not(.homepage) label,
+body.erhu-site:not(.homepage) .panel p,
+body.erhu-site:not(.homepage) .hero p,
+body.erhu-site:not(.homepage) .tracker-item label,
+body.erhu-site:not(.homepage) .summary,
+body.erhu-site:not(.homepage) .status,
+body.erhu-site:not(.homepage) .meta,
+body.erhu-site:not(.homepage) .result,
+body.erhu-site:not(.homepage) .feedback,
+body.erhu-site:not(.homepage) .playlist-item div,
+body.erhu-site:not(.homepage) .chapter-card div,
+body.erhu-site:not(.homepage) .score-note,
+body.erhu-site:not(.homepage) .empty {
+  color: #654a39;
+}
+
+body.erhu-site:not(.homepage) .featured-ai p,
+body.erhu-site:not(.homepage) .meta,
+body.erhu-site:not(.homepage) .score-history,
+body.erhu-site:not(.homepage) .resource-card strong,
+body.erhu-site:not(.homepage) .tracker-item strong,
+body.erhu-site:not(.homepage) .summary,
+body.erhu-site:not(.homepage) .label,
+body.erhu-site:not(.homepage) .status,
+body.erhu-site:not(.homepage) .message small {
+  color: #744b2f;
+}
+
+body.erhu-site:not(.homepage) .question.correct {
+  border-color: rgba(116, 145, 83, 0.38);
+  background: linear-gradient(180deg, rgba(248, 252, 241, 0.98), rgba(235, 243, 224, 0.96));
+}
+
+body.erhu-site:not(.homepage) .question.incorrect {
+  border-color: rgba(189, 111, 81, 0.32);
+  background: linear-gradient(180deg, rgba(255, 249, 246, 0.99), rgba(248, 232, 224, 0.96));
+}
+
+body.erhu-site:not(.homepage) .feedback.correct {
+  color: #5c7d3a;
+}
+
+body.erhu-site:not(.homepage) .feedback.incorrect {
+  color: #b06142;
+}
+
+body.erhu-site:not(.homepage) textarea,
+body.erhu-site:not(.homepage) input,
+body.erhu-site:not(.homepage) select {
+  border-color: rgba(164, 117, 74, 0.16);
+  background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(252, 246, 238, 0.98));
+  color: #2d1d13;
+}

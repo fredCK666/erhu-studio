@@ -13,6 +13,31 @@
     firebase.initializeApp(firebaseConfig);
   }
 
+  function readStoredScoreData(data) {
+    const source = data || {};
+    if (typeof source.scoreDataJson === "string" && source.scoreDataJson.trim()) {
+      try {
+        const parsed = JSON.parse(source.scoreDataJson);
+        return parsed && Array.isArray(parsed.rows) ? parsed : null;
+      } catch (error) {
+        console.warn("read stored scoreDataJson failed", error);
+      }
+    }
+    if (source.scoreData && Array.isArray(source.scoreData.rows)) {
+      return source.scoreData;
+    }
+    return null;
+  }
+
+  function writeStoredScoreData(score) {
+    return JSON.stringify(score || {});
+  }
+
+  window.ErhuScoreStorage = {
+    read: readStoredScoreData,
+    write: writeStoredScoreData
+  };
+
   window.ErhuFirebase = {
     app: firebase.app(),
     auth: firebase.auth(),
@@ -20,7 +45,7 @@
     projectId: firebaseConfig.projectId,
     functionsRegion: "asia-east1",
     functionsBaseUrl: "https://asia-east1-" + firebaseConfig.projectId + ".cloudfunctions.net",
-    askTutorUrl: "https://asia-east1-" + firebaseConfig.projectId + ".cloudfunctions.net/askErhuTutor",
-    askTutorFallbackUrl: "https://askerhututor-jbvhjct63a-de.a.run.app"
+    askTutorUrl: "https://asia-east1-" + firebaseConfig.projectId + ".cloudfunctions.net/askErhuTutorLive",
+    scanScoreUrl: "https://asia-east1-" + firebaseConfig.projectId + ".cloudfunctions.net/scanErhuScore"
   };
 })();

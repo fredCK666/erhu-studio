@@ -3,7 +3,20 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>二胡小教室 | 每週課程</title>
+  <meta name="referrer" content="origin" />
+  <title>二胡小教室 | 級數課程</title>
+  <meta name="description" content="二胡級數課程頁提供每一級的指定曲、自選曲、影片、譜面、AI 跟譜、測驗與練習規劃入口。" />
+  <link rel="canonical" href="https://erhu-auth.web.app/二胡小教室-週課程.html" />
+  <link rel="manifest" href="./site.webmanifest" />
+  <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+  <meta property="og:type" content="website" />
+  <meta property="og:locale" content="zh_TW" />
+  <meta property="og:title" content="二胡小教室 | 級數課程" />
+  <meta property="og:description" content="打開指定級數後，可練曲目、看影片、做測驗、用 AI 跟譜與規劃練習。" />
+  <meta property="og:url" content="https://erhu-auth.web.app/二胡小教室-週課程.html" />
+  <meta property="og:image" content="https://erhu-auth.web.app/assets/scores/level1-lian-gong-yu-fu-dian.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="stylesheet" href="./erhu-theme.css?v=20260327f" />
   <style>
     :root {
       --ink: #1f1713;
@@ -29,32 +42,9 @@
     a { color: inherit; text-decoration: none; }
 
     .shell {
-      width: min(1160px, calc(100% - 28px));
+      width: min(1320px, calc(100% - 20px));
       margin: 0 auto;
-      padding: 24px 0 42px;
-    }
-
-    .topbar {
-      display: flex;
-      justify-content: space-between;
-      gap: 16px;
-      margin-bottom: 18px;
-      flex-wrap: wrap;
-      color: var(--muted);
-      font-weight: 700;
-    }
-
-    .brand {
-      color: var(--ink);
-      font-size: 22px;
-      font-weight: 900;
-      letter-spacing: 0.08em;
-    }
-
-    .nav {
-      display: flex;
-      gap: 14px;
-      flex-wrap: wrap;
+      padding: 18px 0 30px;
     }
 
     .hero,
@@ -67,8 +57,8 @@
     }
 
     .hero {
-      padding: 28px;
-      margin-bottom: 18px;
+      padding: 22px 24px;
+      margin-bottom: 14px;
     }
 
     .eyebrow {
@@ -95,12 +85,79 @@
 
     .layout {
       display: grid;
-      grid-template-columns: minmax(0, 1.08fr) minmax(320px, 0.92fr);
+      grid-template-columns: 1fr;
       gap: 18px;
     }
 
+    .piece-section {
+      margin-bottom: 14px;
+      padding: 18px 20px;
+    }
+
+    .piece-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 14px;
+    }
+
+    .piece-head h2 {
+      margin: 0;
+      font-size: 26px;
+    }
+
+    .piece-meta {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.8;
+    }
+
+    .piece-tabs {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .piece-tab {
+      border: 1px solid rgba(125, 75, 43, 0.1);
+      background: rgba(255, 251, 244, 0.9);
+      color: var(--wood);
+      border-radius: 999px;
+      padding: 10px 14px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .piece-tab.active {
+      background: linear-gradient(135deg, #ffd66b, #e7861d);
+      color: #4a2f18;
+      border-color: transparent;
+    }
+
     .panel {
-      padding: 24px;
+      padding: 20px;
+    }
+
+    .piece-chip {
+      display: inline-flex;
+      margin-bottom: 12px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(125, 75, 43, 0.1);
+      color: var(--wood);
+      font-size: 13px;
+      font-weight: 900;
+    }
+
+    .piece-title {
+      margin: 0 0 10px;
+      font-size: 28px;
+    }
+
+    .piece-description {
+      margin: 0 0 16px;
     }
 
     .video-frame {
@@ -109,12 +166,40 @@
       background: #18120f;
       aspect-ratio: 16 / 9;
       margin-bottom: 16px;
+      width: min(100%, 860px);
     }
 
     .video-frame iframe {
       width: 100%;
       height: 100%;
       border: 0;
+    }
+
+    .video-empty {
+      margin-bottom: 16px;
+      padding: 24px;
+      border-radius: 20px;
+      background: linear-gradient(180deg, rgba(255,246,232,0.96), rgba(255,237,211,0.92));
+      border: 1px solid rgba(125, 75, 43, 0.08);
+      color: var(--muted);
+      line-height: 1.8;
+    }
+
+    .video-note {
+      margin: -2px 0 16px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.8;
+    }
+
+    .video-help {
+      margin: -8px 0 16px;
+      padding: 12px 14px;
+      border-radius: 16px;
+      background: rgba(240, 174, 62, 0.12);
+      color: var(--wood);
+      font-size: 14px;
+      line-height: 1.8;
     }
 
     .bullet-list,
@@ -124,7 +209,7 @@
     }
 
     .score-card {
-      padding: 22px;
+      padding: 16px;
     }
 
     .score-title {
@@ -133,14 +218,291 @@
     }
 
     .score-box {
-      margin-top: 12px;
-      padding: 18px;
+      margin-top: 10px;
+      padding: 14px 14px 12px;
       border-radius: 20px;
-      background: linear-gradient(180deg, rgba(255,246,232,0.96), rgba(255,237,211,0.92));
+      background: rgba(255, 255, 255, 0.94);
       border: 1px solid rgba(125, 75, 43, 0.08);
+      overflow-x: auto;
     }
 
-    .score-box pre {
+    .score-follow-sheet {
+      display: grid;
+      gap: 4px;
+      min-width: 1080px;
+    }
+
+    .score-follow-row {
+      display: flex;
+      gap: 4px;
+      align-items: flex-start;
+    }
+
+    .score-follow-header {
+      display: grid;
+      gap: 4px;
+      margin-bottom: 8px;
+    }
+
+    .score-follow-title {
+      color: #2f1c13;
+      font-size: 25px;
+      font-weight: 900;
+      text-align: center;
+      letter-spacing: 0.02em;
+    }
+
+    .score-follow-meta {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: flex-start;
+    }
+
+    .score-follow-meta-left {
+      display: grid;
+      gap: 2px;
+      color: #473124;
+      font-size: 17px;
+      font-weight: 800;
+    }
+
+    .score-follow-meta-right {
+      color: var(--wood);
+      font-size: 16px;
+      font-weight: 800;
+      text-align: right;
+    }
+
+    .score-follow-prefix {
+      flex: 0 0 24px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 98px;
+      color: #3b2418;
+      font-size: 24px;
+      font-weight: 900;
+      line-height: 0.88;
+      white-space: pre-line;
+    }
+
+    .score-follow-measure-row {
+      flex: 1;
+      display: grid;
+      grid-template-columns: repeat(var(--measure-count, 1), minmax(0, 1fr));
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .score-follow-measure {
+      position: relative;
+      display: grid;
+      grid-template-columns: repeat(var(--unit-count, 8), minmax(0, 1fr));
+      grid-template-rows: 22px 22px 14px auto 16px;
+      gap: 4px 6px;
+      align-items: start;
+      width: 100%;
+      min-width: 0;
+      padding: 12px 8px 0 0;
+      border-right: 2px solid rgba(125, 75, 43, 0.18);
+    }
+
+    .score-follow-measure:last-child {
+      padding-right: 0;
+      border-right: 0;
+    }
+
+    .score-follow-bow {
+      grid-row: 1;
+      align-self: end;
+      justify-self: center;
+      color: #2e1f17;
+      font-size: 15px;
+      font-weight: 900;
+      line-height: 1;
+      white-space: pre;
+      pointer-events: none;
+      padding: 0 1px;
+      transform: translateY(-1px);
+    }
+
+    .score-follow-guide {
+      grid-row: 2;
+      align-self: end;
+      justify-self: center;
+      color: #2e1f17;
+      font-size: 13px;
+      font-weight: 900;
+      line-height: 1.05;
+      letter-spacing: 0.01em;
+      white-space: pre;
+      pointer-events: none;
+      padding: 0 1px;
+      transform: translateY(1px);
+    }
+
+    .score-follow-slur {
+      grid-row: 3;
+      height: 12px;
+      border: 1.5px solid rgba(125, 75, 43, 0.62);
+      border-bottom: 0;
+      border-radius: 16px 16px 0 0;
+      margin: 2px 1px 0;
+      pointer-events: none;
+    }
+
+    .score-follow-underline {
+      grid-row: 5;
+      align-self: start;
+      border-top: 1.5px solid #2f2118;
+      margin: 0 1px;
+      pointer-events: none;
+    }
+
+    .score-follow-underline.double {
+      box-shadow: 0 3.5px 0 0 #2f2118;
+    }
+
+    .score-follow-marker {
+      position: absolute;
+      top: -8px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 0 4px;
+      background: rgba(255, 255, 255, 0.94);
+      color: var(--wood);
+      font-size: 10px;
+      font-weight: 900;
+      line-height: 1.2;
+    }
+
+    .score-follow-label {
+      flex: 0 0 64px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 12px;
+      border-radius: 16px;
+      background: rgba(125, 75, 43, 0.08);
+      color: var(--wood);
+      font-size: 13px;
+      font-weight: 900;
+    }
+
+    .score-follow-notes {
+      flex: 1;
+      display: flex;
+      gap: 8px;
+      min-width: 0;
+    }
+
+    .score-follow-cell {
+      flex: var(--beats, 1) 1 0;
+      display: inline-flex;
+      align-items: flex-end;
+      justify-content: center;
+      min-width: 0;
+      padding: 0;
+    }
+
+    .score-follow-measure .score-follow-cell {
+      grid-row: 4;
+      min-width: 0;
+      position: relative;
+      padding-top: 3px;
+    }
+
+    .score-follow-main {
+      display: inline-flex;
+      align-items: flex-start;
+      justify-content: center;
+      color: #382217;
+      font-size: 19px;
+      font-weight: 900;
+      line-height: 1;
+      padding-top: 2px;
+    }
+
+    .score-follow-jianpu {
+      display: inline-grid;
+      justify-items: center;
+      min-width: 18px;
+      line-height: 1;
+    }
+
+    .score-follow-octave {
+      min-height: 10px;
+      color: #20140e;
+      font-size: 15px;
+      font-weight: 900;
+      letter-spacing: 0.02em;
+      line-height: 0.85;
+    }
+
+    .score-follow-digit {
+      margin-top: 1px;
+      color: #382217;
+      font-size: 22px;
+      font-weight: 900;
+      line-height: 1;
+    }
+
+    .score-follow-low-octave {
+      min-height: 8px;
+      color: #20140e;
+      font-size: 13px;
+      font-weight: 900;
+      letter-spacing: 0.02em;
+      line-height: 0.7;
+    }
+
+    .score-follow-low-octave-marker {
+      grid-row: 5;
+      justify-self: center;
+      align-self: start;
+      color: #20140e;
+      font-size: 13px;
+      font-weight: 900;
+      letter-spacing: 0.02em;
+      line-height: 0.7;
+      pointer-events: none;
+      transform: translateY(4px);
+    }
+
+    .score-follow-tail {
+      margin-left: 1px;
+      align-self: flex-end;
+      color: #382217;
+      font-size: 22px;
+      font-weight: 900;
+      line-height: 1;
+    }
+
+    .score-follow-rhythm-dot {
+      margin-left: 2px;
+      align-self: flex-end;
+      color: #25170f;
+      font-size: 28px;
+      font-weight: 950;
+      line-height: 0.8;
+      transform: translateY(-3px);
+    }
+
+    .score-follow-upper-note {
+      position: absolute;
+      top: -4px;
+      left: 12%;
+      color: #382217;
+      font-size: 12px;
+      font-weight: 900;
+      line-height: 1;
+      white-space: nowrap;
+      pointer-events: none;
+    }
+
+    .score-follow-plain {
       margin: 0;
       white-space: pre-wrap;
       word-break: break-word;
@@ -153,6 +515,59 @@
     .score-note {
       margin-top: 12px;
       font-size: 14px;
+    }
+
+    .score-empty {
+      margin-top: 12px;
+      padding: 18px;
+      border-radius: 18px;
+      background: rgba(125, 75, 43, 0.06);
+      color: var(--muted);
+      line-height: 1.8;
+    }
+
+    .song-links {
+      margin-top: 16px;
+      padding: 18px;
+      border-radius: 18px;
+      background: rgba(255, 248, 238, 0.86);
+      border: 1px solid rgba(125, 75, 43, 0.08);
+    }
+
+    .song-links h3 {
+      margin: 0 0 10px;
+      font-size: 18px;
+    }
+
+    .song-link-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .song-link-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.82);
+      border: 1px solid rgba(125, 75, 43, 0.08);
+    }
+
+    .song-link-item strong {
+      color: var(--ink);
+    }
+
+    .song-link-item small {
+      color: var(--wood);
+      font-weight: 800;
+    }
+
+    .practice-detail[hidden],
+    .song-links[hidden],
+    .actions[hidden] {
+      display: none;
     }
 
     .actions {
@@ -179,24 +594,21 @@
       color: var(--wood);
     }
 
-    @media (max-width: 920px) {
-      .layout {
-        grid-template-columns: 1fr;
-      }
-    }
   </style>
+<link rel="stylesheet" href="./erhu-refined.css?v=20260928" />
+<script src="./erhu-quality.js?v=20260928"></script>
 </head>
-<body>
+<body class="erhu-site">
   <main class="shell">
     <header class="topbar">
       <div class="brand">二胡小教室</div>
       <nav class="nav">
         <a href="./">回首頁</a>
-        <a id="backLevelLink" href="./二胡小教室.html">回課程頁</a>
-        <a href="./二胡小教室-影片.html">影片工具</a>
-        <a href="./二胡小教室-練習打卡.html">每週打卡</a>
-        <a id="aiLinkTop" href="./二胡小教室-AI助教.html">AI 助教</a>
+        <a id="backLevelLink" href="./二胡小教室.html#course-levels">課程分級</a>
+        <a id="plannerLinkTop" href="./二胡小教室-AI練習規劃師.html">AI 規劃</a>
+        <a href="./二胡小教室-練習打卡.html">檢定打卡</a>
       </nav>
+      <a class="tuner-shortcut" href="./二胡小教室-調音器.html">調音器</a>
     </header>
 
     <section class="hero">
@@ -205,108 +617,802 @@
       <p id="weekDescription"></p>
     </section>
 
+    <section class="panel piece-section">
+      <div class="piece-head">
+        <div>
+          <div class="eyebrow">GRADE SONGS</div>
+          <h2>本級檢定曲子</h2>
+          <div class="piece-meta" id="pieceMeta"></div>
+        </div>
+      </div>
+      <div class="piece-tabs" id="pieceTabs"></div>
+    </section>
+
     <section class="layout">
       <article class="panel">
+        <div class="piece-chip" id="pieceTypeChip"></div>
+        <h2 class="piece-title" id="pieceTitle"></h2>
+        <p class="piece-description" id="pieceDescription"></p>
         <div class="video-frame">
-          <iframe id="videoFrame" src="" title="每週教學影片" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+          <iframe id="videoFrame" src="" title="本級示範教材播放器" referrerpolicy="origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
         </div>
-        <h2>本週教學重點</h2>
-        <ul class="bullet-list" id="focusList"></ul>
-        <h2>本週任務</h2>
-        <ul class="task-list" id="taskList"></ul>
-        <div class="actions">
-          <a class="button secondary" id="prevWeekLink" href="#">上一週</a>
-          <a class="button secondary" id="quizLink" href="./二胡小教室-小測驗.html">學習測驗</a>
-          <a class="button secondary" id="aiLink" href="./二胡小教室-AI助教.html">AI 助教</a>
-          <a class="button" id="nextWeekLink" href="#">下一週</a>
-        </div>
+        <div class="video-empty" id="videoEmpty" hidden></div>
+        <p class="video-note" id="videoNote"></p>
+        <div class="video-help" id="videoHelp" hidden></div>
       </article>
 
       <aside class="score-card">
-        <h2 class="score-title">本週練習譜</h2>
-        <p>這裡先放每週對應的練習譜占位。之後你若給我真正的譜圖或 PDF，我可以直接換成圖片版或下載版。</p>
-        <div class="score-box">
-          <pre id="scoreText"></pre>
+        <h2 class="score-title">譜面與問答</h2>
+        <p id="scoreIntro">這裡不提供站內簡譜，會直接引導你用 AI 助教要譜，再搭配影片和本級重點練習。</p>
+        <div class="score-box" id="scoreBox">
+          <div class="score-follow-sheet" id="scoreText"></div>
         </div>
+        <div class="score-empty" id="scoreEmpty" hidden></div>
         <p class="score-note" id="scoreNote"></p>
+        <div class="actions" id="scoreActions">
+          <a class="button secondary" id="videoSearchLink" href="#" target="_blank" rel="noopener noreferrer">其他示範教材</a>
+          <a class="button secondary" id="aiPitchLink" href="#">AI 跟譜練習</a>
+          <a class="button secondary" id="scoreEditLink" href="#">編輯譜面</a>
+          <a class="button secondary" id="aiScoreLink" href="#">問 AI 助教要簡譜</a>
+        </div>
+        <div class="song-links" id="songLinksSection">
+          <h3>這一級所有檢定曲子</h3>
+          <div class="song-link-list" id="songLinkList"></div>
+        </div>
       </aside>
+    </section>
+
+    <section class="panel practice-detail" id="practiceDetailPanel">
+      <h2>本級教學重點</h2>
+      <ul class="bullet-list" id="focusList"></ul>
+      <h2>本級任務</h2>
+      <ul class="task-list" id="taskList"></ul>
+      <div class="actions">
+        <a class="button secondary" id="prevWeekLink" href="#">上一級</a>
+        <a class="button secondary" id="quizLink" href="./二胡小教室-小測驗.html">學習測驗</a>
+        <a class="button secondary" id="plannerLink" href="./二胡小教室-AI練習規劃師.html">AI 規劃</a>
+        <a class="button secondary" id="aiLink" href="./二胡小教室-AI助教.html">AI 助教</a>
+        <a class="button" id="nextWeekLink" href="#">下一級</a>
+      </div>
     </section>
   </main>
 
   <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
-  <script src="./firebase-init.js?v=20260323b"></script>
-  <script src="./auth.js?v=20260323b"></script>
+  <script src="./firebase-init.js?v=20260928"></script>
+  <script src="./auth.js?v=20260928"></script>
+  <script src="./exam-course-data.js?v=20260505c"></script>
+  <script src="./exam-piece-scores.js?v=20260611d"></script>
+  <script src="./exam-progress.js?v=20260519a"></script>
   <script>
     window.ErhuAuth.requireAuth();
     window.ErhuAuth.attachAuthUI();
+
+    function cleanPieceName(text) {
+      return String(text || "").replace(/（.*?）/g, "").trim();
+    }
+
+    function buildProfessorSongQuery(name) {
+      return "黃國豪 " + cleanPieceName(name) + " 二胡";
+    }
+
+    function buildOtherDemoQuery(name) {
+      return cleanPieceName(name) + " 二胡 示範";
+    }
+
+    function buildYouTubeSearchUrl(query) {
+      return "https://www.youtube.com/results?search_query=" + encodeURIComponent(query);
+    }
+
+    function buildYouTubeEmbedFromId(videoId) {
+      const origin = window.location.origin && window.location.origin !== "null"
+        ? "&origin=" + encodeURIComponent(window.location.origin)
+        : "";
+      return "https://www.youtube.com/embed/" + encodeURIComponent(videoId) + "?rel=0&playsinline=1&modestbranding=1" + origin;
+    }
+
+    const huangVideoMap = {
+      "連弓與附點音符練習（劉長福曲）": { id: "2hmAoyUs-qU", source: "fixed" },
+      "田園春色": { id: "mxPAfCjgBRM", source: "fixed" },
+      "紫竹調": { id: "9z04hEvyTeo", source: "fixed" },
+      "鳳陽花鼓": { id: "XG4Tjs7XMgM", source: "fixed" },
+      "西藏舞曲": { id: "Pvson4uvEYU", source: "fixed" },
+      "中把練習（舒昭曲）": { id: "nOa13TQQCFo", source: "approx" },
+      "花好月圓": { id: "pYWFXpuAp2E", source: "fixed" },
+      "茉莉花": { id: "HSnWpG8ALk8", source: "fixed" },
+      "六月茉莉": { id: "dDuanUTimn4", source: "fixed" },
+      "採茶撲蝶": { id: "JefwQnfy-pk", source: "fixed" },
+      "G、D 弦第一、二把位內外弦練習（吳榮燊曲）": { id: "WWjA1Cj7yRo", source: "approx" },
+      "小花鼓": { id: "cm0EfM1PgAI", source: "fixed" },
+      "迎春曲": { id: "Vri3w9CYiN8", source: "fixed" },
+      "喜洋洋": { id: "ZxWPDroeBH8", source: "fixed" },
+      "常動曲（黃正路曲）": { id: "jCkIopWfmNA", source: "fixed" },
+      "阿美族舞曲": { id: "zToMf8yTVVw", source: "fixed" },
+      "良宵": { id: "Nld4t3c2214", source: "fixed" },
+      "光明行": { id: "qZ-7nyX9Vco", source: "fixed" },
+      "賽馬": { id: "XN5NiXqizvs", source: "fixed" },
+      "牧羊姑娘": { id: "oeODKh0Pg6Q", source: "fixed" },
+      "顫指練習（葛瀚聰譜）": { id: "uCppVxZK3T8", source: "fixed" },
+      "踏青": { id: "n-c3Joa6Kgc", source: "fixed" },
+      "空山鳥語": { id: "9PopmkoWpTc", source: "fixed" },
+      "城市歌聲": { id: "tfHVTsuu8Pg", source: "fixed" },
+      "燭影搖紅": { id: "jTD6Ub00aHw", source: "fixed" },
+      "蘇南小曲": { id: "cYTho_THzuU", source: "fixed" },
+      "奔馳千里草原": { id: "crzAxfthgHw", source: "approx" },
+      "兩手配合練習（王國潼曲）": { id: "OwFzT-o6aeI", source: "fixed" },
+      "江南春色": { id: "gReFCfpiegg", source: "fixed" },
+      "獨弦操": { id: "tyg3x4rgFG0", source: "fixed" },
+      "百家春": { id: "4-WbbHMA_nQ", source: "fixed" },
+      "春詩": { id: "nip_ywIsU90", source: "fixed" },
+      "出塞": { id: "YAcL2WaZ3uw", source: "fixed" },
+      "借助空弦的跳指換把練習（宋國生曲）": { id: "mz6FeDmk_Qk", source: "approx" },
+      "月夜": { id: "P4gmeBqQsms", source: "fixed" },
+      "三門峽暢想曲": { id: "Ax0tGkFXbrQ", source: "fixed" },
+      "聽松": { id: "MX-vtpNrb68", source: "fixed" },
+      "戰馬奔騰": { id: "PY5BUzOLl7g", source: "fixed" },
+      "江河水": { id: "vzVMKpA1dXU", source: "fixed" },
+      "二泉映月": { id: "cBRgFr7I76E", source: "fixed" },
+      "陝北抒懷": { id: "abITJuOKGc8", source: "fixed" },
+      "蘭花花敘事曲": { id: "bYUWkkN_L24", source: "fixed" },
+      "天山風情": { id: "tuJhHBKkVDk", source: "fixed" },
+      "第一二胡狂想曲": { id: "rhMLvAdn4v4", source: "fixed" },
+      "陽光照耀著的塔什庫爾干": { id: "csBCelgxgrc", source: "approx" }
+    };
+
+    function resolveProfessorVideo(songName) {
+      const matched = huangVideoMap[songName];
+      if (matched) {
+        return {
+          videoAvailable: true,
+          videoEmbed: buildYouTubeEmbedFromId(matched.id),
+          videoSearchUrl: buildYouTubeSearchUrl(buildOtherDemoQuery(songName)),
+          videoNote: matched.source === "approx"
+            ? "這首使用黃國豪頻道內最接近的對應影片。"
+            : "這首已固定使用黃國豪頻道的對應示範素材。"
+        };
+      }
+      return {
+        videoAvailable: false,
+        videoEmbed: "",
+        videoSearchUrl: buildYouTubeSearchUrl(buildOtherDemoQuery(songName)),
+        videoNote: "黃國豪目前沒有這首對應影片，所以這裡不提供站內播放器。"
+      };
+    }
+
+    function createCoursePiece(id, type, title, description, scoreNote, videoSongName) {
+      const scoreData = window.ErhuPieceScores
+        ? window.ErhuPieceScores.getScore(title, videoSongName, cleanPieceName(title), cleanPieceName(videoSongName || title))
+        : null;
+      return Object.assign({
+        id: id,
+        type: type,
+        title: title,
+        description: description,
+        scoreData: scoreData,
+        scoreAvailable: Boolean(scoreData && ((Array.isArray(scoreData.rows) && scoreData.rows.length) || scoreData.notation)),
+        scoreNote: scoreData && scoreData.note ? scoreData.note : scoreNote
+      }, resolveProfessorVideo(videoSongName || title));
+    }
+
+    function parseScoreNotation(scoreText) {
+      const rows = [];
+      String(scoreText || "").split(/\n+/).forEach(function (lineText, rowIndex) {
+        const line = lineText.trim();
+        if (!line) return;
+        const tokens = line.replace(/\|/g, " | ").trim().split(/\s+/);
+        const row = [];
+        let current = null;
+        tokens.forEach(function (token) {
+          if (!token || token === "|") return;
+          const parts = token.match(/([1-7]'+|[1-7]|-+|~+)/g) || [];
+          parts.forEach(function (part) {
+            if (/^[1-7]/.test(part)) {
+              current = {
+                rowIndex: rowIndex,
+                label: part,
+                beats: 1
+              };
+              row.push(current);
+            } else if (/^[-~]+$/.test(part) && current) {
+              current.beats += part.length;
+            }
+          });
+        });
+        if (row.length) {
+          rows.push(row);
+        }
+      });
+      return rows;
+    }
+
+    function buildScoreDisplayLabel(cellData) {
+      if (!cellData || cellData.beats <= 1) {
+        return cellData ? cellData.label : "";
+      }
+      return cellData.label + "-".repeat(cellData.beats - 1);
+    }
+
+    function buildJianpuHtml(label) {
+      const raw = String(label || "");
+      const noteMatch = raw.match(/^([1-7])('+)?(,*)?(\.)?(.*)$/);
+      if (!noteMatch) {
+        return raw;
+      }
+      const digit = noteMatch[1];
+      const highDots = (noteMatch[2] || "").length;
+      const lowDots = (noteMatch[3] || "").length;
+      const rhythmDot = noteMatch[4] || "";
+      const tail = noteMatch[5] || "";
+      return (
+        "<span class=\"score-follow-jianpu\">" +
+          "<span class=\"score-follow-octave\">" + (highDots ? "●".repeat(highDots) : "") + "</span>" +
+          "<span class=\"score-follow-digit\">" + digit + "</span>" +
+        "</span>" +
+        (rhythmDot ? "<span class=\"score-follow-rhythm-dot\">.</span>" : "") +
+        (tail ? "<span class=\"score-follow-tail\">" + tail + "</span>" : "")
+      );
+    }
+
+    function lowOctaveText(label) {
+      const matched = String(label || "").match(/^[1-7](?:'+)?(,*)/);
+      const count = matched ? (matched[1] || "").length : 0;
+      return count ? "●".repeat(count) : "";
+    }
+
+    function normalizeScoreCell(cellData) {
+      if (typeof cellData === "string") {
+        return { label: cellData, beats: 1, units: 1 };
+      }
+      return {
+        label: cellData.label || "",
+        beats: Number(cellData.beats) > 0 ? Number(cellData.beats) : 1,
+        units: Number(cellData.units) > 0 ? Number(cellData.units) : 1,
+        sub: cellData.sub || ""
+      };
+    }
+
+    function normalizeTextSpan(spanData) {
+      if (Array.isArray(spanData)) {
+        return {
+          start: Number(spanData[0]) || 0,
+          end: Number(spanData[1]) || Number(spanData[0]) || 0,
+          text: String(spanData[2] || "")
+        };
+      }
+      return {
+        start: Number(spanData && spanData.start) || 0,
+        end: Number(spanData && spanData.end) || Number(spanData && spanData.start) || 0,
+        text: String((spanData && spanData.text) || "")
+      };
+    }
+
+    function renderTextSpans(measure, cells, cellStarts, spans, className) {
+      (spans || []).forEach(function (spanData) {
+        const spanMeta = normalizeTextSpan(spanData);
+        if (!spanMeta.text) {
+          return;
+        }
+        const tokens = spanMeta.text.trim().split(/\s+/).filter(Boolean);
+        const start = Math.max(0, Math.min(cells.length - 1, spanMeta.start));
+        const end = Math.max(start, Math.min(cells.length - 1, spanMeta.end));
+        if (tokens.length > 1) {
+          tokens.forEach(function (token, tokenIndex) {
+            const target = Math.min(end, start + tokenIndex);
+            const mark = document.createElement("div");
+            mark.className = className;
+            mark.style.gridColumn = (cellStarts[target] + 1) + " / " + (cellStarts[target] + cells[target].units + 1);
+            mark.textContent = token;
+            measure.appendChild(mark);
+          });
+          return;
+        }
+        const mark = document.createElement("div");
+        mark.className = className;
+        mark.style.gridColumn = (cellStarts[start] + 1) + " / " + (cellStarts[end] + cells[end].units + 1);
+        mark.textContent = spanMeta.text;
+        measure.appendChild(mark);
+      });
+    }
+
+    function buildCellTextMap(cells, spans) {
+      const textMap = {};
+      (spans || []).forEach(function (spanData) {
+        const spanMeta = normalizeTextSpan(spanData);
+        if (!spanMeta.text) {
+          return;
+        }
+        const start = Math.max(0, Math.min(cells.length - 1, spanMeta.start));
+        const end = Math.max(start, Math.min(cells.length - 1, spanMeta.end));
+        const tokens = spanMeta.text.trim().split(/\s+/).filter(Boolean);
+        if (tokens.length === end - start + 1) {
+          tokens.forEach(function (token, offset) {
+            textMap[start + offset] = token;
+          });
+          return;
+        }
+        textMap[start] = spanMeta.text;
+      });
+      return textMap;
+    }
+
+    function buildAutoUnderlines(cells, beatUnits, totalUnits) {
+      const ranges = [];
+      const starts = [];
+      const singleCovered = new Array(cells.length).fill(false);
+      const doubleCovered = new Array(cells.length).fill(false);
+      let cursor = 0;
+      cells.forEach(function (cellData) {
+        starts.push(cursor);
+        cursor += cellData.units;
+      });
+      const measureUnits = Math.max(totalUnits || 0, cursor);
+      const beatSize = Math.max(1, Number(beatUnits) || 4);
+      for (let beatStart = 0; beatStart < measureUnits; beatStart += beatSize) {
+        const beatEnd = beatStart + beatSize;
+        const single = [];
+        const double = [];
+        cells.forEach(function (cellData, cellIndex) {
+          const start = starts[cellIndex];
+          const end = start + cellData.units;
+          if (start >= beatStart && end <= beatEnd && cellData.units < beatSize) {
+            single.push(cellIndex);
+          }
+          if (start >= beatStart && end <= beatEnd && cellData.units < beatSize / 2) {
+            double.push(cellIndex);
+          }
+        });
+        if (single.length) {
+          ranges.push([single[0], single[single.length - 1], 1]);
+          for (let singleIndex = single[0]; singleIndex <= single[single.length - 1]; singleIndex += 1) {
+            singleCovered[singleIndex] = true;
+          }
+        }
+        if (double.length) {
+          let groupStart = double[0];
+          let previous = double[0];
+          for (let index = 1; index <= double.length; index += 1) {
+            const current = double[index];
+            if (current === previous + 1) {
+              previous = current;
+              continue;
+            }
+            ranges.push([groupStart, previous, 2]);
+            for (let doubleIndex = groupStart; doubleIndex <= previous; doubleIndex += 1) {
+              doubleCovered[doubleIndex] = true;
+              singleCovered[doubleIndex] = true;
+            }
+            groupStart = current;
+            previous = current;
+          }
+        }
+      }
+      cells.forEach(function (cellData, cellIndex) {
+        if (cellData.units < beatSize / 2 && !doubleCovered[cellIndex]) {
+          ranges.push([cellIndex, cellIndex, 2]);
+          doubleCovered[cellIndex] = true;
+          singleCovered[cellIndex] = true;
+        }
+        if (cellData.units < beatSize && !singleCovered[cellIndex]) {
+          ranges.push([cellIndex, cellIndex, 1]);
+          singleCovered[cellIndex] = true;
+        }
+      });
+      return ranges;
+    }
+
+    function renderStructuredScore(scoreText, rows, scoreData) {
+      scoreText.className = "score-follow-sheet";
+      rows.forEach(function (rowData, rowIndex) {
+        const rowWrap = document.createElement("div");
+        rowWrap.className = "score-follow-row";
+
+        if (rowData.label) {
+          const rowLabel = document.createElement("div");
+          rowLabel.className = "score-follow-label";
+          rowLabel.textContent = rowData.label;
+          rowWrap.appendChild(rowLabel);
+        }
+
+        if (rowData.prefix) {
+          const prefix = document.createElement("div");
+          prefix.className = "score-follow-prefix";
+          prefix.textContent = rowData.prefix;
+          rowWrap.appendChild(prefix);
+        }
+
+        const measureRow = document.createElement("div");
+        measureRow.className = "score-follow-measure-row";
+        measureRow.style.setProperty("--measure-count", String((rowData.measures || []).length || 1));
+
+        (rowData.measures || []).forEach(function (measureData) {
+          const cells = (measureData.cells || []).map(normalizeScoreCell);
+          if (!cells.length) {
+            return;
+          }
+          const cellStarts = [];
+          let unitCursor = 0;
+          cells.forEach(function (cellData) {
+            cellStarts.push(unitCursor);
+            unitCursor += cellData.units;
+          });
+          const unitCount = Math.max(Number(measureData.totalUnits) || 0, unitCursor, 8);
+          const measure = document.createElement("div");
+          measure.className = "score-follow-measure";
+          measure.style.setProperty("--unit-count", String(unitCount));
+          if (measureData.marker) {
+            const marker = document.createElement("div");
+            marker.className = "score-follow-marker";
+            marker.textContent = measureData.marker;
+            measure.appendChild(marker);
+          }
+
+          renderTextSpans(measure, cells, cellStarts, measureData.bows || [], "score-follow-bow");
+          renderTextSpans(measure, cells, cellStarts, measureData.fingerings || measureData.guides || [], "score-follow-guide");
+          const upperNoteMap = buildCellTextMap(cells, measureData.upperNotes || []);
+
+          (measureData.slurs || []).forEach(function (slurRange) {
+            const start = Math.max(0, Number(slurRange[0]) || 0);
+            const end = Math.min(cells.length - 1, Number(slurRange[1]) || 0);
+            if (end < start) {
+              return;
+            }
+            const startUnit = cellStarts[start];
+            const endUnit = cellStarts[end] + cells[end].units;
+            const slur = document.createElement("div");
+            slur.className = "score-follow-slur";
+            slur.style.gridColumn = (startUnit + 1) + " / " + (endUnit + 1);
+            measure.appendChild(slur);
+          });
+
+          cells.forEach(function (cellData, cellIndex) {
+            const startUnit = cellStarts[cellIndex];
+            const endUnit = startUnit + cellData.units;
+            const cell = document.createElement("div");
+            cell.className = "score-follow-cell";
+            cell.style.gridColumn = (startUnit + 1) + " / " + (endUnit + 1);
+            const upperNote = upperNoteMap[cellIndex] ? ("<span class=\"score-follow-upper-note\">" + upperNoteMap[cellIndex] + "</span>") : "";
+            cell.innerHTML = upperNote + "<span class=\"score-follow-main\">" + buildJianpuHtml(cellData.label) + "</span>";
+            measure.appendChild(cell);
+            const lowDots = lowOctaveText(cellData.label);
+            if (lowDots) {
+              const lowMarker = document.createElement("div");
+              lowMarker.className = "score-follow-low-octave-marker";
+              lowMarker.style.gridColumn = (startUnit + 1) + " / " + (endUnit + 1);
+              lowMarker.textContent = lowDots;
+              measure.appendChild(lowMarker);
+            }
+          });
+
+          const underlineRanges = scoreData && scoreData.autoUnderlines
+            ? buildAutoUnderlines(cells, scoreData.beatUnits || 4, unitCount)
+            : (measureData.underlines || []);
+          underlineRanges.forEach(function (underlineRange) {
+            const start = Math.max(0, Number(underlineRange[0]) || 0);
+            const end = Math.min(cells.length - 1, Number(underlineRange[1]) || 0);
+            if (end < start) {
+              return;
+            }
+            const startUnit = cellStarts[start];
+            const endUnit = cellStarts[end] + cells[end].units;
+            const underline = document.createElement("div");
+            underline.className = "score-follow-underline" + ((Number(underlineRange[2]) || 1) >= 2 ? " double" : " single");
+            underline.style.gridColumn = (startUnit + 1) + " / " + (endUnit + 1);
+            measure.appendChild(underline);
+          });
+
+          measureRow.appendChild(measure);
+        });
+
+        rowWrap.appendChild(measureRow);
+        scoreText.appendChild(rowWrap);
+      });
+    }
+
+    function renderPieceScore(scoreData) {
+      const scoreText = document.getElementById("scoreText");
+      scoreText.innerHTML = "";
+      if (!scoreData) {
+        return;
+      }
+      if (Array.isArray(scoreData.rows) && scoreData.rows.length) {
+        if (scoreData.header) {
+          const header = document.createElement("div");
+          header.className = "score-follow-header";
+          header.innerHTML =
+            "<div class=\"score-follow-title\">" + (scoreData.header.number ? scoreData.header.number + " " : "") + (scoreData.header.title || "") + "</div>" +
+            "<div class=\"score-follow-meta\">" +
+              "<div class=\"score-follow-meta-left\">" +
+                (Array.isArray(scoreData.header.left) ? scoreData.header.left.map(function (item) {
+                  return "<div>" + item + "</div>";
+                }).join("") : "") +
+              "</div>" +
+              "<div class=\"score-follow-meta-right\">" + (scoreData.header.right || "") + "</div>" +
+            "</div>";
+          scoreText.appendChild(header);
+        }
+        renderStructuredScore(scoreText, scoreData.rows, scoreData);
+        return;
+      }
+      if (!scoreData.notation) {
+        return;
+      }
+      const rows = parseScoreNotation(scoreData.notation);
+      if (!rows.length) {
+        scoreText.className = "score-follow-plain";
+        scoreText.textContent = scoreData.notation;
+        return;
+      }
+      scoreText.className = "score-follow-sheet";
+      rows.forEach(function (row) {
+        const rowWrap = document.createElement("div");
+        rowWrap.className = "score-follow-row";
+
+        const rowNotes = document.createElement("div");
+        rowNotes.className = "score-follow-notes";
+        row.forEach(function (cellData) {
+          const cell = document.createElement("div");
+          cell.className = "score-follow-cell";
+          cell.style.setProperty("--beats", String(cellData.beats));
+          cell.innerHTML = "<span class=\"score-follow-main\">" + buildJianpuHtml(buildScoreDisplayLabel(cellData)) + "</span>";
+          rowNotes.appendChild(cell);
+        });
+        rowWrap.appendChild(rowNotes);
+        scoreText.appendChild(rowWrap);
+      });
+    }
+
+    function buildAiTutorUrl(songName, needScore) {
+      const question = needScore
+        ? ("給我《" + cleanPieceName(songName) + "》的二胡簡譜，最好附上練習重點。")
+        : ("給我《" + cleanPieceName(songName) + "》的二胡教學影片和練習重點。");
+      return window.ErhuExamProgress.buildUrl("./二胡小教室-AI助教.html", {
+        level: level,
+        grade: week,
+        question: question
+      });
+    }
+
+    function extractTonicFromScoreData(scoreData) {
+      const sources = [];
+      if (scoreData && scoreData.header && Array.isArray(scoreData.header.left)) {
+        sources.push(scoreData.header.left.join(" "));
+      }
+      if (scoreData && scoreData.note) {
+        sources.push(scoreData.note);
+      }
+      for (let index = 0; index < sources.length; index += 1) {
+        const matched = String(sources[index] || "").match(/1\s*=\s*([A-G](?:b|#)?)/i);
+        if (matched) {
+          return matched[1];
+        }
+      }
+      return "D";
+    }
+
+    function buildAiPitchUrl(piece) {
+      const tonic = extractTonicFromScoreData(piece && piece.scoreData);
+      return window.ErhuExamProgress.buildUrl("./二胡小教室-AI音準評分.html", {
+        v: "20260609v",
+        level: level,
+        grade: week,
+        tonic: tonic,
+        practice: "piece",
+        piece: piece ? piece.title : ""
+      });
+    }
+
+    function buildScoreEditorUrl(piece) {
+      return "./二胡小教室-譜面編輯器.html?title=" +
+        encodeURIComponent(piece ? piece.title : "") +
+        "&back=" +
+        encodeURIComponent(window.location.pathname + window.location.search);
+    }
+
     const weeklyData = {
       beginner: {
         label: "初級",
         backLink: "./二胡小教室-初級.html",
-        weeks: [
-          { title: "第 1 週：姿勢與持琴重整", description: "重整坐姿、琴筒位置、握弓與身體放鬆感。", video: "Mc7fJ2C1Qf8", focus: ["先把持琴與握弓位置放正。", "觀察肩膀是否放鬆。", "用鏡子檢查身體角度。"], tasks: ["完成 5 次姿勢檢查。", "錄 30 秒持琴姿勢影片。", "確認右手握弓不僵硬。"], score: "1  -  | 5  -  | 1  -  | 5  -\n1  1  | 5  5  | 1  -  | 5  -\n1  -  | 1  -  | 5  -  | 5  -\n1  1  | 1  1  | 5  5  | 5  5\n1  -  | 5  -  | 1  -  | 5  -\n1  1  | 5  5  | 1  -  | 5  -", note: "初級第 1 週以空弦與姿勢節奏為主。" },
-          { title: "第 2 週：基本長弓穩定", description: "練長弓平均、弓速控制與音色乾淨度。", video: "LfLqOT0SxwA", focus: ["每個長弓要拉滿。", "控制弓速平均。", "避免音頭太重。"], tasks: ["每天做 8 組長弓。", "錄一段長音回聽。", "穩定維持 4 拍長音。"], score: "5  -  | 5  -  | 3  -  | 2  -\n5  -  | 5  -  | 3  -  | 2  -\n1  -  | 2  -  | 3  -  | 5  -\n5  -  | 3  -  | 2  -  | 1  -\n1  -  | 3  -  | 5  -  | 6  -\n6  -  | 5  -  | 3  -  | 2  -", note: "先求穩，不求快。" },
-          { title: "第 3 週：內外弦切換", description: "建立切弦手感，讓弓路乾淨不混亂。", video: "xQom8S0v6FQ", focus: ["切弦動作要小。", "手肘轉換不要甩。", "保持聲音連續。"], tasks: ["完成 4 組切弦循環。", "配拍器做慢速切換。", "回聽是否有雜音。"], score: "1 5 1 5 | 1 5 1 5\n1 1 5 5 | 1 1 5 5\n1 5 5 1 | 1 5 5 1\n1 1 1 5 | 5 5 5 1\n1 5 1 5 | 1 5 1 5\n1 1 5 5 | 1 1 5 5", note: "這週主角是弓路與切弦準確。" },
-          { title: "第 4 週：節奏與短句", description: "用拍器把短句拉穩，建立拍點概念。", video: "Mc7fJ2C1Qf8", focus: ["句子先拆短。", "拍點要穩。", "短句收尾乾淨。"], tasks: ["拍器下完成 8 小節。", "每句至少重複 3 次。", "避免中途停頓。"], score: "1 2 3 5 | 5 3 2 1\n1 2 3 5 | 6 5 3 2\n2 3 5 6 | 5 3 2 1\n1 - 2 - | 3 - 5 -\n2 3 2 1 | 2 3 5 6\n5 3 2 1 | 1 - - -", note: "先把短句完整，不急著拉長段落。" },
-          { title: "第 5 週：左手按音基礎", description: "加入按音和簡單音階，開始建立音準感。", video: "LfLqOT0SxwA", focus: ["手指落點要穩。", "每個音都先聽準。", "按音後肩膀仍放鬆。"], tasks: ["完成上下行音階 4 次。", "記錄最不穩的兩個音。", "練完回聽音準。"], score: "1 2 3 5 | 5 3 2 1\n1 2 3 5 | 6 5 3 2\n1 1 2 2 | 3 3 5 5\n5 5 3 3 | 2 2 1 1\n1 2 3 5 | 6 5 3 2\n2 3 5 6 | 5 3 2 1", note: "開始進入左手訓練。" },
-          { title: "第 6 週：音階反覆校正", description: "反覆修正落點，讓耳朵和手指對齊。", video: "xQom8S0v6FQ", focus: ["同一個音反覆確認。", "先少量音再加長。", "偏音要做記號。"], tasks: ["每天做 2 輪音階校正。", "錄音回聽 1 次。", "標出偏高偏低位置。"], score: "1 1 2 2 | 3 3 5 5\n5 5 3 3 | 2 2 1 1\n1 2 1 2 | 3 5 3 5\n5 3 2 1 | 2 3 5 6\n1 2 3 5 | 3 2 1 2\n3 5 6 5 | 3 2 1 -", note: "重點是重複，不是求新。" },
-          { title: "第 7 週：分弓與連弓", description: "把常見弓法放進簡單樂句中練習。", video: "Mc7fJ2C1Qf8", focus: ["分弓要清楚。", "連弓要順。", "句子不要斷掉。"], tasks: ["同一句做分弓版與連弓版。", "比較音色差異。", "完整錄一段。"], score: "1 2 3-5 | 5-3 2 1\n1-2 3 5 | 6-5 3 2\n2 3-5 6 | 5 3-2 1\n1 2 3 5 | 5-5 3 2\n1-2 3-5 | 6 5 3-2\n1 2-3 5 | 3 2 1 -", note: "弓法開始進入句子。" },
-          { title: "第 8 週：基礎旋律整合", description: "開始把姿勢、節奏和音準放進旋律。", video: "LfLqOT0SxwA", focus: ["保持完整旋律感。", "音準與節奏同時顧。", "不要只顧單點。"], tasks: ["完成一段短旋律。", "中途不停下。", "錄音回看流暢度。"], score: "5 6 5 3 | 2 3 2 1\n1 2 3 5 | 6 5 3 2\n2 3 5 6 | 5 3 2 1\n1 - 5 - | 3 2 1 -\n1 2 3 5 | 5 6 5 3\n2 3 2 1 | 1 - - -", note: "第一次進入完整旋律練習。" },
-          { title: "第 9 週：完整段落演奏", description: "連續拉完一段短曲，不中斷完成。", video: "xQom8S0v6FQ", focus: ["演奏不能中斷。", "先求完整。", "錯音先做記號。"], tasks: ["完整拉完一段。", "記錄卡住的位置。", "第二次再修正。"], score: "1 2 3 5 | 6 5 3 2\n1 2 3 5 | 5 3 2 1\n2 3 5 6 | 1' 6 5 3\n2 1 2 3 | 5 - - -\n1 2 3 5 | 6 5 3 2\n2 3 5 6 | 5 3 2 1", note: "這週要開始像表演，而不是片段練習。" },
-          { title: "第 10 週：初級成果驗收", description: "錄下一段完整基礎演奏，作為初級收尾。", video: "Mc7fJ2C1Qf8", focus: ["從頭到尾完成。", "維持姿勢與穩定。", "留下成果版本。"], tasks: ["錄一支完整版本。", "聽一次並寫 3 個心得。", "準備進入中級。"], score: "1 2 3 5 | 6 5 3 2\n1 2 3 5 | 5 3 2 1\n2 3 5 6 | 5 3 2 1\n1 2 3 5 | 6 5 3 2\n2 3 5 6 | 5 3 2 1\n1 - - - | 1 - - -", note: "這一週的譜可以直接換成你的成果曲譜。" }
-        ]
+        weeks: window.ErhuExamData.levels.beginner.grades.map(function (item) {
+          return {
+            grade: item.grade,
+            title: item.grade + "：" + item.shortTitle,
+            description: item.description,
+            focus: item.focus,
+            tasks: item.tasks,
+            note: "指定曲：" + item.specified + "｜自選曲：" + item.selected.join("、"),
+            pieces: [
+              createCoursePiece(
+                "specified",
+                "指定曲",
+                item.specified,
+                "這是本級指定曲，先把本級基本技術要求練穩。",
+                "這首指定曲不提供站內簡譜，可直接搭配影片與 AI 助教練習。"
+              )
+            ].concat(item.selected.map(function (song, index) {
+              return createCoursePiece(
+                "selected-" + index,
+                "自選曲",
+                song,
+                "這是本級自選曲，適合搭配示範教材先熟悉旋律和段落。",
+                "這首自選曲不提供站內簡譜，可直接搭配示範教材與 AI 助教練習。"
+              );
+            }))
+          };
+        })
       },
       intermediate: {
         label: "中級",
         backLink: "./二胡小教室-中級.html",
-        weeks: [
-          { title: "第 1 週：換把定位重整", description: "重新整理換把的目標音與手位移動。", video: "LfLqOT0SxwA", focus: ["換把前先想目標音。", "動作要短。", "保持音準。"], tasks: ["做 10 次目標換把。", "錄 1 段換把片段。", "標記常偏的位置。"], score: "1 3 5 1' | 7 6 5 3\n2 5 6 1' | 7 6 5 2\n1 2 3 5 | 6 1' 7 6\n5 3 2 1 | 2 3 5 -\n1 3 5 1' | 6 5 3 2\n2 5 6 1' | 7 6 5 3", note: "中級譜例著重換把定位。" },
-          { title: "第 2 週：揉弦穩定起步", description: "建立小幅度、可控制的揉弦動作。", video: "xQom8S0v6FQ", focus: ["揉弦先小。", "不要掉音。", "配合長音。"], tasks: ["4 個長音揉弦。", "比較有無揉弦差異。", "回聽音準是否穩。"], score: "5~~~ 3~~~ 2~~~ 1~~~\n5~~~ 6~~~ 5~~~ 3~~~\n2~~~ 3~~~ 5~~~ 6~~~\n5~~~ 3~~~ 2~~~ 1~~~\n5~~~ 6~~~ 1'~~~ 6~~~", note: "~~~ 表示持續揉弦。" },
-          { title: "第 3 週：音色控制訓練", description: "練習不同力度和接觸位置造成的音色差異。", video: "Mc7fJ2C1Qf8", focus: ["同一句做強弱變化。", "拉出層次。", "保持乾淨音色。"], tasks: ["完成一組強弱對比。", "錄音比較前後。", "維持穩定弓速。"], score: "1 2 3 5 | 3 5 6 5\n6 5 3 2 | 2 1 - -\n1 2 3 5 | 6 1' 7 6\n5 3 2 1 | 2 3 5 -\n1 2 3 5 | 3 5 6 5", note: "中級開始要加入力度設計。" },
-          { title: "第 4 週：弓法組合進階", description: "把分弓、連弓、重音放進更長的句子。", video: "LfLqOT0SxwA", focus: ["重音要有位置。", "弓法切換要順。", "句子不中斷。"], tasks: ["同句做兩種弓法。", "拍器下完成。", "記錄最難一格。"], score: "1 2-3 5 | 5-3 2 1\n1-2 3 5 | 6-5 3 2\n2 3-5 6 | 5 3-2 1\n2-3 5 6 | 1'-6 5 3\n5 3-2 1 | 2 3 5 -", note: "這週重點是弓法切換與句子連續。" },
-          { title: "第 5 週：中速節奏穩定", description: "從慢速跨到中速，保持節奏與音準不散。", video: "xQom8S0v6FQ", focus: ["拍速逐步增加。", "亂掉就退回。", "不要硬追速度。"], tasks: ["至少提升兩段拍速。", "每段都完整拉對。", "保持放鬆。"], score: "1 2 3 5 | 6 5 3 2\n1 2 3 5 | 6 1' 7 6\n5 3 2 1 | 2 3 5 -\n2 3 5 6 | 1' 6 5 3\n2 1 2 3 | 5 3 2 1\n1 - - - | 1 - - -", note: "逐步加速，不一次跳太快。" },
-          { title: "第 6 週：段落與換氣感", description: "讓演奏不只正確，也開始有句子方向。", video: "Mc7fJ2C1Qf8", focus: ["設計句子高低。", "收尾清楚。", "有呼吸感。"], tasks: ["畫出句子段落。", "完整拉 2 次。", "回聽是否有層次。"], score: "1 2 3 5 | 6 5 3 2\n2 3 5 6 | 1' 6 5 3\n2 1 2 3 | 5 - - -\n1 2 3 5 | 6 1' 7 6\n5 3 2 1 | 2 3 5 -", note: "把句子切出結構感。" },
-          { title: "第 7 週：耐力與不中斷演奏", description: "提升中段演奏耐力與注意力維持。", video: "LfLqOT0SxwA", focus: ["演奏長段落。", "錯音不立刻停。", "保持節奏。"], tasks: ["連續拉 16 小節。", "標記問題點。", "第二輪修正。"], score: "1 2 3 5 | 6 5 3 2\n1 2 3 5 | 6 1' 7 6\n5 3 2 1 | 2 3 5 6\n5 3 2 1 | 1 - - -\n1 2 3 5 | 6 5 3 2\n2 3 5 6 | 1' 6 5 3", note: "耐力比短句更重要。" },
-          { title: "第 8 週：速度提升訓練", description: "逐步提高拍速，維持乾淨與穩定。", video: "xQom8S0v6FQ", focus: ["速度上升仍乾淨。", "手不能緊。", "句子要完整。"], tasks: ["每次加 4 bpm。", "完成 3 段速度。", "回聽是否變亂。"], score: "1 2 3 5 6 5 3 2\n2 3 5 6 1' 6 5 3\n5 6 5 3 2 3 2 1\n1 3 5 6 1' 7 6 5\n3 2 1 2 3 5 6 5", note: "速度上來更要放鬆。" },
-          { title: "第 9 週：技巧整合到曲目", description: "把換把、揉弦、弓法整合進完整段落。", video: "Mc7fJ2C1Qf8", focus: ["技巧為曲子服務。", "不要只顧招式。", "段落表現一致。"], tasks: ["挑一段曲目整合。", "錄影回看。", "寫下 3 個修正點。"], score: "1 3 5 1' | 7 6 5 3\n2 3 5 6 | 1' 6 5 3\n2 1 2 3 | 5 - - -\n1 2 3 5 | 6 1' 7 6\n5 3 2 1 | 2 3 5 -", note: "把技巧真的放回曲子裡。" },
-          { title: "第 10 週：中級成果錄影", description: "完成一段具有表情和完整段落感的演奏。", video: "LfLqOT0SxwA", focus: ["保有表情。", "完成整段。", "錄成成果版本。"], tasks: ["錄一支中級成果。", "回看姿勢與音色。", "準備進入高級。"], score: "1 3 5 1' | 7 6 5 3\n2 3 5 6 | 1' 6 5 3\n2 1 2 3 | 5 3 2 1\n1 2 3 5 | 6 5 3 2\n2 3 5 6 | 5 3 2 1\n1 - - - | 1 - - -", note: "成果曲譜可之後替換成正式版本。" }
-        ]
+        weeks: window.ErhuExamData.levels.intermediate.grades.map(function (item) {
+          return {
+            grade: item.grade,
+            title: item.grade + "：" + item.shortTitle,
+            description: item.description,
+            focus: item.focus,
+            tasks: item.tasks,
+            note: "指定曲：" + item.specified + "｜自選曲：" + item.selected.join("、"),
+            pieces: [
+              createCoursePiece(
+                "specified",
+                "指定曲",
+                item.specified,
+                "這是本級指定曲，先把本級基本技術和句子控制練穩。",
+                "這首指定曲不提供站內簡譜，可直接搭配示範教材與 AI 助教練習。"
+              )
+            ].concat(item.selected.map(function (song, index) {
+              return createCoursePiece(
+                "selected-" + index,
+                "自選曲",
+                song,
+                "這是本級自選曲，先用示範教材熟悉風格、段落和速度要求。",
+                "這首自選曲不提供站內簡譜，可直接搭配示範教材與 AI 助教練習。"
+              );
+            }))
+          };
+        })
       },
       advanced: {
         label: "高級",
         backLink: "./二胡小教室-高級.html",
-        weeks: [
-          { title: "第 1 週：高強度長弓控制", description: "重新提升弓速、弓壓與音色統一性。", video: "xQom8S0v6FQ", focus: ["高強度仍要穩。", "音色統一。", "不要因為用力而緊。"], tasks: ["完成高強度長弓 8 組。", "錄 1 段高低強弱對比。", "回聽音色均勻度。"], score: "5--- 3--- 2--- 1---\n6--- 5--- 3--- 2---\n1'--- 6--- 5--- 3---\n2--- 3--- 5--- 6---\n1'--- 7--- 6--- 5---\n5--- 3--- 2--- 1---", note: "高級先從控制力回頭校正。" },
-          { title: "第 2 週：快速換把與定位", description: "處理高速度下的手位準確與穩定。", video: "Mc7fJ2C1Qf8", focus: ["高速度目標更準。", "手位移動短。", "聲音不能糊。"], tasks: ["做快速換把 12 次。", "拍器提速測試。", "記錄不穩位置。"], score: "1 3 5 1' | 7 6 5 3\n2 5 6 1' | 7 6 5 2\n3 5 6 1' | 2' 1' 7 6\n5 6 1' 2' | 1' 7 6 5\n3 5 6 1' | 7 6 5 3", note: "高級換把要快又準。" },
-          { title: "第 3 週：複合弓法連接", description: "把複雜弓法放在高難度片段中完成。", video: "LfLqOT0SxwA", focus: ["複合弓法順接。", "重音位置清楚。", "整段不散。"], tasks: ["慢速拆解。", "回到原速。", "完成一段錄音。"], score: "1 2-3 5 | 6-5 3 2\n2 3-5 6 | 1'-6 5 3\n5-6 1' 7 | 6-5 3 2\n2 3-5 6 | 1' 7-6 5\n3 5 6-1' | 7 6 5 3", note: "高級弓法重點是連接與乾淨。" },
-          { title: "第 4 週：揉弦與表情深化", description: "精修不同速度、不同情緒的揉弦效果。", video: "xQom8S0v6FQ", focus: ["揉弦速度有變化。", "符合樂句情緒。", "不犧牲音準。"], tasks: ["同句做兩種表情。", "錄音比較。", "選最適合版本。"], score: "5~~~ 6~~~~ 5~~~ 3~~~\n2~~~ 3~~~~ 5~~~ 6~~~\n1'~~~~ 7~~~ 6~~~ 5~~~\n3~~~ 2~~~ 1~~~ 2~~~\n5~~~ 6~~~~ 1'~~~ 6~~~", note: "揉弦開始服務於表情。" },
-          { title: "第 5 週：高速度節奏穩定", description: "在更高拍速下維持乾淨、準確與放鬆。", video: "Mc7fJ2C1Qf8", focus: ["高拍速不能亂。", "動作要更小。", "節奏更精確。"], tasks: ["逐步加速。", "維持乾淨音色。", "完成 3 次原速。"], score: "1 2 3 5 6 1' 7 6\n5 6 1' 7 6 5 3 2\n3 5 6 1' 7 6 5 3\n2 3 5 6 1' 7 6 5\n3 5 6 1' 2' 1' 7 6\n5 3 2 1 2 3 5 6", note: "這週的譜更接近高難度片段。" },
-          { title: "第 6 週：段落推進與層次", description: "設計樂句起伏、呼吸感和結構感。", video: "LfLqOT0SxwA", focus: ["分層次演奏。", "有推進方向。", "收尾清楚。"], tasks: ["標出起承轉合。", "完整拉一次。", "寫下段落設計。"], score: "1 2 3 5 | 6 5 3 2\n2 3 5 6 | 1' 7 6 5\n3 2 1 2 | 5 - - -\n1 2 3 5 | 6 1' 7 6\n5 6 1' 7 | 6 5 3 2\n2 1 2 3 | 5 - - -", note: "高級要開始設計整段敘事。" },
-          { title: "第 7 週：困難段拆解修正", description: "鎖定最難片段，做精準拆解練習。", video: "xQom8S0v6FQ", focus: ["找最難的 2 小節。", "拆出節奏、弓法、指法。", "再組回原段。"], tasks: ["列出困難段。", "拆練 3 輪。", "回到整段測試。"], score: "1' 7 6 5 | 6 5 3 2\n1' 7 6 5 | 3 2 1 -\n2 3 5 6 | 1' 6 5 3\n1' 7 6 5 | 6 5 3 2\n3 5 6 1' | 7 6 5 3", note: "這週是修正週，不是拼命往下練。" },
-          { title: "第 8 週：整首曲目連續演奏", description: "訓練從頭到尾不中斷完成曲目。", video: "Mc7fJ2C1Qf8", focus: ["完整演奏。", "不中斷。", "保持專注。"], tasks: ["至少完成兩次整首。", "第一次不修，第二次修。", "記錄失誤點。"], score: "1 2 3 5 | 6 1' 7 6\n5 6 1' 7 | 6 5 3 2\n2 3 5 6 | 1' 6 5 3\n2 1 2 3 | 5 - - -\n1 2 3 5 | 6 1' 7 6\n5 3 2 1 | 2 3 5 -", note: "練的是完整度。" },
-          { title: "第 9 週：錄影回看與舞台修正", description: "用錄影檢查音色、動作與舞台完整度。", video: "LfLqOT0SxwA", focus: ["不只聽，也要看。", "修動作與表情。", "調整舞台感。"], tasks: ["錄影 1 次。", "回看並寫 3 個問題。", "做第二次修正版。"], score: "1 2 3 5 | 6 1' 7 6\n5 6 1' 7 | 6 5 3 2\n2 3 5 6 | 1' 6 5 3\n3 5 6 1' | 7 6 5 3\n2 1 2 3 | 5 - - -", note: "錄影是高級課程的必備工具。" },
-          { title: "第 10 週：高級總驗收", description: "完成正式版本錄影，作為高級課程成果輸出。", video: "xQom8S0v6FQ", focus: ["像正式演出一樣。", "從頭到尾完成。", "留下最終版本。"], tasks: ["錄正式版。", "回看完整度。", "保留成果檔案。"], score: "1 2 3 5 | 6 1' 7 6\n5 6 1' 7 | 2' 1' 7 6\n5 3 2 1 | 2 3 5 6\n1' 7 6 5 | 3 2 1 -\n1 2 3 5 | 6 1' 7 6\n5 3 2 1 | 1 - - -", note: "最後可直接換成你的正式演出曲譜。" }
-        ]
+        weeks: window.ErhuExamData.levels.advanced.grades.map(function (item) {
+          return {
+            grade: item.grade,
+            title: item.grade + "：" + item.shortTitle,
+            description: item.description,
+            focus: item.focus,
+            tasks: item.tasks,
+            note: "指定曲：" + item.specified + "｜自選曲：" + item.selected.join("、"),
+            pieces: [
+              createCoursePiece(
+                "specified",
+                item.specified === "本級無指定曲" ? "本級主題" : "指定曲",
+                item.specified === "本級無指定曲" ? (item.grade + "考曲準備") : item.specified,
+                item.specified === "本級無指定曲"
+                  ? "這一級沒有指定曲，先看本級主題示範，再從自選曲挑主考曲。"
+                  : "這是本級指定曲，先把本級技術和音樂性練穩。",
+                item.specified === "本級無指定曲"
+                  ? "這一級不提供站內簡譜，可先看示範教材，再向 AI 助教索取需要的譜。"
+                  : "這首指定曲不提供站內簡譜，可直接搭配示範教材與 AI 助教練習。",
+                item.specified === "本級無指定曲" ? item.selected[0] : item.specified
+              )
+            ].concat(item.selected.map(function (song, index) {
+              return createCoursePiece(
+                "selected-" + index,
+                "自選曲",
+                song,
+                "這是本級自選曲，建議先對照示範教材抓風格和整體段落。",
+                "這首自選曲不提供站內簡譜，可直接搭配示範教材與 AI 助教練習。"
+              );
+            }))
+          };
+        })
       }
     };
 
     const params = new URLSearchParams(window.location.search);
     const level = params.get("level") || "beginner";
-    const week = Math.min(10, Math.max(1, Number(params.get("week") || "1")));
     const course = weeklyData[level] || weeklyData.beginner;
+    const week = Math.min(course.weeks.length, window.ErhuExamProgress.getGradeNumber(params, 1));
     const data = course.weeks[week - 1];
+    const defaultPiece = data.pieces.find(function (piece) { return piece.type !== "本級主題"; }) || data.pieces[0];
+    const pieceId = params.get("piece") || defaultPiece.id;
+    const selectedPiece = data.pieces.find(function (piece) { return piece.id === pieceId; }) || data.pieces[0];
 
-    document.title = "二胡小教室 | " + course.label + "第 " + week + " 週";
+    document.title = "二胡小教室 | " + course.label + data.grade + "級數課程";
     document.getElementById("backLevelLink").href = course.backLink;
-    document.getElementById("backLevelLink").textContent = "回" + course.label + "課程";
-    document.getElementById("weekLabel").textContent = course.label + "課程｜第 " + week + " 週";
+    document.getElementById("backLevelLink").textContent = "回" + course.label + "檢定";
+    document.getElementById("weekLabel").textContent = course.label + "檢定｜" + data.grade;
     document.getElementById("weekTitle").textContent = data.title;
     document.getElementById("weekDescription").textContent = data.description;
-    document.getElementById("videoFrame").src = "https://www.youtube.com/embed/" + data.video + "?rel=0";
-    document.getElementById("scoreText").textContent = data.score;
-    document.getElementById("scoreNote").textContent = data.note;
+    document.getElementById("pieceMeta").textContent = data.note;
+    document.getElementById("pieceTypeChip").textContent = selectedPiece.type;
+    document.getElementById("pieceTitle").textContent = cleanPieceName(selectedPiece.title);
+    document.getElementById("pieceDescription").textContent = selectedPiece.description;
+    const videoFrame = document.getElementById("videoFrame");
+    const videoFrameWrap = videoFrame.parentElement;
+    const videoEmpty = document.getElementById("videoEmpty");
+    if (selectedPiece.videoAvailable) {
+      videoFrameWrap.hidden = false;
+      videoEmpty.hidden = true;
+      videoFrame.src = selectedPiece.videoEmbed;
+    } else {
+      videoFrameWrap.hidden = true;
+      videoFrame.src = "";
+      videoEmpty.hidden = false;
+      videoEmpty.textContent = "這首曲子找不到黃國豪的對應示範素材，所以這裡不提供站內播放。你如果想看別的版本，可以用下方的「其他示範教材」按鈕。";
+    }
+    document.getElementById("videoNote").textContent = selectedPiece.videoNote;
+    const videoHelp = document.getElementById("videoHelp");
+    if (!/^https?:$/.test(window.location.protocol)) {
+      videoHelp.hidden = false;
+      videoHelp.textContent = "這個播放器要在瀏覽器用 localhost 網址開，YouTube 才會接受來源並直接播放。";
+    }
+    document.getElementById("scoreNote").textContent = selectedPiece.scoreNote;
+    document.getElementById("videoSearchLink").href = selectedPiece.videoSearchUrl;
+    document.getElementById("videoSearchLink").textContent = "其他示範教材";
+    const aiPitchLink = document.getElementById("aiPitchLink");
+    aiPitchLink.href = buildAiPitchUrl(selectedPiece);
+    const scoreEditLink = document.getElementById("scoreEditLink");
+    scoreEditLink.href = buildScoreEditorUrl(selectedPiece);
+    document.getElementById("aiScoreLink").href = buildAiTutorUrl(selectedPiece.title, true);
+
+    const scoreEmpty = document.getElementById("scoreEmpty");
+    const scoreBox = document.getElementById("scoreBox");
+    const scoreActions = document.getElementById("scoreActions");
+    const songLinksSection = document.getElementById("songLinksSection");
+    const practiceDetailPanel = document.getElementById("practiceDetailPanel");
+    if (selectedPiece.scoreAvailable) {
+      scoreEmpty.hidden = true;
+      scoreBox.hidden = false;
+      document.querySelector(".score-title").hidden = true;
+      document.getElementById("scoreIntro").hidden = true;
+      document.getElementById("scoreNote").hidden = true;
+      renderPieceScore(selectedPiece.scoreData);
+      document.getElementById("pieceDescription").hidden = true;
+      document.getElementById("videoNote").hidden = true;
+      scoreActions.hidden = false;
+      aiPitchLink.hidden = false;
+      scoreEditLink.hidden = false;
+      songLinksSection.hidden = true;
+      practiceDetailPanel.hidden = false;
+    } else {
+      scoreEmpty.hidden = false;
+      scoreBox.hidden = true;
+      document.querySelector(".score-title").hidden = false;
+      document.getElementById("scoreIntro").hidden = false;
+      document.getElementById("scoreNote").hidden = false;
+      document.getElementById("pieceDescription").hidden = false;
+      document.getElementById("videoNote").hidden = false;
+      scoreActions.hidden = false;
+      aiPitchLink.hidden = true;
+      scoreEditLink.hidden = true;
+      songLinksSection.hidden = false;
+      practiceDetailPanel.hidden = false;
+      document.getElementById("scoreIntro").textContent = "這裡不提供站內簡譜，會直接引導你用 AI 助教要譜，再搭配示範教材和本級重點練習。";
+      scoreEmpty.textContent = "這首曲子目前沒有站內簡譜。你可以看左邊示範教材，再用下方按鈕查看其他示範教材，或直接問 AI 助教要《" + cleanPieceName(selectedPiece.title) + "》的二胡簡譜。";
+    }
+
+    const pieceTabs = document.getElementById("pieceTabs");
+    const songLinkList = document.getElementById("songLinkList");
+    data.pieces.forEach(function (piece) {
+      const tab = document.createElement("a");
+      tab.className = "piece-tab" + (piece.id === selectedPiece.id ? " active" : "");
+      tab.href = window.ErhuExamProgress.buildUrl("./二胡小教室-週課程.html", {
+        level: level,
+        grade: week,
+        piece: piece.id
+      });
+      tab.textContent = piece.type + "｜" + cleanPieceName(piece.title);
+      pieceTabs.appendChild(tab);
+
+      const row = document.createElement("div");
+      row.className = "song-link-item";
+      row.innerHTML =
+        "<div><small>" + piece.type + "</small><strong>" + cleanPieceName(piece.title) + "</strong></div>" +
+        "<a class=\"button secondary\" href=\"" + window.ErhuExamProgress.buildUrl("./二胡小教室-週課程.html", { level: level, grade: week, piece: piece.id }) + "\">打開練習</a>";
+      songLinkList.appendChild(row);
+    });
 
     const focusList = document.getElementById("focusList");
     const taskList = document.getElementById("taskList");
@@ -321,17 +1427,25 @@
       taskList.appendChild(li);
     });
 
-    const prevWeek = Math.max(1, week - 1);
-    const nextWeek = Math.min(10, week + 1);
+    const prevGrade = ErhuQuality.gradeNeighbor(level, week, -1);
+    const nextGrade = ErhuQuality.gradeNeighbor(level, week, 1);
     const prevLink = document.getElementById("prevWeekLink");
     const nextLink = document.getElementById("nextWeekLink");
-    document.getElementById("quizLink").href = "./二胡小教室-小測驗.html?level=" + level + "&week=" + week;
-    document.getElementById("aiLink").href = "./二胡小教室-AI助教.html?level=" + level + "&week=" + week;
-    document.getElementById("aiLinkTop").href = "./二胡小教室-AI助教.html?level=" + level + "&week=" + week;
-    prevLink.href = "./二胡小教室-週課程.html?level=" + level + "&week=" + prevWeek;
-    nextLink.href = "./二胡小教室-週課程.html?level=" + level + "&week=" + nextWeek;
-    if (week === 1) prevLink.textContent = "已經是第一週";
-    if (week === 10) nextLink.textContent = "已經是最後一週";
+    document.getElementById("quizLink").href = window.ErhuExamProgress.buildUrl("./二胡小教室-小測驗.html", { level: level, grade: week });
+    document.getElementById("plannerLink").href = window.ErhuExamProgress.buildUrl("./二胡小教室-AI練習規劃師.html", { level: level, grade: week });
+    document.getElementById("plannerLinkTop").href = window.ErhuExamProgress.buildUrl("./二胡小教室-AI練習規劃師.html", { level: level, grade: week });
+    document.getElementById("aiLink").href = buildAiTutorUrl(selectedPiece.title, false);
+    for (const [link, target, boundary] of [[prevLink, prevGrade, "已是第一級"], [nextLink, nextGrade, "已是第十級"]]) {
+      if (target) link.href = window.ErhuExamProgress.buildUrl("./二胡小教室-週課程.html", target);
+      else { link.removeAttribute("href"); link.setAttribute("aria-disabled", "true"); link.textContent = boundary; }
+    }
+    if (!selectedPiece.scoreAvailable) {
+      aiPitchLink.hidden = false;
+      aiPitchLink.href = "./二胡小教室-AI掃描譜.html?title=" + encodeURIComponent(cleanPieceName(selectedPiece.title));
+      aiPitchLink.textContent = "上傳這首曲子的譜";
+      scoreEmpty.textContent = "這首曲子尚無站內譜面。請上傳你有權使用的原譜，確認辨識結果後即可編輯與跟譜。";
+    }
+
   </script>
 </body>
 </html>

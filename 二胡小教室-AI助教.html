@@ -4,6 +4,18 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>二胡小教室 | AI 二胡助教</title>
+  <meta name="description" content="AI 二胡助教可回答二胡技巧、姿勢、節奏、音準與檢定曲目問題，並依初級、中級、高級級數提供練習建議與相關資源。" />
+  <link rel="canonical" href="https://erhu-auth.web.app/%E4%BA%8C%E8%83%A1%E5%B0%8F%E6%95%99%E5%AE%A4-AI%E5%8A%A9%E6%95%99.html" />
+  <link rel="manifest" href="./site.webmanifest" />
+  <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+  <meta property="og:type" content="website" />
+  <meta property="og:locale" content="zh_TW" />
+  <meta property="og:title" content="二胡小教室 | AI 二胡助教" />
+  <meta property="og:description" content="登入後可向 AI 二胡助教詢問技巧、檢定曲目、練習卡點與相關教學資源。" />
+  <meta property="og:url" content="https://erhu-auth.web.app/%E4%BA%8C%E8%83%A1%E5%B0%8F%E6%95%99%E5%AE%A4-AI%E5%8A%A9%E6%95%99.html" />
+  <meta property="og:image" content="https://erhu-auth.web.app/assets/scores/level1-lian-gong-yu-fu-dian.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="stylesheet" href="./erhu-theme.css?v=20260327f" />
   <style>
     :root {
       --ink: #1f1713;
@@ -21,9 +33,9 @@
       color: var(--ink);
       font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
       background:
-        radial-gradient(circle at top left, rgba(255, 207, 92, 0.34), transparent 22%),
-        radial-gradient(circle at 90% 12%, rgba(130, 157, 117, 0.18), transparent 20%),
-        linear-gradient(180deg, #fff4dd 0%, #fffdfa 38%, #f3e6d9 100%);
+        radial-gradient(circle at top left, rgba(211, 166, 97, 0.24), transparent 22%),
+        radial-gradient(circle at 90% 12%, rgba(130, 157, 117, 0.12), transparent 20%),
+        linear-gradient(180deg, #f8efe4 0%, #fffdfa 38%, #ead8c6 100%);
     }
 
     a { color: inherit; text-decoration: none; }
@@ -32,29 +44,6 @@
       width: min(1380px, calc(100% - 24px));
       margin: 0 auto;
       padding: 24px 0 42px;
-    }
-
-    .topbar {
-      display: flex;
-      justify-content: space-between;
-      gap: 16px;
-      margin-bottom: 18px;
-      flex-wrap: wrap;
-      color: var(--muted);
-      font-weight: 700;
-    }
-
-    .brand {
-      color: var(--ink);
-      font-size: 22px;
-      font-weight: 900;
-      letter-spacing: 0.08em;
-    }
-
-    .nav {
-      display: flex;
-      gap: 14px;
-      flex-wrap: wrap;
     }
 
     .chat-shell {
@@ -135,13 +124,15 @@
     }
 
     .button.primary {
-      background: linear-gradient(135deg, #ffd66b, #e7861d);
-      color: #4a2f18;
+      background: linear-gradient(135deg, #cea57f, #9b6a45);
+      color: #fffaf6;
+      box-shadow: 0 14px 28px rgba(108, 71, 45, 0.18);
     }
 
     .button.secondary {
-      background: rgba(125, 75, 43, 0.08);
-      color: var(--wood);
+      background: linear-gradient(180deg, rgba(249, 239, 229, 0.98), rgba(236, 217, 197, 0.96));
+      color: #6a4733;
+      border: 1px solid rgba(156, 111, 72, 0.12);
     }
 
     .messages {
@@ -165,13 +156,13 @@
 
     .message.user {
       margin-left: auto;
-      background: linear-gradient(135deg, #ffd66b, #ed9e2f);
-      color: #422916;
+      background: linear-gradient(135deg, #8f5c39, #5d3621);
+      color: #f9eee6;
       border-bottom-right-radius: 10px;
     }
 
     .message.assistant {
-      background: linear-gradient(180deg, #fffaf2, #fff1df);
+      background: linear-gradient(180deg, #fffaf3, #f5e7d6);
       border: 1px solid rgba(125, 75, 43, 0.08);
       border-bottom-left-radius: 10px;
     }
@@ -344,16 +335,22 @@
       .lightbox-button.next { right: 6px; }
     }
   </style>
+<link rel="stylesheet" href="./erhu-refined.css?v=20260928" />
+<script src="./erhu-quality.js?v=20260928"></script>
 </head>
-<body>
+<body class="erhu-site">
   <main class="shell">
     <header class="topbar">
       <div class="brand">二胡小教室</div>
       <nav class="nav">
         <a href="./">回首頁</a>
-        <a href="./二胡小教室.html">課程分級</a>
-        <a href="./二胡小教室-練習打卡.html">每週打卡</a>
+        <a href="./二胡小教室.html#course-levels">課程分級</a>
+        <a href="./二胡小教室-AI練習規劃師.html">AI 規劃</a>
+        <a href="./二胡小教室-AI音準評分.html?v=20260609v">音準評分</a>
+        <a href="./二胡小教室-AI錯音複習師.html?v=20260409a">級數回報</a>
+        <a href="./二胡小教室-練習打卡.html">檢定打卡</a>
       </nav>
+      <a class="tuner-shortcut" href="./二胡小教室-調音器.html">調音器</a>
     </header>
 
     <section class="chat-shell">
@@ -368,7 +365,7 @@
       <div class="composer">
         <div>
           <label class="label" for="questionInput">要問什麼問題</label>
-          <textarea id="questionInput" placeholder="例如：給我賽馬的二胡簡譜、給我賽馬的二胡教學影片、我的內外弦切換一直卡住怎麼練？"></textarea>
+          <textarea id="questionInput" placeholder="例如：給我賽馬的二胡簡譜、給我賽馬的二胡示範教材、我的內外弦切換一直卡住怎麼練？"></textarea>
         </div>
         <button class="button primary" id="askButton" type="button">送出問題</button>
         <button class="button secondary" id="clearButton" type="button">清除聊天紀錄</button>
@@ -388,11 +385,19 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
-  <script src="./firebase-init.js?v=20260323b"></script>
-  <script src="./auth.js?v=20260323b"></script>
+  <script src="./firebase-init.js?v=20260928"></script>
+  <script src="./auth.js?v=20260928"></script>
+  <script src="./exam-course-data.js?v=20260505c"></script>
+  <script src="./exam-progress.js?v=20260519a"></script>
   <script>
     window.ErhuAuth.requireAuth();
     window.ErhuAuth.attachAuthUI();
+    const params = new URLSearchParams(window.location.search);
+    const plannerData = {
+      beginner: { label: "初級", grades: window.ErhuExamData.levels.beginner.grades },
+      intermediate: { label: "中級", grades: window.ErhuExamData.levels.intermediate.grades },
+      advanced: { label: "高級", grades: window.ErhuExamData.levels.advanced.grades }
+    };
 
     const questionInput = document.getElementById("questionInput");
     const askButton = document.getElementById("askButton");
@@ -411,14 +416,20 @@
     let learningProfile = null;
     let lightboxImages = [];
     let lightboxIndex = 0;
+    let currentLevel = plannerData[params.get("level")] ? params.get("level") : "beginner";
+    let currentGrade = Math.min(plannerData[currentLevel].grades.length, window.ErhuExamProgress.getGradeNumber(params, 1));
 
     function setSourceStatus(text) {
       sourceStatus.textContent = "目前來源：" + text;
     }
 
+    function currentGradeData() {
+      return plannerData[currentLevel].grades[currentGrade - 1] || plannerData[currentLevel].grades[0];
+    }
+
     function updateContextMeta() {
       const displayName = currentUser ? currentUser.displayName : "目前學生";
-      contextMeta.textContent = displayName + "｜直接輸入你的問題即可";
+      contextMeta.textContent = displayName + "｜" + plannerData[currentLevel].label + "｜" + currentGradeData().grade + "｜直接輸入你的問題即可";
     }
 
     function escapeHtml(text) {
@@ -464,7 +475,7 @@
 
     function renderMessages() {
       if (!historyMessages.length) {
-        messages.innerHTML = "<div class=\"empty\">直接輸入你要問的問題就可以。<br>例如：<br>1. 給我賽馬的二胡簡譜<br>2. 給我賽馬的二胡教學影片<br>3. 我的內外弦切換一直卡住怎麼練？</div>";
+        messages.innerHTML = "<div class=\"empty\">直接輸入你要問的問題就可以。<br>例如：<br>1. 給我賽馬的二胡簡譜<br>2. 給我賽馬的二胡示範教材<br>3. 我的內外弦切換一直卡住怎麼練？</div>";
         return;
       }
       messages.innerHTML = historyMessages.map(function (item) {
@@ -474,7 +485,7 @@
               return renderResource(resource);
             }).join("") + "</div>"
           : "";
-        return "<div class=\"message " + item.role + "\"><small>" + author + "</small>" + escapeHtml(item.text) + resourcesHtml + "</div>";
+        return "<div class=\"message " + item.role + "\"><small>" + author + "</small>" + ErhuQuality.markdown(item.text) + resourcesHtml + "</div>";
       }).join("");
       messages.scrollTop = messages.scrollHeight;
     }
@@ -515,29 +526,45 @@
       const trackerSummary = {};
       trackerSnapshot.forEach(function (doc) {
         const data = doc.data() || {};
-        const completedWeeks = Object.keys(data).filter(function (key) {
-          return key.indexOf("week_") === 0 && data[key];
-        }).length;
-        trackerSummary[doc.id] = completedWeeks;
+        const totalGrades = plannerData[doc.id] ? plannerData[doc.id].grades.length : 10;
+        trackerSummary[doc.id] = window.ErhuExamProgress.countCompleted(data, totalGrades);
       });
       const quizSummary = {};
+      const quizEntries = {};
       quizSnapshot.forEach(function (doc) {
         const data = doc.data() || {};
-        const match = doc.id.match(/^(beginner|intermediate|advanced)_week_(\d+)$/);
-        if (!match) return;
-        const levelKey = match[1];
-        if (!quizSummary[levelKey]) {
-          quizSummary[levelKey] = { best: 0, last: null, weakWeeks: [] };
+        const parsed = window.ErhuExamProgress.parseScoreDocId(doc.id);
+        if (!parsed) return;
+        const levelKey = parsed.level;
+        if (!quizEntries[levelKey]) {
+          quizEntries[levelKey] = {};
         }
-        if (typeof data.bestScore === "number" && data.bestScore > quizSummary[levelKey].best) {
-          quizSummary[levelKey].best = data.bestScore;
+        const current = quizEntries[levelKey][parsed.grade];
+        if (!current || (current.variant === "week" && parsed.variant === "grade")) {
+          quizEntries[levelKey][parsed.grade] = {
+            variant: parsed.variant,
+            data: data
+          };
         }
-        if (typeof data.lastScore === "number") {
-          quizSummary[levelKey].last = data.lastScore;
-          if (data.lastScore < 8) {
-            quizSummary[levelKey].weakWeeks.push("第 " + match[2] + " 週 " + data.lastScore + "/10");
+      });
+      Object.keys(quizEntries).forEach(function (levelKey) {
+        quizSummary[levelKey] = { best: 0, last: null, weakWeeks: [] };
+        Object.keys(quizEntries[levelKey]).sort(function (a, b) {
+          return Number(a) - Number(b);
+        }).forEach(function (gradeKey) {
+          const data = quizEntries[levelKey][gradeKey].data || {};
+          if (typeof data.bestScore === "number" && data.bestScore > quizSummary[levelKey].best) {
+            quizSummary[levelKey].best = data.bestScore;
           }
-        }
+          if (typeof data.lastScore === "number") {
+            quizSummary[levelKey].last = data.lastScore;
+            if (data.lastScore < 8) {
+              const gradeData = plannerData[levelKey] && plannerData[levelKey].grades[Number(gradeKey) - 1];
+              const label = gradeData ? gradeData.grade : ("第 " + gradeKey + " 級");
+              quizSummary[levelKey].weakWeeks.push(label + " " + data.lastScore + "/10");
+            }
+          }
+        });
       });
       return {
         displayName: currentUser.displayName,
@@ -554,21 +581,29 @@
       if (!currentUser) {
         throw new Error("missing-user");
       }
+      const firebaseUser = window.ErhuFirebase.auth.currentUser;
+      if (!firebaseUser) {
+        throw new Error("missing-auth-session");
+      }
+      const idToken = await firebaseUser.getIdToken();
       const payload = JSON.stringify({
+        route: "tutor",
         question: question,
-        level: "beginner",
-        week: 1,
+        level: currentLevel,
+        grade: currentGrade,
+        week: currentGrade,
         history: historyMessages,
         studentProfile: learningProfile
       });
-      const urls = [window.ErhuFirebase.askTutorUrl, window.ErhuFirebase.askTutorFallbackUrl].filter(Boolean);
+      const urls = [window.ErhuFirebase.askTutorUrl].filter(Boolean);
       let lastError = null;
       for (let index = 0; index < urls.length; index += 1) {
         try {
           const response = await fetch(urls[index], {
             method: "POST",
             headers: {
-              "Content-Type": "application/json"
+              "Content-Type": "application/json",
+              "Authorization": "Bearer " + idToken
             },
             body: payload
           });
@@ -576,7 +611,7 @@
           if (!response.ok || !data.answer) {
             throw new Error(data && data.error ? data.error : "backend-failed");
           }
-          setSourceStatus("OpenAI 後端");
+          setSourceStatus("AI 助教已回覆");
           return {
             text: data.answer,
             resources: Array.isArray(data.resources) ? data.resources : []
@@ -615,15 +650,14 @@
     }
 
     function buildAnswer(question) {
-      if (/簡譜|樂譜|譜|圖片|影片|youtube|video/i.test(question)) {
-        return "我先幫你整理和這個問題直接相關的圖片或影片資源，你可以看下方顯示的內容。";
-      }
-      return "我先直接回答你的問題。如果你想要，我也可以再幫你拆成更短的練習步驟。";
+      return "AI 暫時無法回覆，這次沒有生成練習建議或找到新資源。請稍後重試；你也可以先回課程查看教學重點。";
     }
 
     async function submitQuestion() {
       const question = questionInput.value.trim();
-      if (!question || !currentUser) return;
+      if (!question) { questionInput.setCustomValidity("請先輸入想問的二胡問題。"); questionInput.reportValidity(); questionInput.focus(); return; }
+      questionInput.setCustomValidity("");
+      if (!currentUser) return;
       askButton.disabled = true;
       askButton.textContent = "回覆中...";
       try {
@@ -632,8 +666,8 @@
         try {
           answer = await askBackendTutor(question);
         } catch (error) {
-          console.error("askBackendTutor failed, fallback to local tutor", error);
-          setSourceStatus("本地備援（" + (error && error.message ? error.message : "unknown-error") + "）");
+          console.error("askBackendTutor failed", error);
+          setSourceStatus("AI 暫時無法連線，請稍後重試。");
           answer = { text: buildAnswer(question), resources: [] };
         }
         await addMessage("assistant", answer.text, answer.resources);
@@ -664,6 +698,7 @@
         closeLightbox();
       }
     });
+    questionInput.addEventListener("input", () => questionInput.setCustomValidity(""));
     questionInput.addEventListener("keydown", function (event) {
       if ((event.metaKey || event.ctrlKey) && event.key === "Enter") {
         submitQuestion();
@@ -685,6 +720,9 @@
     window.ErhuAuth.onReady(async function (user) {
       currentUser = user;
       updateContextMeta();
+      if (params.get("question")) {
+        questionInput.value = params.get("question");
+      }
       learningProfile = await loadLearningProfile();
       await loadHistory();
     });

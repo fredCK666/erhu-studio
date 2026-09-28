@@ -3,7 +3,20 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>二胡小教室 | 課程分級入口</title>
+  <title>二胡小教室 | 二胡檢定課程分級</title>
+  <meta name="description" content="用二胡國家級檢定的初級、中級、高級分級方式，整理指定曲、自選曲與 AI 助教、AI 掃描譜、AI 音準跟譜、AI 規劃、AI 回報和比賽展示路線。" />
+  <meta name="theme-color" content="#f7efe3" />
+  <link rel="canonical" href="https://erhu-auth.web.app/二胡小教室.html" />
+  <link rel="manifest" href="./site.webmanifest" />
+  <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+  <meta property="og:type" content="website" />
+  <meta property="og:locale" content="zh_TW" />
+  <meta property="og:title" content="二胡小教室｜二胡檢定課程分級" />
+  <meta property="og:description" content="以二胡國家級檢定的三個級別整理課程入口，搭配 AI 助教、AI 掃描譜、AI 音準跟譜、AI 規劃、打卡、回報工具與比賽展示頁。" />
+  <meta property="og:url" content="https://erhu-auth.web.app/二胡小教室.html" />
+  <meta property="og:image" content="https://erhu-auth.web.app/assets/scores/level1-lian-gong-yu-fu-dian.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="stylesheet" href="./erhu-theme.css?v=20260327f" />
   <style>
     :root {
       --ink: #211914;
@@ -25,9 +38,6 @@
     }
     a { color: inherit; text-decoration: none; }
     .shell { width: min(1120px, calc(100% - 28px)); margin: 0 auto; padding: 24px 0 40px; }
-    .topbar { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 20px; }
-    .brand { font-size: 22px; font-weight: 800; letter-spacing: 0.08em; }
-    .home-link { color: var(--muted); font-weight: 700; }
     .hero, .card, .note {
       border: 1px solid var(--line);
       box-shadow: var(--shadow);
@@ -38,8 +48,8 @@
       padding: 34px;
       color: #fff8f1;
       background:
-        radial-gradient(circle at 100% 0%, rgba(255, 222, 171, 0.18), transparent 26%),
-        linear-gradient(145deg, rgba(35, 25, 20, 0.98), rgba(109, 67, 40, 0.94));
+        radial-gradient(circle at 100% 0%, rgba(238, 194, 122, 0.2), transparent 26%),
+        linear-gradient(145deg, rgba(49, 33, 24, 0.98), rgba(123, 79, 47, 0.95));
     }
     .tag {
       display: inline-flex;
@@ -50,29 +60,70 @@
       letter-spacing: 0.12em;
     }
     h1 { margin: 16px 0 12px; font-size: clamp(34px, 6vw, 56px); line-height: 1.04; }
-    .hero p { margin: 0; max-width: 720px; line-height: 1.85; color: rgba(255, 248, 241, 0.84); }
+    .hero p {
+      margin: 0;
+      max-width: 720px;
+      line-height: 1.85;
+      color: rgba(255, 246, 236, 0.94);
+      text-shadow: 0 1px 10px rgba(36, 23, 16, 0.12);
+    }
+    .featured-ai-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+      margin-top: 22px;
+    }
     .featured-ai {
       margin-top: 22px;
       padding: 28px;
       text-align: center;
-      border: 1px solid rgba(202, 133, 49, 0.16);
-      box-shadow: 0 24px 56px rgba(202, 133, 49, 0.18);
+      border: 1px solid rgba(99, 63, 40, 0.2);
+      box-shadow: 0 24px 56px rgba(93, 60, 37, 0.22);
       background:
-        radial-gradient(circle at top center, rgba(255, 220, 167, 0.48), transparent 32%),
-        linear-gradient(180deg, rgba(255, 248, 239, 0.98), rgba(255, 238, 210, 0.96));
+        radial-gradient(circle at top center, rgba(194, 155, 111, 0.26), transparent 30%),
+        linear-gradient(180deg, rgba(249, 242, 235, 0.98), rgba(219, 192, 167, 0.97));
       border-radius: 30px;
+      min-height: 320px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
     }
+    .featured-ai-grid .featured-ai { margin-top: 0; }
     .featured-ai h2 {
       margin: 10px 0 12px;
       font-size: clamp(30px, 4.5vw, 46px);
-      color: #4d2f15;
+      color: #3f2719;
     }
     .featured-ai p {
       margin: 0 auto;
       max-width: 760px;
-      color: var(--muted);
+      color: #5f4739;
       line-height: 1.9;
       font-size: 18px;
+    }
+    .featured-ai.featured-planner {
+      background:
+        radial-gradient(circle at top center, rgba(154, 118, 86, 0.18), transparent 28%),
+        linear-gradient(180deg, rgba(255, 248, 242, 0.98), rgba(232, 216, 201, 0.97));
+      border-color: rgba(108, 75, 51, 0.2);
+    }
+    .featured-ai.featured-review {
+      background:
+        radial-gradient(circle at top center, rgba(132, 152, 112, 0.16), transparent 28%),
+        linear-gradient(180deg, rgba(252, 247, 241, 0.98), rgba(225, 218, 205, 0.97));
+      border-color: rgba(88, 104, 73, 0.18);
+    }
+    .featured-ai.featured-pitch {
+      background:
+        radial-gradient(circle at top center, rgba(155, 181, 120, 0.18), transparent 28%),
+        linear-gradient(180deg, rgba(248, 250, 243, 0.98), rgba(215, 224, 204, 0.96));
+      border-color: rgba(100, 118, 78, 0.18);
+    }
+    .featured-ai.featured-review {
+      background:
+        radial-gradient(circle at top center, rgba(188, 128, 108, 0.18), transparent 28%),
+        linear-gradient(180deg, rgba(252, 246, 241, 0.98), rgba(233, 211, 194, 0.97));
+      border-color: rgba(143, 98, 74, 0.18);
     }
     .featured-actions {
       display: flex;
@@ -81,11 +132,22 @@
       flex-wrap: wrap;
       margin-top: 22px;
     }
+    .featured-actions .button.secondary {
+      background: rgba(123, 77, 45, 0.08);
+      color: #6a4733;
+      border: 1px solid rgba(123, 77, 45, 0.12);
+      box-shadow: none;
+    }
+    .featured-ai .button.primary {
+      min-width: 220px;
+    }
     .button.primary {
       min-width: 220px;
       padding: 16px 24px;
       font-size: 20px;
-      box-shadow: 0 18px 34px rgba(202, 133, 49, 0.28);
+      background: linear-gradient(135deg, #8d5a39, #5b3520);
+      color: #fff7ef;
+      box-shadow: 0 18px 34px rgba(93, 58, 35, 0.26);
     }
     .helper-badge {
       display: inline-flex;
@@ -107,6 +169,21 @@
       letter-spacing: 0.18em;
     }
     .grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; margin-top: 18px; }
+    .hero-summary {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 22px;
+    }
+    .hero-summary span {
+      display: inline-flex;
+      padding: 10px 14px;
+      border-radius: 999px;
+      background: rgba(255, 248, 241, 0.12);
+      border: 1px solid rgba(255, 248, 241, 0.12);
+      font-size: 14px;
+      font-weight: 700;
+    }
     .card {
       padding: 24px;
       min-height: 278px;
@@ -129,6 +206,76 @@
       margin: 0 0 18px;
       flex: 1;
     }
+    .outline-section {
+      margin-top: 18px;
+      padding: 24px;
+    }
+    .outline-section h2 {
+      margin: 0 0 10px;
+      font-size: 30px;
+    }
+    .outline-section p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.8;
+    }
+    .grade-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      margin-top: 18px;
+    }
+    .grade-card {
+      display: block;
+      padding: 20px;
+      border-radius: 24px;
+      background: rgba(255, 252, 248, 0.9);
+      border: 1px solid rgba(123, 77, 45, 0.12);
+      transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+    }
+    .grade-card:hover {
+      transform: translateY(-2px);
+      border-color: rgba(123, 77, 45, 0.26);
+      box-shadow: 0 18px 34px rgba(46, 28, 18, 0.1);
+    }
+    .grade-meta {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+    .grade-meta strong {
+      color: var(--wood);
+      font-size: 18px;
+    }
+    .grade-card h3 {
+      margin: 0 0 10px;
+      font-size: 24px;
+      color: var(--ink);
+    }
+    .grade-card p {
+      margin: 0 0 14px;
+      color: var(--muted);
+      line-height: 1.8;
+    }
+    .piece-text {
+      margin-top: 8px;
+      color: var(--muted);
+      line-height: 1.8;
+    }
+    .piece-text span {
+      display: inline-block;
+      margin-right: 8px;
+      color: var(--wood);
+      font-weight: 800;
+    }
+    .grade-link {
+      display: inline-flex;
+      margin-top: 14px;
+      color: var(--wood);
+      font-weight: 800;
+    }
     .button {
       display: inline-flex;
       align-items: center;
@@ -149,62 +296,165 @@
       font-family: "SFMono-Regular", Consolas, monospace;
     }
     @media (max-width: 820px) {
+      .featured-ai-grid { grid-template-columns: 1fr; }
       .grid { grid-template-columns: 1fr; }
+      .grade-grid { grid-template-columns: 1fr; }
       .hero, .card { padding: 22px; }
       .featured-ai { padding: 22px; }
     }
   </style>
+<link rel="stylesheet" href="./erhu-refined.css?v=20260928" />
+<script src="./erhu-quality.js?v=20260928"></script>
 </head>
-<body>
+<body class="erhu-site">
   <main class="shell">
     <header class="topbar">
       <div class="brand">二胡小教室</div>
-      <a class="home-link" href="./">回首頁入口</a>
+      <nav class="nav">
+        <a href="./">回首頁</a>
+        <a href="./二胡小教室-比賽展示.html">比賽展示</a>
+        <a href="./二胡小教室.html#course-levels">課程分級</a>
+        <a href="./二胡小教室-AI助教.html">AI 助教</a>
+        <a href="./二胡小教室-AI掃描譜.html">AI 掃描譜</a>
+        <a href="./二胡小教室-AI練習規劃師.html">AI 規劃</a>
+        <a href="./二胡小教室-AI音準評分.html?v=20260609v">音準評分</a>
+        <a href="./二胡小教室-AI錯音複習師.html?v=20260409a">級數回報</a>
+        <a href="./二胡小教室-練習打卡.html">檢定打卡</a>
+        <a href="./二胡小教室-AI使用與隱私.html">AI/隱私</a>
+      </nav>
+      <a class="tuner-shortcut" href="./二胡小教室-調音器.html">調音器</a>
     </header>
     <section class="hero">
-      <div class="tag">ERHU LEARNING HUB</div>
-      <h1>AI 二胡學習入口</h1>
-      <p>AI 二胡助教，你可以直接發問、找譜、找影片，再依照自己的程度回到初級、中級、高級 10 週課程線去練習。</p>
-    </section>
-    <section class="featured-ai">
-      <div class="eyebrow">AI TUTOR</div>
-      <h2>先進 AI 助教，再進各級課程</h2>
-      <p>卡關時先問 AI 助教最直接。你可以問技巧問題、要某首曲子的二胡簡譜連結、找教學影片，之後再回到初級、中級、高級各自的每週訓練。</p>
-      <div class="featured-actions">
-        <a class="button primary" href="./二胡小教室-AI助教.html">進入 AI 助教</a>
+      <div class="tag">ERHU EXAM PREP</div>
+      <h1>AI 二胡考級檢定訓練</h1>
+      <p>這裡提供二胡考級檢定導向的 AI 訓練流程。你可以依照初級、中級、高級三個級別進入課程，再搭配 AI 助教、音準跟譜、練習規劃、打卡與回報工具準備考試。</p>
+      <div class="hero-summary">
+        <span>初級：第一級到第三級</span>
+        <span>中級：第四級到第七級</span>
+        <span>高級：第八級到第十級</span>
+        <span>比賽展示：掃譜到回報</span>
       </div>
-      <div class="helper-badge">AI 助教的主要入口</div>
     </section>
-    <div class="levels-title">LEVEL COURSES</div>
+    <section class="note">
+      <strong>TAECT 2026 作品展示版：</strong>
+      展示主軸集中在 AI 掃描譜、譜面編輯、AI 音準跟譜、級數回報、音準技術說明與 AI/隱私說明。
+      <a class="button" href="./二胡小教室-比賽展示.html">查看比賽展示</a>
+    </section>
+    <section class="featured-ai-grid">
+      <section class="featured-ai">
+        <div>
+          <div class="eyebrow">AI TUTOR</div>
+          <h2>先問檢定曲目，再回到對應級數</h2>
+          <p>卡關時先問 AI 助教最直接。你可以問指定曲技巧、找檢定曲示範教材、整理練習重點，再回到對應的檢定級數練習頁。</p>
+        </div>
+        <div class="featured-actions">
+          <a class="button primary" href="./二胡小教室-AI助教.html">進入 AI 助教</a>
+        </div>
+      </section>
+      <section class="featured-ai featured-planner">
+        <div>
+          <div class="eyebrow">AI PLANNER</div>
+          <h2>讓 AI 直接排今天的練習單</h2>
+          <p>AI 練習規劃師會依照你現在準備的檢定級別、曲目、可練時間、測驗弱點和打卡進度，直接排出今天要練的流程。</p>
+        </div>
+        <div class="featured-actions">
+          <a class="button primary" href="./二胡小教室-AI練習規劃師.html">進入 AI 規劃師</a>
+        </div>
+      </section>
+      <section class="featured-ai featured-pitch">
+        <div>
+          <div class="eyebrow">AI SCORE SCANNER</div>
+          <h2>把自己的譜掃進來，再細修成可跟譜版本</h2>
+          <p>學生可以上傳想練的簡譜圖片，AI 先辨識成站內譜面；保存後可進譜面編輯器微調，也能直接拿到 AI 音準跟譜練習。</p>
+        </div>
+        <div class="featured-actions">
+          <a class="button primary" href="./二胡小教室-AI掃描譜.html">進入 AI 掃描譜</a>
+        </div>
+      </section>
+      <section class="featured-ai featured-pitch">
+        <div>
+          <div class="eyebrow">AI PITCH REVIEW</div>
+          <h2>直接跟著檢定級數練習譜，逐音抓音準</h2>
+          <p>選好檢定級別、級數和速度後，直接照著畫面演奏。系統會一個音一個音抓，幫你把檢定準備裡最容易偏的音抓出來。</p>
+        </div>
+        <div class="featured-actions">
+          <a class="button primary" href="./二胡小教室-AI音準評分.html?v=20260609v">進入 AI 音準跟譜</a>
+        </div>
+      </section>
+      <section class="featured-ai featured-review">
+        <div>
+          <div class="eyebrow">AI GRADE REPORTER</div>
+          <h2>把打卡、測驗和音準練習整理成一份級數回報</h2>
+          <p>AI 級數回報師會讀你這一級留下來的打卡、測驗和音準跟譜資料，幫你整理目前的整體表現與下一步先補什麼。</p>
+        </div>
+        <div class="featured-actions">
+          <a class="button primary" href="./二胡小教室-AI錯音複習師.html?v=20260409a">進入 AI 級數回報師</a>
+        </div>
+      </section>
+    </section>
+    <div class="levels-title" id="course-levels">LEVEL COURSES</div>
     <section class="grid">
       <article class="card">
-        <div class="eyebrow">BEGINNER</div>
-        <h2>初級課程</h2>
-        <p>適合剛入門或想重整基礎的人，內容從姿勢、長弓、切弦、音準一路練到第一段完整演奏。</p>
-        <a class="button" href="./二胡小教室-初級.html">進入初級</a>
+        <div class="eyebrow">BEGINNER EXAM</div>
+        <h2>初級檢定</h2>
+        <p>對應第一級到第三級，先準備指定曲，再從曲目表裡挑自選曲。重點放在基本運弓、把位、節奏和內外弦控制。</p>
+        <a class="button" href="./二胡小教室-初級.html">進入初級檢定</a>
       </article>
       <article class="card">
-        <div class="eyebrow">INTERMEDIATE</div>
-        <h2>中級課程</h2>
-        <p>適合已有基本演奏能力的人，會加強換把、揉弦、弓法組合、速度與段落控制。</p>
-        <a class="button" href="./二胡小教室-中級.html">進入中級</a>
+        <div class="eyebrow">INTERMEDIATE EXAM</div>
+        <h2>中級檢定</h2>
+        <p>對應第四級到第七級，開始加強顫指、揉弦、跳指、換把與雙手配合，準備更完整的檢定曲目。</p>
+        <a class="button" href="./二胡小教室-中級.html">進入中級檢定</a>
       </article>
       <article class="card">
-        <div class="eyebrow">ADVANCED</div>
-        <h2>高級課程</h2>
-        <p>適合想把技巧整合成表現的人，重點放在控制力、音色設計、速度穩定與完整曲目演出。</p>
-        <a class="button" href="./二胡小教室-高級.html">進入高級</a>
+        <div class="eyebrow">ADVANCED EXAM</div>
+        <h2>高級檢定</h2>
+        <p>對應第八級到第十級，沒有指定曲，重點是選好自選曲後，把高難技巧、風格和整體演出穩定度做出來。</p>
+        <a class="button" href="./二胡小教室-高級.html">進入高級檢定</a>
       </article>
+    </section>
+    <section class="card outline-section">
+      <div class="eyebrow">TEN GRADE OUTLINE</div>
+      <h2>十級課程總覽</h2>
+      <p>依級數找到指定曲、自選曲與練習方向，從熟悉的起點循序練習。</p>
+      <div class="grade-grid" id="gradeGrid"></div>
     </section>
   </main>
   <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
-  <script src="./firebase-init.js?v=20260323b"></script>
-  <script src="./auth.js?v=20260323b"></script>
+  <script src="./exam-course-data.js?v=20260505c"></script>
+  <script src="./exam-progress.js?v=20260519a"></script>
+  <script src="./firebase-init.js?v=20260928"></script>
+  <script src="./auth.js?v=20260928"></script>
   <script>
-    window.ErhuAuth.requireAuth();
-    window.ErhuAuth.attachAuthUI();
+    const gradeGrid = document.getElementById("gradeGrid");
+    [
+      { key: "beginner" },
+      { key: "intermediate" },
+      { key: "advanced" }
+    ].forEach(function (entry) {
+      const level = window.ErhuExamData.levels[entry.key];
+      level.grades.forEach(function (grade, index) {
+        const card = document.createElement("a");
+        card.className = "grade-card";
+        card.href = window.ErhuExamProgress.buildUrl("./二胡小教室-週課程.html", { level: entry.key, grade: index + 1 });
+        card.innerHTML =
+          "<div class=\"grade-meta\"><span class=\"eyebrow\">" + level.label + "檢定</span><strong>" + grade.grade + "</strong></div>" +
+          "<h3>" + grade.shortTitle + "</h3>" +
+          "<p>" + grade.description + "</p>" +
+          "<div class=\"piece-text\"><span>指定曲</span>" + grade.specified + "</div>" +
+          "<div class=\"piece-text\"><span>自選曲</span>" + grade.selected.join("、") + "</div>" +
+          "<span class=\"grade-link\">查看這一級</span>";
+        gradeGrid.appendChild(card);
+      });
+    });
+
+    window.ErhuAuth.attachAuthUI({
+      showGuestActions: true,
+      guestHref: "./二胡小教室-登入.html",
+      guestLabel: "登入"
+    });
   </script>
 </body>
 </html>

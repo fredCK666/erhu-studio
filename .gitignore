@@ -3,3 +3,7 @@ __pycache__/
 firebase-config.js
 .firebaserc
 functions/node_modules/
+node_modules/
+quality-functions/node_modules/
+dist/
+.env*
