@@ -1,30 +1,30 @@
-/* Rice paper, dark rosewood, jade and a cinnabar seal. */
-:root { --ink:#292820;--muted:#68685b;--wood:#684735;--paper:#fffdf8;--line:#dfd8c8;--green:#3d5c4c;--shadow:0 8px 24px #33291808; }
+/* Rice paper, dark rosewood, walnut and a cinnabar seal. */
+:root { --ink:#292820;--muted:#68685b;--wood:#684735;--paper:#fffdf8;--line:#dfd8c8;--green:#5a4b3f;--shadow:0 8px 24px #33291808; }
 html { scroll-behavior:smooth; }
-body,body.erhu-site { background:#f4f1e9; color:#292820; line-height:1.75; font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif; }
+body,body.erhu-site { background:#f5f0e8; color:#292820; line-height:1.75; font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif; }
 body.erhu-site::before,body.erhu-site::after { opacity:.12; }
 body.erhu-site .shell,.shell { width:min(1240px,calc(100% - 48px)); padding-top:24px; }
 body.erhu-site .topbar,.topbar { background:#fffdf8; border:1px solid #dfd8c8; border-radius:14px; box-shadow:none; padding:16px 22px; gap:16px; }
-body.erhu-site .brand,.brand { color:#3d493a; letter-spacing:.14em; }
-body.erhu-site h1,body.erhu-site h2,body.erhu-site h3,h1,h2,h3 { font-family:"Noto Serif TC","Songti TC","PMingLiU",serif; text-wrap:balance; color:#303e31; line-height:1.35; }
+body.erhu-site .brand,.brand { color:#49413a; letter-spacing:.14em; }
+body.erhu-site h1,body.erhu-site h2,body.erhu-site h3,h1,h2,h3 { font-family:"Noto Serif TC","Songti TC","PMingLiU",serif; text-wrap:balance; color:#3e3630; line-height:1.35; }
 body.erhu-site h1,h1 { font-size:clamp(30px,4.4vw,56px);letter-spacing:.05em; }
 body.erhu-site h2,h2 { font-size:clamp(24px,2.7vw,34px); }
 body.erhu-site .hero,.hero,body.erhu-site .frame,.frame { border-radius:20px; border:1px solid #d8d1c1; background:#faf8f1;box-shadow:none; }
 body.erhu-site .card,body.erhu-site .panel,body.erhu-site .section,body.erhu-site .summary-card,body.erhu-site .history-card,body.erhu-site .report-card,body.erhu-site .score-card,body.erhu-site .course-card,body.erhu-site .tool-card,.card,.panel,.section,.course-card,.tool-card { border-radius:14px; border-color:#dfd8c8; background:#fffdf8;box-shadow:0 4px 16px #29282005; }
-body.erhu-site .button,.button,body.erhu-site .cta,.cta { background:#3d5c4c; color:#fffdf8; border:1px solid #3d5c4c; border-radius:8px; box-shadow:none; padding:11px 20px; min-height:44px; line-height:1.5; font-weight:700; cursor:pointer; }
-body.erhu-site .button.secondary,.button.secondary { background:#fffdf8; color:#3d5c4c; border-color:#b9c2b4; }
+body.erhu-site .button,.button,body.erhu-site .cta,.cta { background:#5a4b3f; color:#fffdf8; border:1px solid #5a4b3f; border-radius:8px; box-shadow:none; padding:11px 20px; min-height:44px; line-height:1.5; font-weight:700; cursor:pointer; }
+body.erhu-site .button.secondary,.button.secondary { background:#fffdf8; color:#5a4b3f; border-color:#c3bab3; }
 body.erhu-site .button:hover,.button:hover { filter:brightness(.94);transform:translateY(-1px); }
 button:disabled,[aria-disabled="true"] { opacity:.55;cursor:not-allowed;transform:none!important; }
-body.erhu-site .tab.active,body.erhu-site .week-tab.active,body.erhu-site .tab[aria-pressed="true"],body.erhu-site .week-tab[aria-pressed="true"] { background:#3d5c4c;color:#fffdf8;border-color:#3d5c4c; }
+body.erhu-site .tab.active,body.erhu-site .week-tab.active,body.erhu-site .tab[aria-pressed="true"],body.erhu-site .week-tab[aria-pressed="true"] { background:#5a4b3f;color:#fffdf8;border-color:#5a4b3f; }
 body.erhu-site .eyebrow,.eyebrow { color:#9a4834; letter-spacing:.16em; font-size:12px; }
 body.erhu-site input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),body.erhu-site select,body.erhu-site textarea { background:#fff;color:#292820;border:1px solid #bdbbab;border-radius:8px;min-height:44px; font:inherit; }
 input,select,textarea { max-width:100%; }
 :focus-visible { outline:3px solid #9a4834!important; outline-offset:4px; }
 [hidden] { display:none!important; }
 .access-note { margin:28px auto;padding:20px;border-top:1px solid #dfd8c8;color:#68685b;font-size:14px;max-width:1120px; }
-.access-note a,.recovery a { text-decoration:underline;text-underline-offset:4px;color:#3d5c4c; }
+.access-note a,.recovery a { text-decoration:underline;text-underline-offset:4px;color:#5a4b3f; }
 .recovery { margin:20px 0;padding:14px;border:1px solid #dfd8c8;border-radius:8px; }
-.recovery summary { cursor:pointer;color:#3d5c4c; }
+.recovery summary { cursor:pointer;color:#5a4b3f; }
 .recovery input { margin:10px 0;width:100%; }
 .source-comparison { padding:20px;margin:18px 0;background:#f6f3ea;border:1px solid #dfd8c8;border-radius:12px; }
 .source-comparison p { font-size:14px;color:#68685b; }
@@ -44,7 +44,7 @@ input,select,textarea { max-width:100%; }
 .demo-grid article:last-child {grid-column:1/-1;}
 .demo-number {font-family:Georgia,serif;font-size:32px;color:#9a4834;}
 .demo-label {font-size:13px;color:#68685b;letter-spacing:.1em;}
-.demo-output {white-space:pre-wrap;padding:18px;background:#f5f3eb;border-left:3px solid #718771;margin:16px 0;}
+.demo-output {white-space:pre-wrap;padding:18px;background:#f5f3eb;border-left:3px solid #8b7a6d;margin:16px 0;}
 @media(max-width:760px) {
  body.erhu-site .shell,.shell {width:calc(100% - 24px);padding-top:12px;}
  body.erhu-site .topbar,.topbar {display:flex!important;flex-wrap:wrap;gap:12px;padding:14px;}
@@ -60,7 +60,7 @@ input,select,textarea { max-width:100%; }
 }
 @media(prefers-reduced-motion:reduce) {html{scroll-behavior:auto;}*,*::before,*::after{animation:none!important;transition:none!important;}}
 @media print {.topbar,.source-comparison,.access-note,button{display:none!important}.engraved-row{overflow:visible}.engraved-row svg{min-width:0!important;max-height:none!important}body{background:white}}
-body.erhu-site .hero-cta {background:#3d5c4c;border:1px solid #3d5c4c;color:#fffdf8;border-radius:8px;box-shadow:none;}
-body.erhu-site .hero-cta.secondary {background:#fffdf8;color:#3d5c4c;border-color:#b9c2b4;}
-body.erhu-site .promo-ribbon {background:#ebece0;color:#3d5c4c;border:0;box-shadow:none;}
+body.erhu-site .hero-cta {background:#5a4b3f;border:1px solid #5a4b3f;color:#fffdf8;border-radius:8px;box-shadow:none;}
+body.erhu-site .hero-cta.secondary {background:#fffdf8;color:#5a4b3f;border-color:#c3bab3;}
+body.erhu-site .promo-ribbon {background:#ebe5e1;color:#5a4b3f;border:0;box-shadow:none;}
 body.erhu-site .hero-badge {background:#fffdf8;color:#68685b;border:1px solid #dfd8c8;box-shadow:none;}
