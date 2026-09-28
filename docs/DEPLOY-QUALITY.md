@@ -36,3 +36,19 @@ firebase deploy --only hosting --project erhu-auth --config firebase.quality.jso
 Hosting發布前記錄目前版本；若有回歸，從Firebase Hosting部署歷史回復原版本。V2為新名稱，不需刪除既有函式即可退回舊前端。
 
 目前本地無Firebase CLI憑證。瀏覽器可開啟erhu-auth專案，但嵌入Cloud Shell顯示 Site Unavailable；因此本分支不代表已發布正式站。
+
+
+## 咖啡色首頁及前端介面發布（2026-09-28）
+
+這次外觀更新使用現有正式後端，不必部署 V2 函式。只發布 Hosting：
+
+```sh
+npm ci
+npm run check
+npm test
+npm run build
+npx firebase-tools login
+npx firebase-tools deploy --project erhu-auth --config firebase.hosting.json --only hosting
+```
+
+`firebase.hosting.json` 僅包含 erhu-auth Hosting，不會部署或刪除 Functions。正式版不包含示範帳號、固定 AI 回覆或本機模擬資料庫。發布後檢查首頁、登入、分級課程與掃譜；必要時可從 Firebase Hosting 部署歷史回復上一版。

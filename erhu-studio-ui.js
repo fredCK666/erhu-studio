@@ -2,6 +2,7 @@
 (function(){
  function mount(){
   let page;try{page=decodeURIComponent(location.pathname.split('/').pop()||'index.html')}catch{page='index.html'}
+  if(page&&!page.includes('.'))page+='.html';
   const routes=[['課程與紀錄',[['01','練習首頁','index.html'],['02','十級課程','二胡小教室.html'],['03','練習打卡','二胡小教室-練習打卡.html'],['04','級數測驗','二胡小教室-小測驗.html']]],['AI 練習工具',[['問','問答助教','二胡小教室-AI助教.html'],['練','練習規劃','二胡小教室-AI練習規劃師.html'],['譜','掃描樂譜','二胡小教室-AI掃描譜.html'],['聽','音準跟譜','二胡小教室-AI音準評分.html'],['記','學習回報','二胡小教室-AI錯音複習師.html']]],['譜面與調音',[['編','譜面編輯','二胡小教室-譜面編輯器.html'],['調','二胡調音器','二胡小教室-調音器.html']]]];
   const labels=routes.flatMap(x=>x[1]);const current=labels.find(x=>x[2]===page)?.[1]||'二胡課程';
   document.body.classList.add('studio-redesign');

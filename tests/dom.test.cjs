@@ -7,6 +7,7 @@ async function page(name,query='',extra={}) {
  w.ErhuAuth={requireAuth(){},attachAuthUI(){},onReady(cb){ready.push(cb)},getCurrentUser(){return {uid:'unit-test',displayName:'測試'}},getCurrentDisplayName(){return '測試'},getScopedStorageKey(k){return k+'-unit-test'}};
  w.ErhuFirebase={db:store,auth:{currentUser:{async getIdToken(){return 'offline-test';}}}};
  w.firebase={firestore:{FieldValue:{serverTimestamp(){return 'test-date'}}}};
+ w.matchMedia=q=>({matches:q.includes('min-width'),media:q,addEventListener(){},removeEventListener(){}});
  w.TextEncoder=TextEncoder;w.TextDecoder=TextDecoder;Object.assign(w,extra);
  for(const script of w.document.querySelectorAll('script')){
   const src=script.getAttribute('src');
