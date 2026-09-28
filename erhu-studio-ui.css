@@ -134,3 +134,32 @@ body.studio-redesign .export-detail{border:1px solid #dfd4c6;border-radius:8px;p
 ::view-transition-old(root){animation:studio-page-out 100ms ease both}::view-transition-new(root){animation:studio-page-in 180ms ease both}
 @keyframes studio-page-out{to{opacity:0}}@keyframes studio-page-in{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
 @media(prefers-reduced-motion:reduce){body.studio-redesign *,body.studio-redesign *::before,body.studio-redesign *::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}::view-transition-old(root),::view-transition-new(root){animation:none!important}}
+/* Explicit surface contrast overrides legacy text selectors and nested text colors. */
+body.erhu-site.studio-redesign{--text-primary:#38291f;--text-secondary:#69513e;--text-on-dark:#fff8ed;--text-on-dark-muted:#ead8c3}
+body.erhu-site.studio-redesign .studio-rail :is(p,small,summary){color:var(--text-on-dark-muted)!important}
+body.erhu-site.studio-redesign .studio-rail :is(a,strong){color:var(--text-on-dark)!important}
+body.erhu-site.studio-redesign .studio-rail .studio-nav-number{color:#f2c994!important}
+body.erhu-site.studio-redesign .welcome-copy :is(h1,h2,h3,strong){color:var(--text-on-dark)!important;text-shadow:none!important}
+body.erhu-site.studio-redesign .welcome-copy p{color:var(--text-on-dark-muted)!important}
+body.erhu-site.studio-redesign .welcome-copy .eyebrow{color:#f3d1a3!important}
+body.erhu-site.studio-redesign .welcome-actions .button{background:#f4e5cd!important;color:#402b1d!important;border-color:#f4e5cd!important}
+body.erhu-site.studio-redesign .welcome-actions .button.secondary{background:#ffffff0a!important;color:#fff8ed!important;border-color:#d4b795!important}
+body.erhu-site.studio-redesign .chat-head :is(h1,h2,h3,strong){color:#fff8ed!important;text-shadow:none!important}
+body.erhu-site.studio-redesign .chat-head :is(p,.meta,.status,small){color:#f2e3d1!important}
+body.erhu-site.studio-redesign .chat-head .meta{background:transparent!important;border:0!important;box-shadow:none!important}
+body.erhu-site.studio-redesign .chat-head .status{background:#ffffff12!important;border-color:#d9b58b!important}
+body.erhu-site.studio-redesign .message.user{background:#573b2b!important;color:#fff8ed!important}
+body.erhu-site.studio-redesign .message.user :is(p,li,strong,small,span,a){color:#fff8ed!important}
+body.erhu-site.studio-redesign :is(.button,.tab,.week-tab,.minute-button,.focus-chip) :is(span,strong,small){color:inherit!important}
+body.erhu-site.studio-redesign :is(.studio-tool-tile,.studio-level-card) p{color:#69513e!important}
+body.erhu-site.studio-redesign :is(.studio-section-title>span,.studio-home-footer,.studio-level-range){color:#705239!important}
+body.erhu-site.studio-redesign :is(.muted,.muted-small,.hint,.demo-label,.empty,.empty-state,.plan-empty,.live-sub){color:#6b5543!important}
+body.erhu-site.studio-redesign :is(.panel,.card,.summary-card,.plan-card,.report-card) :is(p,label,li){color:#4e3b2d}
+body.erhu-site.studio-redesign input::placeholder,body.erhu-site.studio-redesign textarea::placeholder{color:#766454!important;opacity:1}
+body.erhu-site.studio-redesign .preview-notice :is(label,strong,span){color:#493827!important}
+body.erhu-site.studio-redesign button:disabled{opacity:1!important;filter:none!important;background:#e5ddd1!important;color:#746351!important;border-color:#c7baaa!important;box-shadow:none!important}
+body.erhu-site.studio-redesign .studio-welcome{grid-template-columns:minmax(0,1fr) minmax(0,.95fr);gap:32px;padding:38px 40px}
+.studio-illustration{margin:0;min-width:0;align-self:stretch;display:flex;align-items:center;justify-content:center;background:#f2e6d4;border:1px solid #d8bb97;border-radius:10px;overflow:hidden;box-shadow:0 12px 30px #26180f24}
+.studio-illustration img{display:block;width:100%;height:auto;max-height:360px;object-fit:contain;background:#f2e6d4}
+@media(max-width:1000px){body.erhu-site.studio-redesign .studio-welcome{grid-template-columns:1fr;gap:26px}.studio-illustration{max-width:560px;width:100%}.studio-illustration img{max-height:330px}}
+@media(max-width:760px){body.erhu-site.studio-redesign .studio-welcome{padding:27px 22px;gap:24px}.studio-illustration{border-radius:8px}.studio-illustration img{max-height:285px}.studio-home .welcome-copy p{font-size:15px!important;line-height:1.9}.studio-tool-tile p,.studio-level-card p{font-size:14px!important}.studio-nav-group>p{font-size:13px!important}}
