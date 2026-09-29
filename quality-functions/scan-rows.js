@@ -1,5 +1,5 @@
 'use strict';
-async function transcribeRows(layout,transcribe,{concurrency=3}={}){
+async function transcribeRows(layout,transcribe,{concurrency=1}={}){
  if(!Array.isArray(layout.rows)||!layout.rows.length||layout.rows.length>24)throw Error('scan-layout');
  const output=new Array(layout.rows.length);let cursor=0;let stopped=false;
  async function worker(){

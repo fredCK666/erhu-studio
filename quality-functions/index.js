@@ -6,7 +6,8 @@ const {getAuth}=require('firebase-admin/auth');
 const {getFirestore,FieldValue}=require('firebase-admin/firestore');
 const Q=require('./erhu-quality');
 const schema=require('./schema');
-const {apiError,describe}=require('./errors');
+const {describe}=require('./errors');
+const {requestCompletion}=require('./model-request');
 if(!getApps().length)initializeApp();
 const VERSION='20260928-v2';
 const cors=['https://erhu-auth.web.app','https://erhu-auth.firebaseapp.com'];
@@ -15,14 +16,9 @@ const clean=(value,max=4000)=>String(value||'').slice(0,max);
 async function model(messages, responseSchema, name, vision=false, timeoutMs=240000) {
   const controller=new AbortController();const timer=setTimeout(()=>controller.abort(),timeoutMs);
   try {
-    const body={model:vision?(process.env.ERHU_VISION_MODEL||'gpt-4.1'):(process.env.ERHU_TEXT_MODEL||'gpt-4.1-mini'),messages,temperature:vision?0:0.3,max_completion_tokens:vision?24000:3500};
+    const body={model:vision?(process.env.ERHU_VISION_MODEL||'gpt-4.1'):(process.env.ERHU_TEXT_MODEL||'gpt-4.1-mini'),messages,temperature:vision?0:0.3,max_completion_tokens:name==='erhu_layout'?2000:name==='erhu_score'?5000:3500};
     if(responseSchema)body.response_format={type:'json_schema',json_schema:{name,strict:true,schema:responseSchema}};
-    const response=await fetch('https://api.openai.com/v1/chat/completions',{method:'POST',headers:{Authorization:'Bearer '+process.env.OPENAI_API_KEY,'Content-Type':'application/json'},body:JSON.stringify(body),signal:controller.signal});
-    if(!response.ok){
-      let detail={};try{detail=(await response.json()).error||{};}catch{}
-      throw apiError(response.status,detail);
-    }
-    const data=await response.json();const choice=data.choices?.[0];
+    const data=await requestCompletion(body,controller.signal);const choice=data.choices?.[0];
     if(choice?.message?.refusal)throw Error('model-refusal');
     if(choice?.finish_reason==='length')throw Error('model-length');
     if(choice?.finish_reason!=='stop'||!choice.message?.content)throw Error('model-format');
