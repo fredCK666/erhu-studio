@@ -1,0 +1,3104 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>二胡小教室 | AI 音準跟譜</title>
+  <meta name="description" content="AI 音準跟譜使用麥克風即時偵測二胡音高，讓學生照著檢定譜或自訂譜逐音練習並保存音準結果。" />
+  <link rel="canonical" href="https://erhu-auth.web.app/%E4%BA%8C%E8%83%A1%E5%B0%8F%E6%95%99%E5%AE%A4-AI%E9%9F%B3%E6%BA%96%E8%A9%95%E5%88%86.html" />
+  <link rel="manifest" href="./site.webmanifest" />
+  <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+  <meta property="og:type" content="website" />
+  <meta property="og:locale" content="zh_TW" />
+  <meta property="og:title" content="二胡小教室 | AI 音準跟譜" />
+  <meta property="og:description" content="跟著檢定譜逐音演奏，系統會即時抓音準並留下可回顧的練習結果。" />
+  <meta property="og:url" content="https://erhu-auth.web.app/%E4%BA%8C%E8%83%A1%E5%B0%8F%E6%95%99%E5%AE%A4-AI%E9%9F%B3%E6%BA%96%E8%A9%95%E5%88%86.html" />
+  <meta property="og:image" content="https://erhu-auth.web.app/assets/scores/level1-lian-gong-yu-fu-dian.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="stylesheet" href="./erhu-theme.css?v=20260327f" />
+  <style>
+    :root {
+      --ink: #231812;
+      --muted: #6d5b4e;
+      --wood: #7b4d2d;
+      --paper: rgba(255, 250, 244, 0.96);
+      --line: rgba(114, 75, 41, 0.1);
+      --shadow: 0 24px 56px rgba(61, 39, 24, 0.12);
+      --accent: #5f7345;
+      --accent-soft: rgba(95, 115, 69, 0.12);
+      --good: #5f8a45;
+      --bad: #b85d43;
+      --live: #7a6bff;
+      --warn: #b67c40;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(185, 202, 139, 0.16), transparent 22%),
+        radial-gradient(circle at 90% 12%, rgba(210, 168, 101, 0.16), transparent 22%),
+        linear-gradient(180deg, #f7efe3 0%, #fbf9f5 40%, #efe4d5 100%);
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    .shell {
+      width: min(1400px, calc(100% - 24px));
+      margin: 0 auto;
+      padding: 24px 0 42px;
+    }
+
+    .hero,
+    .panel,
+    .result-card,
+    .history-card,
+    .help-card {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 32px;
+      box-shadow: var(--shadow);
+    }
+
+    .hero {
+      padding: 28px;
+      margin-top: 18px;
+      margin-bottom: 16px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      margin-bottom: 10px;
+      padding: 7px 12px;
+      border-radius: 999px;
+      background: rgba(123, 77, 45, 0.1);
+      color: var(--wood);
+      font-size: 13px;
+      font-weight: 900;
+      letter-spacing: 0.06em;
+    }
+
+    h1 {
+      margin: 0 0 10px;
+      font-size: clamp(34px, 5vw, 54px);
+    }
+
+    h2 {
+      margin: 0 0 10px;
+      font-size: 28px;
+    }
+
+    p,
+    li {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.8;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(340px, 0.62fr);
+      gap: 16px;
+      align-items: start;
+    }
+
+    .layout.piece-mode {
+      grid-template-columns: 1fr;
+    }
+
+    .layout.piece-mode .layout-aside {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 16px;
+      align-items: start;
+    }
+
+    .panel,
+    .result-card,
+    .history-card,
+    .help-card {
+      padding: 24px;
+    }
+
+    .section + .section {
+      margin-top: 20px;
+    }
+
+    .label {
+      display: block;
+      margin-bottom: 10px;
+      color: var(--wood);
+      font-size: 15px;
+      font-weight: 900;
+    }
+
+    .tabs,
+    .week-tabs {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .tab,
+    .week-tab {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 44px;
+      padding: 10px 16px;
+      border-radius: 999px;
+      border: 1px solid rgba(123, 77, 45, 0.14);
+      background: rgba(255, 252, 248, 0.95);
+      color: var(--wood);
+      font: inherit;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    .tab.active,
+    .week-tab.active {
+      border-color: transparent;
+      background: linear-gradient(135deg, #9bb07b, #6f7d53);
+      color: #fffdf8;
+      box-shadow: 0 12px 22px rgba(95, 108, 73, 0.16);
+    }
+
+    .week-tab {
+      min-width: 82px;
+      padding: 10px 14px;
+    }
+
+    .tempo-card {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto auto auto auto;
+      gap: 14px;
+      align-items: center;
+      padding: 18px 20px;
+      border-radius: 24px;
+      background: rgba(255, 255, 255, 0.72);
+      border: 1px solid rgba(123, 77, 45, 0.1);
+    }
+
+    .tempo-control-stack {
+      min-width: 0;
+    }
+
+    .tempo-card input[type="range"] {
+      width: 100%;
+      accent-color: #7b6a55;
+    }
+
+    .tempo-input-card {
+      display: grid;
+      gap: 6px;
+      min-width: 108px;
+      padding: 10px 14px;
+      border-radius: 18px;
+      background: linear-gradient(135deg, #f7efe4, #ead8c6);
+      border: 1px solid rgba(123, 77, 45, 0.12);
+      color: #5b3a22;
+    }
+
+    .tempo-input-label {
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    .tempo-number {
+      width: 100%;
+      border: 0;
+      padding: 0;
+      background: transparent;
+      color: inherit;
+      font: inherit;
+      font-size: 18px;
+      font-weight: 900;
+      outline: none;
+    }
+
+    .tempo-readout {
+      min-width: 120px;
+      padding: 10px 14px;
+      border-radius: 18px;
+      background: linear-gradient(135deg, #f3e8dc, #e6d2bb);
+      color: #5b3a22;
+      font-weight: 900;
+      text-align: center;
+    }
+
+    .key-select {
+      min-width: 144px;
+      padding: 10px 14px;
+      border-radius: 18px;
+      border: 1px solid rgba(123, 77, 45, 0.12);
+      background: linear-gradient(135deg, #f7efe4, #ead8c6);
+      color: #5b3a22;
+      font: inherit;
+      font-weight: 900;
+    }
+
+    .metronome-toggle {
+      min-height: 52px;
+      padding: 0 18px;
+      border-radius: 18px;
+      border: 1px solid rgba(95, 115, 69, 0.18);
+      background: linear-gradient(135deg, rgba(155, 176, 123, 0.22), rgba(111, 125, 83, 0.18));
+      color: #435332;
+      font: inherit;
+      font-weight: 900;
+      cursor: pointer;
+    }
+
+    .metronome-toggle.is-off {
+      border-color: rgba(123, 77, 45, 0.12);
+      background: linear-gradient(180deg, rgba(249, 239, 229, 0.98), rgba(236, 217, 197, 0.96));
+      color: #6a4733;
+    }
+
+    .button-row {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 18px;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 170px;
+      min-height: 54px;
+      padding: 0 18px;
+      border: 0;
+      border-radius: 999px;
+      font: inherit;
+      font-weight: 900;
+      cursor: pointer;
+    }
+
+    .button.primary {
+      background: linear-gradient(135deg, #9bb07b, #6f7d53);
+      color: #fffdf8;
+      box-shadow: 0 14px 28px rgba(95, 108, 73, 0.18);
+    }
+
+    .button.secondary {
+      background: linear-gradient(180deg, rgba(249, 239, 229, 0.98), rgba(236, 217, 197, 0.96));
+      color: #6a4733;
+      border: 1px solid rgba(156, 111, 72, 0.12);
+    }
+
+    .button:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    .status-strip {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 14px;
+    }
+
+    .status-chip {
+      display: inline-flex;
+      align-items: center;
+      min-height: 42px;
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: rgba(123, 77, 45, 0.1);
+      color: var(--wood);
+      font-size: 14px;
+      font-weight: 900;
+    }
+
+    .status-chip.live {
+      background: rgba(122, 107, 255, 0.12);
+      color: var(--live);
+    }
+
+    .score-stage {
+      position: relative;
+      margin-top: 18px;
+      padding: 18px;
+      border-radius: 28px;
+      border: 1px solid rgba(123, 77, 45, 0.1);
+      background:
+        radial-gradient(circle at top left, rgba(255, 255, 255, 0.76), transparent 28%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(247, 238, 228, 0.94));
+    }
+
+    .score-stage-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+
+    .countdown {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 98px;
+      min-height: 42px;
+      padding: 8px 16px;
+      border-radius: 999px;
+      background: rgba(123, 77, 45, 0.08);
+      color: var(--wood);
+      font-weight: 900;
+    }
+
+    .countdown.active {
+      background: rgba(95, 115, 69, 0.14);
+      color: var(--accent);
+    }
+
+    .countdown-overlay {
+      position: absolute;
+      inset: 18px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 24px;
+      background: rgba(47, 31, 22, 0.32);
+      backdrop-filter: blur(4px);
+      z-index: 4;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s ease;
+    }
+
+    .countdown-overlay.visible {
+      opacity: 1;
+    }
+
+    .countdown-bubble {
+      min-width: 200px;
+      min-height: 200px;
+      padding: 24px;
+      border-radius: 999px;
+      background: radial-gradient(circle at 30% 30%, rgba(255,255,255,0.96), rgba(242, 231, 217, 0.96));
+      box-shadow: 0 24px 60px rgba(35, 22, 15, 0.24);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+
+    .countdown-bubble strong {
+      display: block;
+      color: #5a3822;
+      font-size: 15px;
+      letter-spacing: 0.08em;
+    }
+
+    .countdown-number {
+      margin-top: 8px;
+      color: #2f1c13;
+      font-size: clamp(64px, 12vw, 110px);
+      font-weight: 900;
+      line-height: 1;
+    }
+
+    .countdown-help {
+      margin-top: 10px;
+      color: #745d4f;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .live-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .live-card {
+      padding: 16px;
+      border-radius: 22px;
+      background: rgba(255, 252, 248, 0.94);
+      border: 1px solid rgba(123, 77, 45, 0.1);
+    }
+
+    .live-card strong {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--wood);
+      font-size: 14px;
+    }
+
+    .live-value {
+      font-size: clamp(22px, 3.2vw, 34px);
+      font-weight: 900;
+      color: #372218;
+    }
+
+    .live-sub {
+      margin-top: 6px;
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .progress-track {
+      width: 100%;
+      height: 14px;
+      border-radius: 999px;
+      overflow: hidden;
+      background: rgba(123, 77, 45, 0.12);
+    }
+
+    .progress-fill {
+      width: 0%;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, #9bb07b, #6f7d53);
+      transition: width 0.12s linear;
+    }
+
+    .score-sheet {
+      display: grid;
+      gap: 12px;
+      max-height: 760px;
+      overflow: auto;
+      padding-right: 4px;
+    }
+
+    .score-sheet.piece-mode {
+      gap: 16px;
+      max-height: 820px;
+      padding-bottom: 8px;
+    }
+
+    .score-follow-sheet {
+      display: grid;
+      gap: 8px;
+      min-width: 1180px;
+      padding: 4px 0 10px;
+    }
+
+    .score-follow-meta {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: flex-start;
+      margin-bottom: 4px;
+    }
+
+    .score-follow-meta-left {
+      display: grid;
+      gap: 2px;
+      color: #473124;
+      font-size: 16px;
+      font-weight: 800;
+    }
+
+    .score-follow-meta-right {
+      color: var(--wood);
+      font-size: 15px;
+      font-weight: 800;
+      text-align: right;
+    }
+
+    .score-follow-row {
+      display: flex;
+      gap: 6px;
+      align-items: flex-start;
+    }
+
+    .score-follow-prefix {
+      flex: 0 0 24px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 98px;
+      color: #3b2418;
+      font-size: 24px;
+      font-weight: 900;
+      line-height: 0.88;
+      white-space: pre-line;
+    }
+
+    .score-follow-measure-row {
+      flex: 1;
+      display: grid;
+      grid-template-columns: repeat(var(--measure-count, 1), minmax(0, 1fr));
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .score-follow-measure {
+      position: relative;
+      display: grid;
+      grid-template-columns: repeat(var(--unit-count, 8), minmax(0, 1fr));
+      grid-template-rows: 22px 22px 14px auto 16px;
+      gap: 4px 6px;
+      align-items: start;
+      width: 100%;
+      min-width: 0;
+      padding: 12px 8px 0 0;
+      border-right: 2px solid rgba(125, 75, 43, 0.18);
+    }
+
+    .score-follow-measure:last-child {
+      padding-right: 0;
+      border-right: 0;
+    }
+
+    .score-follow-bow {
+      grid-row: 1;
+      align-self: end;
+      justify-self: center;
+      color: #2e1f17;
+      font-size: 15px;
+      font-weight: 900;
+      line-height: 1;
+      white-space: pre;
+      pointer-events: none;
+      position: relative;
+      z-index: 1;
+      padding: 0 1px;
+      transform: translateY(-1px);
+    }
+
+    .score-follow-guide {
+      grid-row: 2;
+      align-self: end;
+      justify-self: center;
+      color: #2e1f17;
+      font-size: 13px;
+      font-weight: 900;
+      line-height: 1.05;
+      letter-spacing: 0.01em;
+      white-space: pre;
+      pointer-events: none;
+      position: relative;
+      z-index: 1;
+      padding: 0 1px;
+      transform: translateY(1px);
+    }
+
+    .score-follow-slur {
+      grid-row: 3;
+      height: 12px;
+      border: 1.5px solid rgba(125, 75, 43, 0.62);
+      border-bottom: 0;
+      border-radius: 16px 16px 0 0;
+      margin: 2px 1px 0;
+      pointer-events: none;
+    }
+
+    .score-follow-underline {
+      grid-row: 5;
+      align-self: start;
+      border-top: 1.5px solid #2f2118;
+      margin: 0 1px;
+      pointer-events: none;
+    }
+
+    .score-follow-underline.double {
+      box-shadow: 0 3.5px 0 0 #2f2118;
+    }
+
+    .score-follow-marker {
+      position: absolute;
+      top: -8px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 0 4px;
+      background: rgba(255, 255, 255, 0.94);
+      color: var(--wood);
+      font-size: 10px;
+      font-weight: 900;
+      line-height: 1.2;
+    }
+
+    .score-follow-cell {
+      display: inline-flex;
+      align-items: flex-end;
+      justify-content: center;
+      min-width: 0;
+      padding: 0;
+    }
+
+    .score-follow-measure .score-follow-cell {
+      grid-row: 4;
+      min-width: 0;
+      position: relative;
+      padding-top: 3px;
+    }
+
+    .score-follow-main {
+      display: inline-flex;
+      align-items: flex-start;
+      justify-content: center;
+      color: #382217;
+      font-size: 19px;
+      font-weight: 900;
+      line-height: 1;
+      position: relative;
+      z-index: 1;
+      padding-top: 2px;
+    }
+
+    .score-follow-jianpu {
+      display: inline-grid;
+      justify-items: center;
+      min-width: 18px;
+      line-height: 1;
+    }
+
+    .score-follow-octave {
+      min-height: 10px;
+      color: #20140e;
+      font-size: 15px;
+      font-weight: 900;
+      letter-spacing: 0.02em;
+      line-height: 0.85;
+    }
+
+    .score-follow-digit {
+      margin-top: 1px;
+      color: #382217;
+      font-size: 22px;
+      font-weight: 900;
+      line-height: 1;
+    }
+
+    .score-follow-low-octave {
+      min-height: 8px;
+      color: #20140e;
+      font-size: 13px;
+      font-weight: 900;
+      letter-spacing: 0.02em;
+      line-height: 0.7;
+    }
+
+    .score-follow-low-octave-marker {
+      grid-row: 5;
+      justify-self: center;
+      align-self: start;
+      color: #20140e;
+      font-size: 13px;
+      font-weight: 900;
+      letter-spacing: 0.02em;
+      line-height: 0.7;
+      pointer-events: none;
+      transform: translateY(4px);
+    }
+
+    .score-follow-tail {
+      margin-left: 1px;
+      align-self: flex-end;
+      color: #382217;
+      font-size: 22px;
+      font-weight: 900;
+      line-height: 1;
+    }
+
+    .score-follow-rhythm-dot {
+      margin-left: 2px;
+      align-self: flex-end;
+      color: #25170f;
+      font-size: 28px;
+      font-weight: 950;
+      line-height: 0.8;
+      transform: translateY(-3px);
+    }
+
+    .score-follow-upper-note {
+      position: absolute;
+      top: -4px;
+      left: 12%;
+      color: #382217;
+      font-size: 12px;
+      font-weight: 900;
+      line-height: 1;
+      white-space: nowrap;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .score-row {
+      display: flex;
+      gap: 10px;
+      align-items: stretch;
+    }
+
+    .score-row.piece-mode {
+      min-width: 1180px;
+      gap: 14px;
+    }
+
+    .row-label {
+      flex: 0 0 66px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 12px;
+      border-radius: 18px;
+      background: rgba(123, 77, 45, 0.08);
+      color: var(--wood);
+      font-size: 13px;
+      font-weight: 900;
+    }
+
+    .row-label.piece-mode {
+      flex: 0 0 76px;
+      font-size: 15px;
+    }
+
+    .row-notes {
+      flex: 1;
+      display: flex;
+      gap: 8px;
+      min-width: 0;
+    }
+
+    .row-notes.piece-mode {
+      display: grid;
+      grid-template-columns: repeat(var(--unit-count, 1), minmax(20px, 1fr));
+      gap: 3px;
+      align-items: stretch;
+    }
+
+    .note-cell {
+      position: relative;
+      flex: var(--beats, 1) 1 0;
+      min-width: 50px;
+      padding: 12px 10px;
+      border-radius: 20px;
+      border: 1px solid rgba(123, 77, 45, 0.1);
+      background: rgba(255, 255, 255, 0.86);
+      overflow: hidden;
+      transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease, background 0.18s ease;
+    }
+
+    .note-cell.piece-mode {
+      min-width: 0;
+      padding: 16px 6px;
+      border-radius: 18px;
+    }
+
+    .note-cell.piece-mode.piece-notation-note {
+      grid-row: 4;
+      padding: 0;
+      border: 0;
+      border-radius: 14px;
+      background: transparent;
+      overflow: visible;
+      transition: transform 0.18s ease;
+    }
+
+    .note-cell.piece-mode.piece-notation-note::before {
+      inset: auto 0 -2px 0;
+      width: var(--fill, 0%);
+      height: 2.3em;
+      border-radius: 14px;
+      background: rgba(122, 107, 255, 0.14);
+      box-shadow: none;
+    }
+
+    .note-cell.piece-mode.piece-notation-note.current {
+      border-color: transparent;
+      box-shadow: none;
+      transform: translateY(-1px);
+    }
+
+    .note-cell.piece-mode.piece-notation-note.current::before {
+      background: rgba(122, 107, 255, 0.2);
+    }
+
+    .note-cell.piece-mode.piece-notation-note.pass {
+      background: transparent;
+      border-color: transparent;
+    }
+
+    .note-cell.piece-mode.piece-notation-note.pass::before {
+      width: 100%;
+      background: rgba(86, 170, 58, 0.38);
+      box-shadow: inset 0 0 0 1px rgba(59, 128, 34, 0.18);
+    }
+
+    .note-cell.piece-mode.piece-notation-note.fail {
+      background: transparent;
+      border-color: transparent;
+    }
+
+    .note-cell.piece-mode.piece-notation-note.fail::before {
+      width: 100%;
+      background: rgba(214, 74, 54, 0.3);
+      box-shadow: inset 0 0 0 1px rgba(166, 33, 24, 0.16);
+    }
+
+    .note-cell::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      width: var(--fill, 0%);
+      background: rgba(122, 107, 255, 0.12);
+      transition: width 0.12s linear;
+      pointer-events: none;
+    }
+
+    .note-cell.current {
+      border-color: rgba(122, 107, 255, 0.35);
+      box-shadow: 0 10px 20px rgba(122, 107, 255, 0.14);
+      transform: translateY(-2px);
+    }
+
+    .note-cell.pass {
+      background: rgba(86, 170, 58, 0.34);
+      border-color: rgba(59, 128, 34, 0.62);
+      box-shadow: 0 10px 18px rgba(86, 170, 58, 0.2);
+    }
+
+    .note-cell.fail {
+      background: rgba(214, 74, 54, 0.24);
+      border-color: rgba(166, 33, 24, 0.5);
+      box-shadow: 0 10px 18px rgba(214, 74, 54, 0.14);
+    }
+
+    .numbered-note,
+    .letter-note {
+      position: relative;
+      z-index: 1;
+    }
+
+    .numbered-note {
+      display: block;
+      color: #382217;
+      font-size: 24px;
+      font-weight: 900;
+    }
+
+    .note-cell.piece-mode .numbered-note {
+      font-size: 30px;
+      line-height: 1;
+    }
+
+    .letter-note {
+      display: block;
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .note-cell.piece-mode .letter-note {
+      display: none;
+    }
+
+    .result-score {
+      font-size: clamp(44px, 8vw, 72px);
+      font-weight: 900;
+      line-height: 1;
+      color: #362014;
+    }
+
+    .meta {
+      margin-top: 12px;
+      color: var(--muted);
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    .summary-box {
+      margin-top: 18px;
+      padding: 18px;
+      border-radius: 24px;
+      background: rgba(255, 255, 255, 0.78);
+      border: 1px solid rgba(123, 77, 45, 0.1);
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 18px;
+    }
+
+    .stat-box {
+      padding: 16px;
+      border-radius: 22px;
+      background: rgba(255, 252, 248, 0.9);
+      border: 1px solid rgba(123, 77, 45, 0.1);
+    }
+
+    .stat-box strong {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--wood);
+      font-size: 14px;
+    }
+
+    .stat-box span {
+      font-size: 28px;
+      font-weight: 900;
+      color: #372218;
+    }
+
+    .problem-list,
+    .history-stack,
+    .help-list {
+      display: grid;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .problem-item,
+    .history-item {
+      padding: 14px 16px;
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.78);
+      border: 1px solid rgba(123, 77, 45, 0.1);
+    }
+
+    .problem-item strong,
+    .history-item strong {
+      display: block;
+      margin-bottom: 6px;
+      color: #3a2418;
+      font-size: 15px;
+    }
+
+    .muted-small {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    .empty-state {
+      padding: 16px 18px;
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.74);
+      border: 1px dashed rgba(123, 77, 45, 0.18);
+      color: var(--muted);
+      line-height: 1.8;
+    }
+
+    @media (max-width: 1100px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      .live-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .tempo-card {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .tempo-input-card,
+      .tempo-readout,
+      .key-select,
+      .metronome-toggle {
+        width: 100%;
+      }
+    }
+
+    @media (max-width: 720px) {
+      .shell {
+        width: min(100%, calc(100% - 18px));
+      }
+
+      .panel,
+      .result-card,
+      .history-card,
+      .help-card,
+      .hero {
+        padding: 18px;
+        border-radius: 24px;
+      }
+
+      .live-grid,
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .tempo-card {
+        grid-template-columns: 1fr;
+      }
+
+      .score-row {
+        flex-direction: column;
+      }
+
+      .row-label {
+        flex: none;
+        width: fit-content;
+      }
+    }
+  </style>
+<link rel="stylesheet" href="./erhu-refined.css?v=20260928" />
+<script src="./erhu-quality.js?v=20260928"></script>
+<link rel="stylesheet" href="./erhu-studio-ui.css?v=20260929-polish"><script defer src="./erhu-studio-ui.js?v=20260929-polish"></script><style>
+body.studio-redesign[data-studio-page="pitch"] .layout { grid-template-columns:minmax(0,1fr); }
+#scoreSheet { min-width:0; max-width:100%; }
+.score-follow-measure-row { grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr)); }
+.score-follow-measure { box-sizing:border-box; column-gap:0; }
+.live-value { font-variant-numeric:tabular-nums; }
+#detectedCents { color:#573c28; }
+.score-stage { overflow:visible; max-height:none; }
+.score-follow-cell.current { outline:2px solid #94643e; outline-offset:2px; }
+</style><style>
+.score-follow-underline.triple{box-shadow:0 3.5px 0 0 #2f2118,0 7px 0 0 #2f2118}
+.score-follow-measure:has(.score-follow-marker){margin-top:30px}
+.score-follow-marker{max-width:100%;white-space:normal;text-align:center}
+.score-source-reference{margin:18px 0;padding:12px;border:1px solid #d6bea5;border-radius:8px}
+.score-source-reference img{display:block;width:100%;height:auto;margin-top:12px}
+</style></head>
+<body class="erhu-site">
+  <main class="shell">
+    <header class="topbar">
+      <div class="brand">二胡小教室</div>
+      <nav class="nav">
+        <a href="./">回首頁</a>
+        <a href="./二胡小教室.html#course-levels">課程分級</a>
+        <a href="./二胡小教室-AI掃描譜.html">AI 掃描譜</a>
+        <a href="./二胡小教室-AI練習規劃師.html">AI 規劃</a>
+        <a href="./二胡小教室-AI音準評分.html?v=20260609v">音準評分</a>
+        <a href="./二胡小教室-AI錯音複習師.html?v=20260409a">級數回報</a>
+        <a href="./二胡小教室-練習打卡.html">檢定打卡</a>
+      </nav>
+      <a class="tuner-shortcut" href="./二胡小教室-調音器.html">調音器</a>
+    </header>
+
+    <section class="hero">
+      <div class="eyebrow">LIVE PITCH PRACTICE</div>
+      <h1>跟著檢定級數練習譜直接拉，逐音抓音準</h1>
+      <p>這頁提供即時音準跟譜練習。你先選等級、級數和速度，再按開始演奏，譜面會像卡拉 OK 一樣往前跑。系統會用麥克風即時抓每個音，結束後直接把準的音標綠色，不準的音標紅色。</p>
+    </section>
+
+    <section class="layout" id="practiceLayout">
+      <section class="panel">
+        <div class="section">
+          <span class="label">選擇等級</span>
+          <div class="tabs" id="levelTabs"></div>
+        </div>
+
+        <div class="section">
+          <span class="label">選擇級數</span>
+          <div class="week-tabs" id="weekTabs"></div>
+        </div>
+
+        <div class="section">
+          <span class="label">我的譜</span>
+          <div class="tempo-card">
+            <select class="key-select" id="customScoreSelect" aria-label="選擇我的譜">
+              <option value="">尚未讀取自訂譜</option>
+            </select>
+            <a class="button secondary" id="scanScoreLink" href="./二胡小教室-AI掃描譜.html">AI 掃描新譜</a>
+            <a class="button secondary" id="editCustomScoreLink" href="#" hidden>編輯這份譜</a>
+          </div>
+          <p class="muted-small" id="customScoreHint">保存過的掃描譜會出現在這裡，可以直接拿來做 AI 跟譜。</p>
+        </div>
+
+        <div class="section">
+          <span class="label">速度調整</span>
+          <div class="tempo-card">
+            <div class="tempo-control-stack">
+              <label class="visually-hidden" for="tempoRange">速度調整 BPM</label>
+              <input id="tempoRange" type="range" min="30" max="120" step="0.5" value="60" />
+              <p class="muted-small">速度現在可以用 0.5 BPM 微調。第一次建議先用 50 到 64 BPM，再慢慢往上加。二胡標準空弦是內弦 D4、外弦 A4；如果不確定調號，先用 1 = D 開始。</p>
+            </div>
+            <label class="tempo-input-card" for="tempoNumber">
+              <span class="tempo-input-label">BPM</span>
+              <input id="tempoNumber" class="tempo-number" type="number" min="30" max="120" step="0.5" value="60" />
+            </label>
+            <div class="tempo-readout" id="tempoValue">60 BPM</div>
+            <select class="key-select" id="tonicSelect" aria-label="選擇調號">
+              <option value="D" selected>1 = D</option>
+              <option value="A">1 = A</option>
+              <option value="G">1 = G</option>
+              <option value="C">1 = C</option>
+              <option value="F">1 = F</option>
+              <option value="Bb">1 = Bb</option>
+            </select>
+            <button class="metronome-toggle" id="metronomeToggle" type="button" aria-pressed="true">節拍器：開</button>
+          </div>
+          <p class="muted-small" id="scaleMapHint">目前音階對照：1=D4 2=E4 3=F#4 4=G4 5=A4 6=B4 7=C#5</p>
+          <div class="button-row">
+            <button class="button primary" id="startButton" type="button">開始演奏</button>
+            <button class="button secondary" id="stopButton" type="button" disabled>停止</button>
+            <button class="button secondary" id="resetButton" type="button">清除顏色</button>
+          </div>
+          <div class="status-strip">
+            <div class="status-chip" id="statusChip">尚未開始</div>
+            <div class="status-chip live" id="modeChip">即時逐音偵測</div>
+          </div>
+        </div>
+
+        <div class="score-stage">
+          <div class="countdown-overlay" id="countdownOverlay" hidden>
+            <div class="countdown-bubble">
+              <strong>準備演奏</strong>
+              <div class="countdown-number" id="countdownNumber">3</div>
+              <div class="countdown-help">等倒數結束，譜面就會開始往前跑</div>
+            </div>
+          </div>
+          <div class="score-stage-header">
+            <div>
+              <div class="eyebrow" id="sheetEyebrow">BEGINNER GRADE 1</div>
+              <h2 id="sheetTitle">音階練習譜</h2>
+              <p id="sheetSubtitle">先按開始演奏，譜面就會從第一行開始往前跑。</p>
+            </div>
+            <div class="countdown" id="countdownText">待命中</div>
+          </div>
+
+          <div class="live-grid">
+            <div class="live-card">
+              <strong>目前應拉</strong>
+              <div class="live-value" id="currentTarget">--</div>
+              <div class="live-sub" id="currentTargetMeta">第 1 個音</div>
+            </div>
+            <div class="live-card">
+              <strong>偵測到的音</strong>
+              <div class="live-value" id="detectedNote">--</div>
+              <div class="live-sub" id="detectedNoteMeta">等待麥克風</div>
+            </div>
+            <div class="live-card">
+              <strong>偏差</strong>
+              <div class="live-value" id="detectedCents">--</div>
+              <div class="live-sub" id="detectedCentsMeta">cents</div>
+            </div>
+            <div class="live-card">
+              <strong>整體進度</strong>
+              <div class="live-value" id="progressValue">0%</div>
+              <div class="live-sub">
+                <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="score-sheet" id="scoreSheet"></div>
+        </div>
+      </section>
+
+      <aside class="layout-aside" id="practiceAside">
+        <section class="result-card">
+          <div class="eyebrow">SESSION RESULT</div>
+          <div class="result-score" id="overallScore">--</div>
+          <div class="meta" id="resultMeta">尚未開始本次跟譜</div>
+
+          <div class="summary-box">
+            <p id="resultSummary">完成後會在這裡顯示整體評語，並告訴你哪幾個音最需要回去慢練。</p>
+          </div>
+
+          <div class="stats-grid">
+            <div class="stat-box">
+              <strong>判定正確的音</strong>
+              <span id="correctCount">0</span>
+            </div>
+            <div class="stat-box">
+              <strong>整體平均偏差</strong>
+              <span id="averageCents">--</span>
+            </div>
+            <div class="stat-box">
+              <strong>已完成 / 總拍數</strong>
+              <span id="beatCount">0</span>
+            </div>
+            <div class="stat-box">
+              <strong>本次速度</strong>
+              <span id="tempoResult">60</span>
+            </div>
+          </div>
+
+          <div class="section">
+            <span class="label">最需要修正的音</span>
+            <div class="problem-list" id="problemList">
+              <div class="empty-state">還沒開始演奏。完成一輪後，這裡會列出偏高、偏低或常跑到別的音的地方。</div>
+            </div>
+          </div>
+        </section>
+
+        <section class="help-card section">
+          <div class="eyebrow">使用方式</div>
+          <div class="help-list">
+            <div class="problem-item">
+              <strong>1. 先慢速抓準</strong>
+              <div class="muted-small">第一次建議先用 50 到 64 BPM。速度現在可每次微調 0.5 BPM，音準先對，再慢慢往上加。</div>
+            </div>
+            <div class="problem-item">
+              <strong>2. 一格一拍，符號「-」是延音</strong>
+              <div class="muted-small">同一顆音如果被拉長，格子會變寬。節拍器會跟著譜面每拍的第一個音出聲，方便你直接對拍跟譜。</div>
+            </div>
+            <div class="problem-item">
+              <strong>3. 綠色代表過關，紅色代表要回去修</strong>
+              <div class="muted-small">結束後直接看譜面顏色，就能知道哪個音還不穩，不用再猜是哪一段。</div>
+            </div>
+          </div>
+        </section>
+
+        <section class="history-card section">
+          <div class="eyebrow">RECENT SESSIONS</div>
+          <h2>最近練習紀錄</h2>
+          <div class="history-stack" id="historyStack">
+            <div class="empty-state">還沒有音準跟譜紀錄。完成一輪後，這裡會自動留下最近幾次的分數。</div>
+          </div>
+        </section>
+      </aside>
+    </section>
+  </main>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+  <script src="./firebase-init.js?v=20260928"></script>
+  <script src="./auth.js?v=20260928"></script>
+  <script src="./exam-course-data.js?v=20260505c"></script>
+  <script src="./exam-piece-scores.js?v=20260929-zizhu"></script>
+  <script src="./exam-progress.js?v=20260519a"></script>
+  <script>
+    window.ErhuAuth.requireAuth();
+    window.ErhuAuth.attachAuthUI();
+
+    const SHARP_NOTE_NAMES = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
+    const FLAT_NOTE_NAMES = ["C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B"];
+    const KEY_ROOT_MIDI = { C: 72, D: 62, F: 65, G: 67, A: 69, Bb: 70 };
+    const KEY_DISPLAY_NAMES = { C: "C調", D: "D調", F: "F調", G: "G調", A: "A調", Bb: "Bb調" };
+    const MAJOR_SCALE_OFFSETS = { "1": 0, "2": 2, "3": 4, "4": 5, "5": 7, "6": 9, "7": 11 };
+    const PITCH_JUDGMENT = {
+      nearCents: 36,
+      goodCents: 30,
+      matchCents: 50,
+      pitchControlPenaltyPerCent: 0.82,
+      passScore: 58,
+      passCorrectRatio: 0.6,
+      highLowBoundary: 36,
+      noteJudgeStartRatio: 0.5,
+      quickNotePassScore: 80,
+      latencyCompensationMs: 0
+    };
+    const TEMPO_MIN = 30;
+    const TEMPO_MAX = 120;
+    const TEMPO_STEP = 0.5;
+    const weeklyData = {
+      beginner: {
+        label: "初級",
+        weeks: window.ErhuExamData.levels.beginner.grades.map(function (item) {
+          return { grade: item.grade, title: item.shortTitle, description: item.description };
+        })
+      },
+      intermediate: {
+        label: "中級",
+        weeks: window.ErhuExamData.levels.intermediate.grades.map(function (item) {
+          return { grade: item.grade, title: item.shortTitle, description: item.description };
+        })
+      },
+      advanced: {
+        label: "高級",
+        weeks: window.ErhuExamData.levels.advanced.grades.map(function (item) {
+          return { grade: item.grade, title: item.shortTitle, description: item.description };
+        })
+      }
+    };
+    const SCALE_PRACTICE_SCORE = [
+      "1 - 2 - | 3 - 4 -",
+      "5 - 6 - | 7 - 1' -",
+      "2' - 3' - | 4' - 5' -",
+      "5' - 4' - | 3' - 2' -",
+      "1' - 7 - | 6 - 5 -",
+      "4 - 3 - | 2 - 1 -"
+    ].join("\n");
+    const PRACTICE_TYPE = {
+      SCALE: "scale",
+      PIECE: "piece",
+      CUSTOM: "custom"
+    };
+
+    const params = new URLSearchParams(window.location.search);
+    let currentLevel = weeklyData[params.get("level")] ? params.get("level") : "beginner";
+    let currentWeek = Math.min(weeklyData[currentLevel].weeks.length, window.ErhuExamProgress.getGradeNumber(params, 1));
+    let currentTempo = clampTempoValue(Number(params.get("tempo")) || 60);
+    let currentTonic = KEY_ROOT_MIDI[params.get("tonic")] ? params.get("tonic") : "D";
+    let currentPracticeType = params.get("practice") === PRACTICE_TYPE.CUSTOM
+      ? PRACTICE_TYPE.CUSTOM
+      : (params.get("practice") === PRACTICE_TYPE.PIECE ? PRACTICE_TYPE.PIECE : PRACTICE_TYPE.SCALE);
+    let currentPieceTitle = params.get("piece") || "";
+    let currentCustomScoreId = params.get("customScoreId") || "";
+    let customScores = [];
+    let currentCustomScoreData = null;
+    let metronomeEnabled = params.get("metronome") !== "off";
+    let currentUser = null;
+    let currentTimeline = null;
+    let currentPracticeMeta = null;
+    let noteElements = [];
+    let countdownTimer = null;
+
+    const levelTabs = document.getElementById("levelTabs");
+    const weekTabs = document.getElementById("weekTabs");
+    const customScoreSelect = document.getElementById("customScoreSelect");
+    const customScoreHint = document.getElementById("customScoreHint");
+    const editCustomScoreLink = document.getElementById("editCustomScoreLink");
+    const tempoRange = document.getElementById("tempoRange");
+    const tempoNumber = document.getElementById("tempoNumber");
+    const tempoValue = document.getElementById("tempoValue");
+    const tonicSelect = document.getElementById("tonicSelect");
+    const metronomeToggle = document.getElementById("metronomeToggle");
+    const scaleMapHint = document.getElementById("scaleMapHint");
+    const startButton = document.getElementById("startButton");
+    const stopButton = document.getElementById("stopButton");
+    const resetButton = document.getElementById("resetButton");
+    const statusChip = document.getElementById("statusChip");
+    const sheetEyebrow = document.getElementById("sheetEyebrow");
+    const sheetTitle = document.getElementById("sheetTitle");
+    const sheetSubtitle = document.getElementById("sheetSubtitle");
+    const countdownText = document.getElementById("countdownText");
+    const countdownOverlay = document.getElementById("countdownOverlay");
+    const countdownNumber = document.getElementById("countdownNumber");
+    const currentTarget = document.getElementById("currentTarget");
+    const currentTargetMeta = document.getElementById("currentTargetMeta");
+    const detectedNote = document.getElementById("detectedNote");
+    const detectedNoteMeta = document.getElementById("detectedNoteMeta");
+    const detectedCents = document.getElementById("detectedCents");
+    const detectedCentsMeta = document.getElementById("detectedCentsMeta");
+    const progressValue = document.getElementById("progressValue");
+    const progressFill = document.getElementById("progressFill");
+    const scoreSheet = document.getElementById("scoreSheet");
+    const practiceLayout = document.getElementById("practiceLayout");
+    const overallScore = document.getElementById("overallScore");
+    const resultMeta = document.getElementById("resultMeta");
+    const resultSummary = document.getElementById("resultSummary");
+    const correctCount = document.getElementById("correctCount");
+    const averageCents = document.getElementById("averageCents");
+    const beatCount = document.getElementById("beatCount");
+    const tempoResult = document.getElementById("tempoResult");
+    const problemList = document.getElementById("problemList");
+    const historyStack = document.getElementById("historyStack");
+
+    const sessionState = {
+      active: false,
+      audioContext: null,
+      analyser: null,
+      mediaStream: null,
+      sourceNode: null,
+      sampleBuffer: null,
+      rafId: 0,
+      readyAt: 0,
+      startAt: 0,
+      beatMs: 0,
+      timingCompensationBeats: 0,
+      liveElapsedBeat: 0,
+      lastMetronomeCueIndex: -1,
+      assessments: [],
+      finalizedIndex: -1,
+      currentIndex: -1,
+      smoothedFrequency: null
+    };
+
+    function clampTempoValue(value) {
+      const numeric = Number(value);
+      if (!isFinite(numeric)) {
+        return 60;
+      }
+      const clamped = Math.min(TEMPO_MAX, Math.max(TEMPO_MIN, numeric));
+      return Math.round(clamped / TEMPO_STEP) * TEMPO_STEP;
+    }
+
+    function formatTempoValue(value) {
+      const rounded = Math.round(Number(value) * 10) / 10;
+      return Number.isInteger(rounded) ? String(rounded) : rounded.toFixed(1);
+    }
+
+    function syncTempoControls() {
+      const tempoLabel = formatTempoValue(currentTempo);
+      tempoRange.value = String(currentTempo);
+      tempoNumber.value = String(currentTempo);
+      tempoValue.textContent = tempoLabel + " BPM";
+      tempoResult.textContent = tempoLabel;
+    }
+
+    function syncMetronomeToggle() {
+      metronomeToggle.textContent = metronomeEnabled ? "節拍器：開" : "節拍器：關";
+      metronomeToggle.classList.toggle("is-off", !metronomeEnabled);
+      metronomeToggle.setAttribute("aria-pressed", metronomeEnabled ? "true" : "false");
+    }
+
+    function updateUrl() {
+      const urlParams = {
+        v: "20260609v",
+        level: currentLevel,
+        grade: currentWeek,
+        tempo: currentTempo,
+        tonic: currentTonic,
+        metronome: metronomeEnabled ? "on" : "off",
+        practice: currentPracticeType,
+        piece: currentPracticeType === PRACTICE_TYPE.PIECE ? currentPieceTitle : "",
+        customScoreId: currentPracticeType === PRACTICE_TYPE.CUSTOM ? currentCustomScoreId : ""
+      };
+      history.replaceState(null, "", window.ErhuExamProgress.buildUrl("./二胡小教室-AI音準評分.html", urlParams));
+    }
+
+    function pitchCollection() {
+      return window.ErhuFirebase.db.collection("students").doc(currentUser.uid).collection("pitchReviews");
+    }
+
+    function customScoreCollection() {
+      return window.ErhuFirebase.db.collection("students").doc(currentUser.uid).collection("customScores");
+    }
+
+    function isScorePracticeMeta(meta) {
+      return !!(meta && meta.scoreData);
+    }
+
+    function syncCustomScoreSelect() {
+      customScoreSelect.innerHTML = "";
+      if (!customScores.length) {
+        const option = document.createElement("option");
+        option.value = "";
+        option.textContent = "尚未保存自訂譜";
+        customScoreSelect.appendChild(option);
+        customScoreSelect.disabled = true;
+        customScoreHint.textContent = "先到 AI 掃描譜上傳圖片，保存後就能在這裡跟譜。";
+        editCustomScoreLink.hidden = true;
+        return;
+      }
+      customScoreSelect.disabled = false;
+      const scaleOption = document.createElement("option");
+      scaleOption.value = "";
+      scaleOption.textContent = "使用檢定譜或音階";
+      customScoreSelect.appendChild(scaleOption);
+      customScores.forEach(function (item) {
+        const option = document.createElement("option");
+        option.value = item.id;
+        option.textContent = item.title || "未命名自訂譜";
+        customScoreSelect.appendChild(option);
+      });
+      customScoreSelect.value = currentPracticeType === PRACTICE_TYPE.CUSTOM ? currentCustomScoreId : "";
+      const active = customScores.find(function (item) { return item.id === currentCustomScoreId; });
+      currentCustomScoreData = active ? active.scoreData : null;
+      if (currentPracticeType === PRACTICE_TYPE.CUSTOM && active) {
+        customScoreHint.textContent = "目前使用我的譜：「" + (active.title || "未命名自訂譜") + "」。";
+        editCustomScoreLink.href = "./二胡小教室-譜面編輯器.html?customScoreId=" + encodeURIComponent(active.id);
+        editCustomScoreLink.hidden = false;
+      } else {
+        customScoreHint.textContent = "保存過的掃描譜會出現在這裡，可以直接拿來做 AI 跟譜。";
+        editCustomScoreLink.hidden = true;
+      }
+    }
+
+    async function loadCustomScores() {
+      if (!currentUser) return;
+      try {
+        const snapshot = await customScoreCollection().orderBy("updatedAt", "desc").limit(40).get();
+        customScores = [];
+        snapshot.forEach(function (doc) {
+          const data = doc.data() || {};
+          const storedScore = window.ErhuScoreStorage.read(data);
+          if (storedScore && Array.isArray(storedScore.rows)) {
+            customScores.push({
+              id: doc.id,
+              title: data.title || (storedScore.header && storedScore.header.title) || "未命名自訂譜",
+              scoreData: storedScore
+            });
+          }
+        });
+        if (currentPracticeType === PRACTICE_TYPE.CUSTOM && !customScores.some(function (item) { return item.id === currentCustomScoreId; })) {
+          currentCustomScoreData = null; // Preserve requested custom score; show a missing-score state.
+        }
+        syncCustomScoreSelect();
+      } catch (error) {
+        console.error("load custom scores failed", error);
+        customScoreHint.textContent = "讀取我的譜失敗，請稍後再試。";
+      }
+    }
+
+    function clampWeek(levelKey, weekValue) {
+      return Math.min(weeklyData[levelKey].weeks.length, Math.max(1, Number(weekValue) || 1));
+    }
+
+    function currentGradeData() {
+      return weeklyData[currentLevel].weeks[currentWeek - 1];
+    }
+
+    function currentGradeLabel() {
+      return currentGradeData().grade;
+    }
+
+    function gradeLabel(levelKey, weekValue) {
+      const levelData = weeklyData[levelKey];
+      if (!levelData) return "未知級數";
+      const gradeData = levelData.weeks[clampWeek(levelKey, weekValue) - 1];
+      return gradeData ? gradeData.grade : "未知級數";
+    }
+
+    function tonicLabel() {
+      return "1=" + currentTonic;
+    }
+
+    function tonicDisplayLabel() {
+      return (KEY_DISPLAY_NAMES[currentTonic] || (currentTonic + "調")) + "（1=" + currentTonic + "）";
+    }
+
+    function cleanPieceName(text) {
+      return String(text || "").replace(/（.*?）/g, "").trim();
+    }
+
+    function scaleDegreeSummary() {
+      return ["1", "2", "3", "4", "5", "6", "7"].map(function (degree) {
+        return degree + "=" + midiToNoteName(numberedToMidi(degree));
+      }).join("  ");
+    }
+
+    function numberedToMidi(numberChar) {
+      const rootMidi = KEY_ROOT_MIDI[currentTonic] || KEY_ROOT_MIDI.D;
+      return rootMidi + (MAJOR_SCALE_OFFSETS[numberChar] || 0);
+    }
+
+    function parseJianpuPitch(label) {
+      const matched = String(label || "").match(/^([#b♯♭]?)([1-7])([',]*)(\.*)$/);
+      if (!matched) return null;
+      const highShift = (matched[3].match(/'/g)||[]).length * 12;
+      const lowShift = (matched[3].match(/,/g)||[]).length * 12;
+      const alteration = /[#♯]/.test(matched[1]) ? 1 : /[b♭]/.test(matched[1]) ? -1 : 0;
+      const midi = numberedToMidi(matched[2]) + highShift - lowShift + alteration;
+      return {digit:matched[2],midi,noteName:midiToNoteName(midi)};
+    }
+
+    function midiToFrequency(midi) {
+      return 440 * Math.pow(2, (midi - 69) / 12);
+    }
+
+    function frequencyToMidi(frequency) {
+      return Math.round(12 * (Math.log(frequency / 440) / Math.log(2)) + 69);
+    }
+
+    function noteNamesForCurrentTonic() {
+      return currentTonic === "F" || currentTonic === "Bb" ? FLAT_NOTE_NAMES : SHARP_NOTE_NAMES;
+    }
+
+    function midiToNoteName(midi) {
+      const note = noteNamesForCurrentTonic()[((midi % 12) + 12) % 12];
+      const octave = Math.floor(midi / 12) - 1;
+      return note + octave;
+    }
+
+    function getClosestTargetAlignment(frequency, targetMidi) {
+      const signedCents = 1200 * Math.log2(frequency / midiToFrequency(targetMidi));
+      return { midi: targetMidi, signedCents: signedCents, absCents: Math.abs(signedCents) };
+    }
+
+    function formatSigned(value) {
+      if (!isFinite(value)) return "--";
+      return (value >= 0 ? "+" : "") + value.toFixed(1);
+    }
+
+    function clamp(value, min, max) {
+      return Math.max(min, Math.min(max, value));
+    }
+
+    function average(values) {
+      if (!values.length) return 0;
+      return values.reduce(function (sum, value) { return sum + value; }, 0) / values.length;
+    }
+
+    function buildJianpuHtml(label) {
+      const raw = String(label || "");
+      const noteMatch = raw.match(/^([1-7])('+)?(,*)?(\.)?(.*)$/);
+      if (!noteMatch) {
+        return ErhuQuality.escape(raw);
+      }
+      const digit = noteMatch[1];
+      const highDots = (noteMatch[2] || "").length;
+      const lowDots = (noteMatch[3] || "").length;
+      const rhythmDot = noteMatch[4] || "";
+      const tail = noteMatch[5] || "";
+      return (
+        "<span class=\"score-follow-jianpu\">" +
+          "<span class=\"score-follow-octave\">" + (highDots ? "●".repeat(highDots) : "") + "</span>" +
+          "<span class=\"score-follow-digit\">" + digit + "</span>" +
+        "</span>" +
+        (rhythmDot ? "<span class=\"score-follow-rhythm-dot\">.</span>" : "") +
+        (tail ? "<span class=\"score-follow-tail\">" + ErhuQuality.escape(tail) + "</span>" : "")
+      );
+    }
+
+    function lowOctaveText(label) {
+      const matched = String(label || "").match(/^[1-7](?:'+)?(,*)/);
+      const count = matched ? (matched[1] || "").length : 0;
+      return count ? "●".repeat(count) : "";
+    }
+
+    function extractTonicFromScoreData(scoreData) {
+      const sources = [];
+      if (scoreData && scoreData.header && Array.isArray(scoreData.header.left)) {
+        sources.push(scoreData.header.left.join(" "));
+      }
+      if (scoreData && scoreData.note) {
+        sources.push(scoreData.note);
+      }
+      for (let index = 0; index < sources.length; index += 1) {
+        const matched = String(sources[index] || "").match(/1\s*=\s*([A-G](?:b|#)?)/i);
+        if (matched && KEY_ROOT_MIDI[matched[1]]) {
+          return matched[1];
+        }
+      }
+      return null;
+    }
+
+    function extractBeatsPerMeasure(scoreData) {
+      const sources = [];
+      if (scoreData && scoreData.note) {
+        sources.push(scoreData.note);
+      }
+      if (scoreData && scoreData.header) {
+        if (Array.isArray(scoreData.header.left)) {
+          sources.push(scoreData.header.left.join(" "));
+        }
+        if (scoreData.header.center) {
+          sources.push(scoreData.header.center);
+        }
+      }
+      for (let index = 0; index < sources.length; index += 1) {
+        const matched = String(sources[index] || "").match(/(\d+)\s*\/\s*(\d+)/);
+        if (matched) {
+          return Math.max(1, Number(matched[1]) || 2);
+        }
+      }
+      return 2;
+    }
+
+    function normalizePieceScoreCell(cellData) {
+      if (typeof cellData === "string") {
+        return { label: cellData, units: 1 };
+      }
+      return {
+        label: cellData.label || "",
+        units: Number(cellData.units) > 0 ? Number(cellData.units) : 1
+      };
+    }
+
+    function normalizeTextSpan(spanData) {
+      if (Array.isArray(spanData)) {
+        return {
+          start: Number(spanData[0]) || 0,
+          end: Number(spanData[1]) || Number(spanData[0]) || 0,
+          text: String(spanData[2] || "")
+        };
+      }
+      return {
+        start: Number(spanData && spanData.start) || 0,
+        end: Number(spanData && spanData.end) || Number(spanData && spanData.start) || 0,
+        text: String((spanData && spanData.text) || "")
+      };
+    }
+
+    function renderTextSpans(measure, cells, cellStarts, spans, className) {
+      (spans || []).forEach(function (spanData) {
+        const spanMeta = normalizeTextSpan(spanData);
+        if (!spanMeta.text) {
+          return;
+        }
+        const tokens = spanMeta.text.trim().split(/\s+/).filter(Boolean);
+        const start = Math.max(0, Math.min(cells.length - 1, spanMeta.start));
+        const end = Math.max(start, Math.min(cells.length - 1, spanMeta.end));
+        if (tokens.length > 1) {
+          tokens.forEach(function (token, tokenIndex) {
+            const target = Math.min(end, start + tokenIndex);
+            const mark = document.createElement("div");
+            mark.className = className;
+            mark.style.gridColumn = ((cellStarts[target] + 1) + " / " + (cellStarts[target] + cells[target].units + 1)).split(" / ").map(function (n) { return Number(n) * 2 - 1; }).join(" / ");
+            mark.textContent = token;
+            measure.appendChild(mark);
+          });
+          return;
+        }
+        const mark = document.createElement("div");
+        mark.className = className;
+        mark.style.gridColumn = ((cellStarts[start] + 1) + " / " + (cellStarts[end] + cells[end].units + 1)).split(" / ").map(function (n) { return Number(n) * 2 - 1; }).join(" / ");
+        mark.textContent = spanMeta.text;
+        measure.appendChild(mark);
+      });
+    }
+
+    function buildCellTextMap(cells, spans) {
+      const textMap = {};
+      (spans || []).forEach(function (spanData) {
+        const spanMeta = normalizeTextSpan(spanData);
+        if (!spanMeta.text) {
+          return;
+        }
+        const start = Math.max(0, Math.min(cells.length - 1, spanMeta.start));
+        const end = Math.max(start, Math.min(cells.length - 1, spanMeta.end));
+        const tokens = spanMeta.text.trim().split(/\s+/).filter(Boolean);
+        if (tokens.length === end - start + 1) {
+          tokens.forEach(function (token, offset) {
+            textMap[start + offset] = token;
+          });
+          return;
+        }
+        textMap[start] = spanMeta.text;
+      });
+      return textMap;
+    }
+
+    function buildAutoUnderlines(cells, beatUnits, totalUnits) {
+      const ranges = [];
+      const starts = [];
+      const singleCovered = new Array(cells.length).fill(false);
+      const doubleCovered = new Array(cells.length).fill(false);
+      let cursor = 0;
+      cells.forEach(function (cellData) {
+        starts.push(cursor);
+        cursor += cellData.units;
+      });
+      const measureUnits = Math.max(totalUnits || 0, cursor);
+      const beatSize = Math.max(1, Number(beatUnits) || 4);
+      for (let beatStart = 0; beatStart < measureUnits; beatStart += beatSize) {
+        const beatEnd = beatStart + beatSize;
+        const single = [];
+        const double = [];
+        cells.forEach(function (cellData, cellIndex) {
+          const start = starts[cellIndex];
+          const end = start + cellData.units;
+          if (start >= beatStart && end <= beatEnd && cellData.units < beatSize) {
+            single.push(cellIndex);
+          }
+          if (start >= beatStart && end <= beatEnd && cellData.units < beatSize / 2) {
+            double.push(cellIndex);
+          }
+        });
+        if (single.length) {
+          ranges.push([single[0], single[single.length - 1], 1]);
+          for (let singleIndex = single[0]; singleIndex <= single[single.length - 1]; singleIndex += 1) {
+            singleCovered[singleIndex] = true;
+          }
+        }
+        if (double.length) {
+          let groupStart = double[0];
+          let previous = double[0];
+          for (let index = 1; index <= double.length; index += 1) {
+            const current = double[index];
+            if (current === previous + 1) {
+              previous = current;
+              continue;
+            }
+            ranges.push([groupStart, previous, 2]);
+            for (let doubleIndex = groupStart; doubleIndex <= previous; doubleIndex += 1) {
+              doubleCovered[doubleIndex] = true;
+              singleCovered[doubleIndex] = true;
+            }
+            groupStart = current;
+            previous = current;
+          }
+        }
+      }
+      cells.forEach(function (cellData, cellIndex) {
+        if (cellData.units < beatSize / 2 && !doubleCovered[cellIndex]) {
+          ranges.push([cellIndex, cellIndex, 2]);
+          doubleCovered[cellIndex] = true;
+          singleCovered[cellIndex] = true;
+        }
+        if (cellData.units < beatSize && !singleCovered[cellIndex]) {
+          ranges.push([cellIndex, cellIndex, 1]);
+          singleCovered[cellIndex] = true;
+        }
+      });
+      return ranges;
+    }
+
+    function parsePieceTimeline(scoreData) {
+      const rows = [];
+      const events = [];
+      (scoreData.rows || []).forEach(function (rowData, rowIndex) {
+        const row = { rowIndex: rowIndex, events: [], totalUnits: 0 };
+        (rowData.measures || []).forEach(function (measureData) {
+          (measureData.cells || []).map(normalizePieceScoreCell).forEach(function (cellData) {
+            let pitchMeta = parseJianpuPitch(cellData.label);
+            const isRest = /^0\.*$/.test(cellData.label);
+            const isTie = /^[-—–]$/.test(cellData.label);
+            const previous = events[events.length-1];
+            if(isTie && previous && !previous.rest) pitchMeta={midi:previous.midi,noteName:previous.noteName};
+            const event = {
+              index: events.length,
+              rowIndex: row.rowIndex,
+              positionInRow: row.events.length + 1,
+              label: cellData.label,
+              displayLabel: cellData.label,
+              midi: pitchMeta ? pitchMeta.midi : null,
+              noteName: isRest ? "休止" : (pitchMeta ? pitchMeta.noteName : "待確認"),
+              rest: isRest,
+              unknown: !isRest && !pitchMeta,
+              durationBeats: cellData.units / (Number(scoreData.beatUnits)||4),
+              durationUnits: cellData.units,
+              rowUnitStart: row.totalUnits,
+              rowUnitEnd: row.totalUnits + cellData.units
+            };
+            events.push(event);
+            row.events.push(event);
+            row.totalUnits += cellData.units;
+          });
+        });
+        if (row.events.length) {
+          rows.push(row);
+        }
+      });
+
+      let cursor = 0;
+      events.forEach(function (event) {
+        event.startBeat = cursor;
+        cursor += event.durationBeats;
+        event.endBeat = cursor;
+      });
+
+      return { rows: rows, events: events, totalBeats: cursor };
+    }
+
+    function buildMetronomeCues(timeline, beatsPerMeasure) {
+      const cues = [];
+      const totalWholeBeats = Math.ceil((timeline && timeline.totalBeats) || 0);
+      for (let beatIndex = 0; beatIndex < totalWholeBeats; beatIndex += 1) {
+        cues.push({
+          beat: beatIndex,
+          accent: beatIndex % Math.max(1, beatsPerMeasure || 2) === 0
+        });
+      }
+      return cues;
+    }
+
+    function missingScoreMeta(title) {
+      return { missing: true, type: PRACTICE_TYPE.SCALE, title, timeline: {rows:[],events:[],totalBeats:0},
+        beatsPerMeasure: 4, metronomeCues: [], subtitle: "請先上傳原譜；系統不會用其他曲目替代。", toneHint: "上傳並確認譜面後，再開始跟譜。", tonicLocked: false };
+    }
+
+    function resolvePracticeMeta() {
+      if (currentPracticeType === PRACTICE_TYPE.CUSTOM) {
+        const scoreData = currentCustomScoreData;
+        if (scoreData && Array.isArray(scoreData.rows) && scoreData.rows.length) {
+          const tonic = extractTonicFromScoreData(scoreData);
+          const timeline = parsePieceTimeline(scoreData);
+          const beatsPerMeasure = extractBeatsPerMeasure(scoreData);
+          if (tonic) {
+            currentTonic = tonic;
+          }
+          return {
+            type: PRACTICE_TYPE.CUSTOM,
+            title: cleanPieceName(scoreData.title || (scoreData.header && scoreData.header.title) || "我的譜"),
+            scoreData: scoreData,
+            timeline: timeline,
+            beatsPerMeasure: beatsPerMeasure,
+            metronomeCues: buildMetronomeCues(timeline, beatsPerMeasure),
+            eyebrow: "我的譜｜AI 掃描譜",
+            subtitle: "這裡使用你保存的自訂譜，會依照譜面節拍逐音判斷音準。",
+            toneHint: "目前這份自訂譜使用 " + tonicDisplayLabel() + "。如果調號不對，先回譜面編輯器修左上角 1= 調號。",
+            tonicLocked: true
+          };
+        }
+        return missingScoreMeta("尚未選擇或無法載入這份自訂譜");
+      }
+
+      if (currentPracticeType === PRACTICE_TYPE.PIECE && window.ErhuPieceScores) {
+        const scoreData = window.ErhuPieceScores.getScore(currentPieceTitle, cleanPieceName(currentPieceTitle));
+        if (scoreData && Array.isArray(scoreData.rows) && scoreData.rows.length) {
+          const tonic = extractTonicFromScoreData(scoreData);
+          const timeline = parsePieceTimeline(scoreData);
+          const beatsPerMeasure = extractBeatsPerMeasure(scoreData);
+          if (tonic) {
+            currentTonic = tonic;
+          }
+          return {
+            type: PRACTICE_TYPE.PIECE,
+            title: cleanPieceName(scoreData.title || currentPieceTitle),
+            scoreData: scoreData,
+            timeline: timeline,
+            beatsPerMeasure: beatsPerMeasure,
+            metronomeCues: buildMetronomeCues(timeline, beatsPerMeasure),
+            subtitle: scoreData.note || "依照譜面節拍逐音判斷音準。",
+            toneHint: "目前這首曲目使用 " + tonicDisplayLabel() + "。綠色代表過關，紅色代表要回去慢練。",
+            tonicLocked: true
+          };
+        }
+        return missingScoreMeta("《" + currentPieceTitle + "》尚無站內譜面");
+      }
+
+      const timeline = parseTimeline(SCALE_PRACTICE_SCORE);
+      return {
+        type: PRACTICE_TYPE.SCALE,
+        title: tonicDisplayLabel() + "音階練習譜",
+        timeline: timeline,
+        beatsPerMeasure: 2,
+        metronomeCues: buildMetronomeCues(timeline, 2),
+        subtitle: "這裡使用音階上下行練習，會一路到高音 5 再回來。現在調號是 " + tonicDisplayLabel() + "，綠色代表過關，紅色代表要回去慢練。",
+        toneHint: "目前音階對照：" + scaleDegreeSummary(),
+        tonicLocked: false
+      };
+    }
+
+    function baseResultMetaText() {
+      const scoreTitle = isScorePracticeMeta(currentPracticeMeta) ? currentPracticeMeta.title + "｜" : "";
+      return weeklyData[currentLevel].label + "｜" + currentGradeLabel() + "｜" + scoreTitle + tonicDisplayLabel();
+    }
+
+    function autoCorrelate(buffer, sampleRate) {
+      let size = buffer.length;
+      let rms = 0;
+      for (let index = 0; index < size; index += 1) {
+        const value = buffer[index];
+        rms += value * value;
+      }
+      rms = Math.sqrt(rms / size);
+      if (rms < 0.01) {
+        return null;
+      }
+
+      let start = 0;
+      let end = size - 1;
+      const threshold = 0.2;
+      for (let index = 0; index < size / 2; index += 1) {
+        if (Math.abs(buffer[index]) < threshold) {
+          start = index;
+          break;
+        }
+      }
+      for (let index = 1; index < size / 2; index += 1) {
+        if (Math.abs(buffer[size - index]) < threshold) {
+          end = size - index;
+          break;
+        }
+      }
+
+      const trimmed = buffer.slice(start, end);
+      size = trimmed.length;
+      const correlations = new Array(size).fill(0);
+      for (let offset = 0; offset < size; offset += 1) {
+        for (let index = 0; index < size - offset; index += 1) {
+          correlations[offset] += trimmed[index] * trimmed[index + offset];
+        }
+      }
+
+      let dip = 0;
+      while (dip + 1 < size && correlations[dip] > correlations[dip + 1]) {
+        dip += 1;
+      }
+
+      let bestOffset = -1;
+      let bestCorrelation = -1;
+      for (let offset = dip; offset < size; offset += 1) {
+        if (correlations[offset] > bestCorrelation) {
+          bestCorrelation = correlations[offset];
+          bestOffset = offset;
+        }
+      }
+
+      if (bestOffset <= 0) {
+        return null;
+      }
+
+      let energyA = 0, energyB = 0;
+      for (let i = 0; i < size - bestOffset; i++) {
+        energyA += trimmed[i] * trimmed[i];
+        energyB += trimmed[i + bestOffset] * trimmed[i + bestOffset];
+      }
+      if (bestCorrelation / Math.sqrt(energyA * energyB) < 0.85) return null;
+      const left = correlations[bestOffset - 1] || 0;
+      const center = correlations[bestOffset] || 0;
+      const right = correlations[bestOffset + 1] || 0;
+      const a = (left + right - 2 * center) / 2;
+      const b = (right - left) / 2;
+      let refinedOffset = bestOffset;
+      if (a) {
+        refinedOffset = bestOffset - b / (2 * a);
+      }
+
+      if (!refinedOffset) {
+        return null;
+      }
+
+      return sampleRate / refinedOffset;
+    }
+
+    function parseTimeline(scoreText) {
+      const rows = [];
+      const events = [];
+      String(scoreText || "").split(/\n+/).forEach(function (lineText, rowIndex) {
+        const line = lineText.trim();
+        if (!line) return;
+        const tokens = line.replace(/\|/g, " | ").trim().split(/\s+/);
+        const row = { rowIndex: rowIndex, events: [] };
+        let currentEvent = null;
+        tokens.forEach(function (token) {
+          if (!token || token === "|") return;
+          const parts = token.match(/([1-7]'*,*|-+|~+)/g) || [];
+          parts.forEach(function (part) {
+            const pitchMeta = parseJianpuPitch(part);
+            if (pitchMeta) {
+              const event = {
+                index: events.length,
+                rowIndex: row.rowIndex,
+                positionInRow: row.events.length + 1,
+                label: part,
+                midi: pitchMeta.midi,
+                noteName: pitchMeta.noteName,
+                durationBeats: 1
+              };
+              events.push(event);
+              row.events.push(event);
+              currentEvent = event;
+            } else if (/^[-~]+$/.test(part) && currentEvent) {
+              currentEvent.durationBeats += part.length;
+            }
+          });
+        });
+        if (row.events.length) {
+          rows.push(row);
+        }
+      });
+
+      let cursor = 0;
+      events.forEach(function (event) {
+        event.startBeat = cursor;
+        cursor += event.durationBeats;
+        event.endBeat = cursor;
+      });
+
+      return { rows: rows, events: events, totalBeats: cursor };
+    }
+
+    function buildDisplayLabel(event) {
+      if (event.displayLabel) {
+        return event.displayLabel;
+      }
+      if (event.durationBeats <= 1) {
+        return event.label;
+      }
+      return event.label + "-".repeat(event.durationBeats - 1);
+    }
+
+    function renderPieceScoreSheet(scoreData) {
+      const sheet = document.createElement("div");
+      sheet.className = "score-follow-sheet";
+
+      if (scoreData && scoreData.header) {
+        const meta = document.createElement("div");
+        meta.className = "score-follow-meta";
+        meta.innerHTML =
+          "<div class=\"score-follow-meta-left\">" +
+            (Array.isArray(scoreData.header.left) ? scoreData.header.left.map(function (item) {
+              return "<div>" + ErhuQuality.escape(item) + "</div>";
+            }).join("") : "") +
+          "</div>" +
+          "<div class=\"score-follow-meta-right\">" + ErhuQuality.escape(scoreData.header.right || "") + "</div>";
+        sheet.appendChild(meta);
+      }
+
+      let eventCursor = 0;
+      (scoreData.rows || []).forEach(function (rowData) {
+        const rowWrap = document.createElement("div");
+        rowWrap.className = "score-follow-row";
+
+        if (rowData.prefix) {
+          const prefix = document.createElement("div");
+          prefix.className = "score-follow-prefix";
+          prefix.textContent = rowData.prefix;
+          rowWrap.appendChild(prefix);
+        }
+
+        const measureRow = document.createElement("div");
+        measureRow.className = "score-follow-measure-row";
+        measureRow.style.setProperty("--measure-count", String((rowData.measures || []).length || 1));
+
+        (rowData.measures || []).forEach(function (measureData) {
+          const cells = (measureData.cells || []).map(normalizePieceScoreCell);
+          if (!cells.length) {
+            return;
+          }
+
+          const cellStarts = [];
+          let unitCursor = 0;
+          cells.forEach(function (cellData) {
+            cellStarts.push(unitCursor);
+            unitCursor += cellData.units;
+          });
+
+          const unitCount = Math.max(Number(measureData.totalUnits) || 0, unitCursor, 8);
+          const measure = document.createElement("div");
+          measure.className = "score-follow-measure";
+          measure.style.setProperty("--unit-count", String(unitCount * 2));
+
+          if (measureData.marker) {
+            const marker = document.createElement("div");
+            marker.className = "score-follow-marker";
+            marker.textContent = measureData.marker;
+            measure.appendChild(marker);
+          }
+
+          renderTextSpans(measure, cells, cellStarts, measureData.bows || [], "score-follow-bow");
+          renderTextSpans(measure, cells, cellStarts, measureData.fingerings || measureData.guides || [], "score-follow-guide");
+          const upperNoteMap = buildCellTextMap(cells, measureData.upperNotes || []);
+
+          (measureData.slurs || []).forEach(function (slurRange) {
+            const start = Math.max(0, Number(slurRange[0]) || 0);
+            const end = Math.min(cells.length - 1, Number(slurRange[1]) || 0);
+            if (end < start) {
+              return;
+            }
+            const slur = document.createElement("div");
+            slur.className = "score-follow-slur";
+            slur.style.gridColumn = ((cellStarts[start] + 1) + " / " + (cellStarts[end] + cells[end].units + 1)).split(" / ").map(function (n) { return Number(n) * 2 - 1; }).join(" / ");
+            measure.appendChild(slur);
+          });
+
+          cells.forEach(function (cellData, cellIndex) {
+            const startUnit = cellStarts[cellIndex];
+            const endUnit = startUnit + cellData.units;
+            const event = currentTimeline.events[eventCursor];
+            const cell = document.createElement("div");
+            cell.className = "score-follow-cell note-cell piece-mode piece-notation-note";
+            cell.style.gridColumn = ((startUnit + 1) + " / " + (endUnit + 1)).split(" / ").map(function (n) { return Number(n) * 2 - 1; }).join(" / ");
+            cell.dataset.index = event ? String(event.index) : "";
+            const upperNote = upperNoteMap[cellIndex] ? ("<span class=\"score-follow-upper-note\">" + upperNoteMap[cellIndex] + "</span>") : "";
+            cell.innerHTML = upperNote + "<span class=\"score-follow-main\">" + buildJianpuHtml(cellData.label) + "</span>";
+            measure.appendChild(cell);
+            const lowDots = lowOctaveText(cellData.label);
+            if (lowDots) {
+              const lowMarker = document.createElement("div");
+              lowMarker.className = "score-follow-low-octave-marker";
+              lowMarker.style.gridColumn = ((startUnit + 1) + " / " + (endUnit + 1)).split(" / ").map(function (n) { return Number(n) * 2 - 1; }).join(" / ");
+              lowMarker.textContent = lowDots;
+              measure.appendChild(lowMarker);
+            }
+            if (event) {
+              noteElements[event.index] = cell;
+            }
+            eventCursor += 1;
+          });
+
+          const underlineRanges = scoreData && scoreData.autoUnderlines
+            ? buildAutoUnderlines(cells, scoreData.beatUnits || 4, unitCount)
+            : (measureData.underlines || []);
+          underlineRanges.forEach(function (underlineRange) {
+            const start = Math.max(0, Number(underlineRange[0]) || 0);
+            const end = Math.min(cells.length - 1, Number(underlineRange[1]) || 0);
+            if (end < start) {
+              return;
+            }
+            const underline = document.createElement("div");
+            underline.className = "score-follow-underline" + ((Number(underlineRange[2]) || 1) >= 3 ? " triple" : (Number(underlineRange[2]) || 1) >= 2 ? " double" : " single");
+            underline.style.gridColumn = ((cellStarts[start] + 1) + " / " + (cellStarts[end] + cells[end].units + 1)).split(" / ").map(function (n) { return Number(n) * 2 - 1; }).join(" / ");
+            measure.appendChild(underline);
+          });
+
+          measureRow.appendChild(measure);
+        });
+
+        rowWrap.appendChild(measureRow);
+        sheet.appendChild(rowWrap);
+      });
+
+      scoreSheet.appendChild(sheet);
+    }
+
+    function renderLevelTabs() {
+      levelTabs.innerHTML = "";
+      Object.entries(weeklyData).forEach(function (entry) {
+        const key = entry[0];
+        const value = entry[1];
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "tab" + (currentLevel === key ? " active" : "");
+        button.setAttribute("aria-pressed", currentLevel === key ? "true" : "false");
+        button.textContent = value.label;
+        button.addEventListener("click", function () {
+          if (sessionState.active) return;
+          currentLevel = key;
+          currentWeek = 1;
+          currentPracticeType = PRACTICE_TYPE.SCALE;
+          currentPieceTitle = "";
+          currentCustomScoreId = "";
+          currentCustomScoreData = null;
+          syncCustomScoreSelect();
+          renderLevelTabs();
+          renderWeekTabs();
+          renderSheet();
+          updateUrl();
+        });
+        levelTabs.appendChild(button);
+      });
+    }
+
+    function renderWeekTabs() {
+      weekTabs.innerHTML = "";
+      currentWeek = clampWeek(currentLevel, currentWeek);
+      weeklyData[currentLevel].weeks.forEach(function (item, index) {
+        const week = index + 1;
+        const button = document.createElement("button");
+        button.type = "button";
+        button.className = "week-tab" + (currentWeek === week ? " active" : "");
+        button.setAttribute("aria-pressed", currentWeek === week ? "true" : "false");
+        button.textContent = item.grade;
+        button.addEventListener("click", function () {
+          if (sessionState.active) return;
+          currentWeek = week;
+          currentPracticeType = PRACTICE_TYPE.SCALE;
+          currentPieceTitle = "";
+          currentCustomScoreId = "";
+          currentCustomScoreData = null;
+          syncCustomScoreSelect();
+          renderWeekTabs();
+          renderSheet();
+          updateUrl();
+        });
+        weekTabs.appendChild(button);
+      });
+    }
+
+    function renderSheet() {
+      currentWeek = clampWeek(currentLevel, currentWeek);
+      currentPracticeMeta = resolvePracticeMeta();
+      currentTimeline = currentPracticeMeta.timeline;
+      noteElements = new Array(currentTimeline.events.length);
+      scoreSheet.innerHTML = "";
+      const isStructuredScore = isScorePracticeMeta(currentPracticeMeta);
+      practiceLayout.classList.toggle("piece-mode", isStructuredScore);
+      scoreSheet.classList.toggle("piece-mode", isStructuredScore);
+
+      sheetEyebrow.textContent = currentPracticeMeta.eyebrow || (weeklyData[currentLevel].label + "｜" + currentGradeLabel() + "｜" + tonicDisplayLabel());
+      sheetTitle.textContent = currentPracticeMeta.title;
+      startButton.disabled = !!currentPracticeMeta.missing;
+      if (currentPracticeMeta.missing) {
+        const upload = document.createElement("a"); upload.className="button";
+        upload.href="./二胡小教室-AI掃描譜.html?title="+encodeURIComponent(currentPieceTitle||"");
+        upload.textContent="上傳原譜"; scoreSheet.appendChild(upload);
+      }
+      sheetSubtitle.textContent = currentPracticeMeta.subtitle;
+      scaleMapHint.textContent = currentPracticeMeta.toneHint;
+      tonicSelect.value = currentTonic;
+      tonicSelect.disabled = currentPracticeMeta.tonicLocked;
+
+      currentTimeline.rows.forEach(function (row) {
+        if (isStructuredScore) {
+          return;
+        }
+        const rowWrap = document.createElement("div");
+        rowWrap.className = "score-row";
+        if (isStructuredScore) {
+          rowWrap.classList.add("piece-mode");
+        }
+
+        const rowLabel = document.createElement("div");
+        rowLabel.className = "row-label";
+        if (isStructuredScore) {
+          rowLabel.classList.add("piece-mode");
+        }
+        rowLabel.textContent = "第 " + (row.rowIndex + 1) + " 行";
+        rowWrap.appendChild(rowLabel);
+
+        const rowNotes = document.createElement("div");
+        rowNotes.className = "row-notes";
+        if (isStructuredScore) {
+          rowNotes.classList.add("piece-mode");
+          rowNotes.style.setProperty("--unit-count", String(row.totalUnits || 1));
+        }
+
+        row.events.forEach(function (event) {
+          const cell = document.createElement("div");
+          cell.className = "note-cell";
+          if (isStructuredScore) {
+            cell.classList.add("piece-mode");
+            cell.style.gridColumn = ((event.rowUnitStart + 1) + " / " + (event.rowUnitEnd + 1)).split(" / ").map(function (n) { return Number(n) * 2 - 1; }).join(" / ");
+          } else {
+            cell.style.setProperty("--beats", String(event.durationBeats));
+          }
+          cell.dataset.index = String(event.index);
+          cell.innerHTML =
+            "<span class=\"numbered-note\">" + buildDisplayLabel(event) + "</span>" +
+            "<span class=\"letter-note\">" + event.noteName + "</span>";
+          rowNotes.appendChild(cell);
+          noteElements[event.index] = cell;
+        });
+
+        rowWrap.appendChild(rowNotes);
+        scoreSheet.appendChild(rowWrap);
+      });
+
+      if (isStructuredScore) {
+        renderPieceScoreSheet(currentPracticeMeta.scoreData);
+      }
+
+      clearNoteStates();
+      resetLiveDisplay();
+      overallScore.textContent = "--";
+      resultMeta.textContent = baseResultMetaText() + "｜尚未開始";
+      resultSummary.textContent = isStructuredScore
+        ? "這一輪會依照你現在選的譜，逐音判斷音準。"
+        : "這一輪會依照你現在選的音階練習，逐音判斷音準。";
+      correctCount.textContent = "0";
+      averageCents.textContent = "--";
+      beatCount.textContent = "0 / " + currentTimeline.totalBeats;
+      tempoResult.textContent = formatTempoValue(currentTempo);
+      problemList.innerHTML = "<div class=\"empty-state\">還沒開始演奏。完成一輪後，這裡會列出偏高、偏低或常跑到別的音的地方。</div>";
+    }
+
+    function clearNoteStates() {
+      noteElements.forEach(function (cell) {
+        if (!cell) return;
+        cell.classList.remove("current", "pass", "fail");
+        cell.style.setProperty("--fill", "0%");
+      });
+    }
+
+    function resetLiveDisplay() {
+      statusChip.textContent = "尚未開始";
+      countdownText.textContent = "待命中";
+      countdownText.classList.remove("active");
+      countdownOverlay.hidden = true;
+      countdownOverlay.classList.remove("visible");
+      countdownNumber.textContent = "3";
+      currentTarget.textContent = "--";
+      currentTargetMeta.textContent = "第 1 個音";
+      detectedNote.textContent = "--";
+      detectedNoteMeta.textContent = "等待麥克風";
+      detectedCents.textContent = "--";
+      detectedCentsMeta.textContent = "cents";
+      progressValue.textContent = "0%";
+      progressFill.style.width = "0%";
+    }
+
+    function getEventAtBeat(beat) {
+      if (!currentTimeline || beat < 0) return -1;
+      for (let index = 0; index < currentTimeline.events.length; index += 1) {
+        const event = currentTimeline.events[index];
+        if (beat >= event.startBeat && beat < event.endBeat) {
+          return index;
+        }
+      }
+      return currentTimeline.events.length - 1;
+    }
+
+    function setCurrentEvent(index, beat) {
+      if (sessionState.currentIndex === index) {
+        const currentCell = noteElements[index];
+        const event = currentTimeline.events[index];
+        if (currentCell && event) {
+          const fill = clamp(((beat - event.startBeat) / event.durationBeats) * 100, 0, 100);
+          currentCell.style.setProperty("--fill", fill.toFixed(2) + "%");
+        }
+        return;
+      }
+
+      if (sessionState.currentIndex >= 0 && noteElements[sessionState.currentIndex]) {
+        noteElements[sessionState.currentIndex].classList.remove("current");
+        noteElements[sessionState.currentIndex].style.setProperty("--fill", "0%");
+      }
+
+      sessionState.currentIndex = index;
+      const event = currentTimeline.events[index];
+      const cell = noteElements[index];
+      if (cell && event) {
+        cell.classList.add("current");
+        cell.scrollIntoView({ block: "nearest", inline: "nearest", behavior: "smooth" });
+      }
+
+      if (event) {
+        currentTarget.textContent = event.label;
+        currentTargetMeta.textContent = "第 " + (event.rowIndex + 1) + " 行，第 " + event.positionInRow + " 音｜" + event.noteName;
+      }
+    }
+
+    function buildAssessments() {
+      return currentTimeline.events.map(function () {
+        return {
+          expectedSamples: 0,
+          samples: 0,
+          goodSamples: 0,
+          matchingSamples: 0,
+          sumAbsCents: 0,
+          sumSignedCents: 0,
+          sumMatchedAbsCents: 0,
+          score: 0,
+          passed: false,
+          verdict: "未判定"
+        };
+      });
+    }
+
+    function isPieceCellHitPassEvent(event) {
+      return !!(
+        isScorePracticeMeta(currentPracticeMeta) &&
+        event
+      );
+    }
+
+    function noteJudgeStartRatioFor(event) {
+      return isPieceCellHitPassEvent(event) ? 0 : PITCH_JUDGMENT.noteJudgeStartRatio;
+    }
+
+    function timingCompensationMs() {
+      return PITCH_JUDGMENT.latencyCompensationMs;
+    }
+
+    function metronomeLeadMs() {
+      return 55;
+    }
+
+    function triggerMetronomeClick(accent) {
+      if (!metronomeEnabled || !sessionState.audioContext) {
+        return;
+      }
+      const now = sessionState.audioContext.currentTime;
+      const oscillator = sessionState.audioContext.createOscillator();
+      const gainNode = sessionState.audioContext.createGain();
+      oscillator.type = "square";
+      oscillator.frequency.setValueAtTime(accent ? 1560 : 1280, now);
+      gainNode.gain.setValueAtTime(0.0001, now);
+      gainNode.gain.exponentialRampToValueAtTime(accent ? 0.28 : 0.2, now + 0.002);
+      gainNode.gain.exponentialRampToValueAtTime(0.0001, now + 0.075);
+      oscillator.connect(gainNode);
+      gainNode.connect(sessionState.audioContext.destination);
+      oscillator.start(now);
+      oscillator.stop(now + 0.08);
+      oscillator.onended = function () {
+        oscillator.disconnect();
+        gainNode.disconnect();
+      };
+    }
+
+    function flushMetronomeClicks(elapsedBeat) {
+      if (!metronomeEnabled || !sessionState.audioContext || !currentPracticeMeta) {
+        return;
+      }
+      const cues = currentPracticeMeta.metronomeCues || [];
+      const metronomeLeadBeats = sessionState.beatMs ? (metronomeLeadMs() / sessionState.beatMs) : 0;
+      const hearingBeat = elapsedBeat + metronomeLeadBeats;
+      while (
+        sessionState.lastMetronomeCueIndex + 1 < cues.length &&
+        hearingBeat >= cues[sessionState.lastMetronomeCueIndex + 1].beat - 0.0001
+      ) {
+        sessionState.lastMetronomeCueIndex += 1;
+        triggerMetronomeClick(!!cues[sessionState.lastMetronomeCueIndex].accent);
+      }
+    }
+
+    async function ensureAudio() {
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        throw new Error("目前瀏覽器不支援麥克風收音");
+      }
+
+      const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+      if (!AudioContextClass) {
+        throw new Error("目前瀏覽器不支援音訊分析");
+      }
+
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: {
+          echoCancellation: false,
+          noiseSuppression: false,
+          autoGainControl: false
+        }
+      });
+
+      sessionState.mediaStream = stream;
+      sessionState.audioContext = new AudioContextClass();
+      sessionState.analyser = sessionState.audioContext.createAnalyser();
+      sessionState.analyser.fftSize = 2048;
+      sessionState.sampleBuffer = new Float32Array(sessionState.analyser.fftSize);
+      sessionState.sourceNode = sessionState.audioContext.createMediaStreamSource(stream);
+      sessionState.sourceNode.connect(sessionState.analyser);
+      if (typeof sessionState.audioContext.resume === "function") {
+        await sessionState.audioContext.resume();
+      }
+    }
+
+    function releaseAudio() {
+      if (sessionState.rafId) {
+        cancelAnimationFrame(sessionState.rafId);
+        sessionState.rafId = 0;
+      }
+      if (sessionState.sourceNode) {
+        sessionState.sourceNode.disconnect();
+      }
+      if (sessionState.mediaStream) {
+        sessionState.mediaStream.getTracks().forEach(function (track) {
+          track.stop();
+        });
+      }
+      if (sessionState.audioContext && typeof sessionState.audioContext.close === "function") {
+        sessionState.audioContext.close();
+      }
+      sessionState.audioContext = null;
+      sessionState.analyser = null;
+      sessionState.mediaStream = null;
+      sessionState.sourceNode = null;
+      sessionState.sampleBuffer = null;
+      sessionState.smoothedFrequency = null;
+      sessionState.liveElapsedBeat = 0;
+      sessionState.lastMetronomeCueIndex = -1;
+    }
+
+    function readFrequency() {
+      if (!sessionState.analyser || !sessionState.sampleBuffer) {
+        return null;
+      }
+      sessionState.analyser.getFloatTimeDomainData(sessionState.sampleBuffer);
+      const frequency = autoCorrelate(sessionState.sampleBuffer, sessionState.audioContext.sampleRate);
+      if (!frequency) {
+        sessionState.smoothedFrequency = null;
+        return null;
+      }
+      if (!sessionState.smoothedFrequency || Math.abs(1200 * Math.log2(frequency / sessionState.smoothedFrequency)) > 80) {
+        sessionState.smoothedFrequency = frequency;
+      } else {
+        sessionState.smoothedFrequency = Math.exp(Math.log(sessionState.smoothedFrequency) * 0.55 + Math.log(frequency) * 0.45);
+      }
+      return sessionState.smoothedFrequency;
+    }
+
+    function recordCurrentPitch(index, frequency, elapsedBeat) {
+      const event = currentTimeline.events[index];
+      const assess = sessionState.assessments[index];
+      if (event.rest || event.unknown) {
+        detectedNote.textContent = "--"; detectedCents.textContent = "--";
+        detectedNoteMeta.textContent = event.rest ? "休止" : "音符待確認";
+        detectedCentsMeta.textContent = "不計音準";
+        return;
+      }
+      const detectedMidi = frequencyToMidi(frequency);
+      const alignment = getClosestTargetAlignment(frequency, event.midi);
+      const signedCents = alignment.signedCents;
+      const absCents = alignment.absCents;
+      const noteElapsedBeats = Math.max(0, elapsedBeat - event.startBeat);
+      const shouldJudgeThisSample = noteElapsedBeats >= event.durationBeats * noteJudgeStartRatioFor(event);
+
+      if (shouldJudgeThisSample) {
+        assess.samples += 1;
+        assess.sumAbsCents += absCents;
+        assess.sumSignedCents += signedCents;
+        if (absCents <= PITCH_JUDGMENT.matchCents) {
+          assess.matchingSamples += 1;
+          assess.sumMatchedAbsCents += absCents;
+          if (absCents <= PITCH_JUDGMENT.goodCents) {
+            assess.goodSamples += 1;
+          }
+        }
+      }
+
+      detectedNote.textContent = midiToNoteName(detectedMidi);
+      detectedNoteMeta.textContent = frequency.toFixed(1) + " Hz";
+      detectedCents.textContent = formatSigned(signedCents);
+      if (!shouldJudgeThisSample) {
+        detectedCentsMeta.textContent = "長音到格子一半才開始判定";
+      } else if (isPieceCellHitPassEvent(event) && absCents <= PITCH_JUDGMENT.matchCents) {
+        detectedCentsMeta.textContent = "格子內有偵測到接近正確音";
+      } else {
+        detectedCentsMeta.textContent = absCents <= PITCH_JUDGMENT.nearCents ? "接近準音" : (signedCents < 0 ? "偏低" : "偏高");
+      }
+    }
+
+    function finalizeNote(index) {
+      if (index < 0 || index >= sessionState.assessments.length) return;
+      const event = currentTimeline.events[index];
+      const assess = sessionState.assessments[index];
+      const cell = noteElements[index];
+      if (event.rest || event.unknown) { assess.excluded=true; if(cell)cell.classList.remove("current"); return; }
+      if (!cell || cell.classList.contains("pass") || cell.classList.contains("fail")) {
+        return;
+      }
+
+      const averageAbsCentsValue = assess.samples ? assess.sumAbsCents / assess.samples : 999;
+      const averageMatchedCentsValue = assess.matchingSamples ? assess.sumMatchedAbsCents / assess.matchingSamples : averageAbsCentsValue;
+      const judgedSamples = Math.max(assess.expectedSamples || 0, assess.samples);
+      const goodRatio = judgedSamples ? assess.goodSamples / judgedSamples : 0;
+      const matchRatio = judgedSamples ? assess.matchingSamples / judgedSamples : 0;
+      const correctRatio = goodRatio;
+      const pitchControl = clamp(100 - averageMatchedCentsValue * PITCH_JUDGMENT.pitchControlPenaltyPerCent, 0, 100);
+      const stablePass = assess.samples >= 3
+        && correctRatio >= PITCH_JUDGMENT.passCorrectRatio;
+      const quickHitPass = isPieceCellHitPassEvent(event) && assess.matchingSamples >= 3 && matchRatio >= 0.6;
+      let score = assess.samples
+        ? Math.round(goodRatio * 60 + matchRatio * 28 + pitchControl * 0.12)
+        : 0;
+      const averageSigned = assess.samples ? assess.sumSignedCents / assess.samples : 0;
+      const passed = stablePass || quickHitPass;
+
+      if (quickHitPass) {
+        score = Math.max(score, PITCH_JUDGMENT.quickNotePassScore);
+      }
+
+      assess.score = score;
+      assess.averageAbsCents = averageAbsCentsValue;
+      assess.averageSignedCents = averageSigned;
+      assess.passed = passed;
+      if (!assess.samples) {
+        assess.verdict = "幾乎沒有收到清楚音高";
+      } else if (!assess.matchingSamples) {
+        assess.verdict = "常跑到別的音";
+      } else if (quickHitPass && !stablePass) {
+        assess.verdict = "格子內有偵測到接近正確音";
+      } else if (averageSigned <= -PITCH_JUDGMENT.highLowBoundary) {
+        assess.verdict = "大多偏低";
+      } else if (averageSigned >= PITCH_JUDGMENT.highLowBoundary) {
+        assess.verdict = "大多偏高";
+      } else if (!passed) {
+        assess.verdict = "音位不夠穩";
+      } else {
+        assess.verdict = "穩定";
+      }
+
+      cell.classList.remove("current");
+      cell.style.setProperty("--fill", "100%");
+      cell.classList.add(passed ? "pass" : "fail");
+    }
+
+    function renderResult(finalizedCount, manuallyStopped) {
+      const evaluated = sessionState.assessments.slice(0, finalizedCount).filter(item=>!item.excluded);
+      const total = Math.max(1, evaluated.length);
+      const passed = evaluated.filter(function (item) { return item.passed; }).length;
+      const passRatio = passed / total;
+      const totalSamples = evaluated.reduce(function (sum, item) {
+        return sum + (item.samples || 0);
+      }, 0);
+      const totalMatchingSamples = evaluated.reduce(function (sum, item) {
+        return sum + (item.matchingSamples || 0);
+      }, 0);
+      const sumAbsCents = evaluated.reduce(function (sum, item) {
+        return sum + (item.sumAbsCents || 0);
+      }, 0);
+      const averageCentsValue = totalSamples
+        ? (sumAbsCents / totalSamples)
+        : average(evaluated.filter(function (item) {
+          return isFinite(item.averageAbsCents);
+        }).map(function (item) {
+          return item.averageAbsCents;
+        }));
+      const overallMatchRatio = totalSamples ? totalMatchingSamples / totalSamples : 0;
+      const overallPitchControl = isFinite(averageCentsValue)
+        ? clamp(100 - averageCentsValue * PITCH_JUDGMENT.pitchControlPenaltyPerCent, 0, 100)
+        : 0;
+      const totalScore = Math.round(passRatio * 72 + overallMatchRatio * 18 + overallPitchControl * 0.10);
+      const wrongItems = currentTimeline.events.map(function (event, index) {
+        return {
+          event: event,
+          assess: sessionState.assessments[index]
+        };
+      }).filter(function (item, index) {
+        return index < finalizedCount && !item.assess.passed && !item.assess.excluded;
+      }).sort(function (left, right) {
+        return (left.assess.score || 0) - (right.assess.score || 0);
+      }).slice(0, 6);
+
+      overallScore.textContent = totalScore + "分";
+      resultMeta.textContent = baseResultMetaText() + "｜" + (manuallyStopped ? "中途停止" : "完整完成");
+      resultSummary.textContent =
+        (manuallyStopped ? "這次你是中途停止，" : "這次整輪完成後，") +
+        "共抓到 " + passed + " 個過關音，" +
+        "平均偏差約 " + (isFinite(averageCentsValue) ? averageCentsValue.toFixed(1) : "--") + " cents。先回去重練紅色音，再把速度往上加。";
+      correctCount.textContent = passed + " / " + total;
+      averageCents.textContent = isFinite(averageCentsValue) ? averageCentsValue.toFixed(1) + "c" : "--";
+      beatCount.textContent = currentTimeline.events.slice(0, finalizedCount).reduce((sum, event) => sum + event.durationBeats, 0) + " / " + currentTimeline.totalBeats;
+      tempoResult.textContent = formatTempoValue(currentTempo);
+
+      if (!wrongItems.length) {
+        problemList.innerHTML = "<div class=\"empty-state\">這一輪全部過關，譜面上沒有紅色音。可以把速度再往上調一點。</div>";
+      } else {
+        problemList.innerHTML = "";
+        wrongItems.forEach(function (item) {
+          const div = document.createElement("div");
+          div.className = "problem-item";
+          div.innerHTML =
+            "<strong>第 " + (item.event.rowIndex + 1) + " 行，第 " + item.event.positionInRow + " 音：" + item.event.label + "（" + item.event.noteName + "）</strong>" +
+            "<div class=\"muted-small\">本音分數 " + (item.assess.score || 0) + " 分，" + item.assess.verdict + "。平均偏差 " + (isFinite(item.assess.averageAbsCents) ? item.assess.averageAbsCents.toFixed(1) : "--") + " cents。</div>";
+          problemList.appendChild(div);
+        });
+      }
+
+      return {
+        scoringVersion: "20260928-v2",
+        overallScore: totalScore,
+        passedNotes: passed,
+        totalNotes: total,
+        averageAbsCents: isFinite(averageCentsValue) ? averageCentsValue : null,
+        wrongNotes: wrongItems.map(function (item) {
+          return {
+            row: item.event.rowIndex + 1,
+            position: item.event.positionInRow,
+            label: item.event.label,
+            noteName: item.event.noteName,
+            score: item.assess.score || 0,
+            verdict: item.assess.verdict
+          };
+        })
+      };
+    }
+
+    async function saveHistory(result, manuallyStopped) {
+      if (!currentUser) return;
+      try {
+        await pitchCollection().add({
+          level: currentLevel,
+          grade: currentWeek,
+          week: currentWeek,
+          gradeLabel: currentGradeLabel(),
+          weekLabel: currentGradeLabel(),
+          mode: "live-score",
+          practiceType: currentPracticeMeta ? currentPracticeMeta.type : PRACTICE_TYPE.SCALE,
+          pieceTitle: isScorePracticeMeta(currentPracticeMeta) ? currentPracticeMeta.title : "",
+          customScoreId: currentPracticeMeta && currentPracticeMeta.type === PRACTICE_TYPE.CUSTOM ? currentCustomScoreId : "",
+          tonic: currentTonic,
+          tempo: currentTempo,
+          overallScore: result.overallScore,
+          passedNotes: result.passedNotes,
+          totalNotes: result.totalNotes,
+          averageAbsCents: result.averageAbsCents,
+          wrongNotes: result.wrongNotes,
+          manuallyStopped: manuallyStopped,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
+        await loadHistory();
+      } catch (error) {
+        console.error("save live score history failed", error);
+      }
+    }
+
+    async function loadHistory() {
+      if (!currentUser) return;
+      try {
+        const snapshot = await pitchCollection().orderBy("createdAt", "desc").limit(6).get();
+        if (snapshot.empty) {
+          historyStack.innerHTML = "<div class=\"empty-state\">還沒有音準跟譜紀錄。完成一輪後，這裡會自動留下最近幾次的分數。</div>";
+          return;
+        }
+        historyStack.innerHTML = "";
+        snapshot.forEach(function (doc) {
+          const data = doc.data();
+          const item = document.createElement("div");
+          item.className = "history-item";
+          item.innerHTML =
+            "<strong>" + (weeklyData[data.level] ? weeklyData[data.level].label : "未知等級") + "｜" + (data.gradeLabel || data.weekLabel || gradeLabel(data.level || currentLevel, data.grade || data.week || 1)) + "｜" + (data.pieceTitle ? data.pieceTitle + "｜" : "") + ((KEY_DISPLAY_NAMES[data.tonic || "D"] || ((data.tonic || "D") + "調")) + "（1=" + (data.tonic || "D") + "）") + "｜" + (data.overallScore || 0) + " 分</strong>" +
+            "<div class=\"muted-small\">速度 " + formatTempoValue(data.tempo || 60) + " BPM｜過關 " + (data.passedNotes || 0) + " / " + (data.totalNotes || 0) + "｜" + (data.pieceTitle || data.gradeLabel || data.weekLabel || "音準練習") + "</div>";
+          const stamp = document.createElement("small"); stamp.textContent = ErhuQuality.date(data.createdAt); item.appendChild(stamp);
+          historyStack.appendChild(item);
+        });
+      } catch (error) {
+        console.error("load pitch history failed", error);
+      }
+    }
+
+    function stopSession(manuallyStopped) {
+      audioAttempt++;
+      countdownOverlay.hidden = true;
+      countdownOverlay.classList.remove("visible");
+      if (countdownTimer) {
+        clearInterval(countdownTimer);
+        countdownTimer = null;
+      }
+      if (!sessionState.active) {
+        releaseAudio();
+        startButton.disabled = false;
+        stopButton.disabled = true;
+        tempoRange.disabled = false;
+        tempoNumber.disabled = false;
+        tonicSelect.disabled = currentPracticeMeta ? currentPracticeMeta.tonicLocked : false;
+        return;
+      }
+
+      sessionState.active = false;
+      if (sessionState.rafId) {
+        cancelAnimationFrame(sessionState.rafId);
+        sessionState.rafId = 0;
+      }
+      const finalizedCount = Math.max(0, sessionState.finalizedIndex + 1);
+      if (finalizedCount > 0) {
+        const result = renderResult(finalizedCount, manuallyStopped);
+        saveHistory(result, manuallyStopped);
+      } else {
+        resultMeta.textContent = baseResultMetaText() + "｜未完成";
+        resultSummary.textContent = "這次還沒正式進入演奏就停止了，所以沒有留下評分結果。";
+      }
+      releaseAudio();
+      startButton.disabled = false;
+      stopButton.disabled = true;
+      tempoRange.disabled = false;
+      tempoNumber.disabled = false;
+      tonicSelect.disabled = currentPracticeMeta ? currentPracticeMeta.tonicLocked : false;
+      statusChip.textContent = manuallyStopped ? "已停止" : "已完成";
+      countdownText.textContent = manuallyStopped ? "已停止" : "完成";
+      countdownText.classList.remove("active");
+      countdownOverlay.hidden = true;
+      countdownOverlay.classList.remove("visible");
+    }
+
+    function tickSession(timestamp) {
+      if (!sessionState.active) {
+        return;
+      }
+
+      if (timestamp < sessionState.startAt) {
+        const remainingSeconds = Math.max(1, Math.ceil((sessionState.readyAt - timestamp) / 1000));
+        const showStart = timestamp >= sessionState.readyAt;
+        countdownText.textContent = showStart ? "開始" : ("準備 " + remainingSeconds);
+        countdownText.classList.add("active");
+        countdownOverlay.hidden = false;
+        countdownOverlay.classList.add("visible");
+        countdownNumber.textContent = showStart ? "開始" : String(remainingSeconds);
+        statusChip.textContent = showStart ? "準備進譜" : "準備開始";
+        sessionState.rafId = requestAnimationFrame(tickSession);
+        return;
+      }
+
+      countdownOverlay.hidden = true;
+      countdownOverlay.classList.remove("visible");
+      const elapsedMs = timestamp - sessionState.startAt;
+      const rawElapsedBeat = elapsedMs / sessionState.beatMs;
+      const elapsedBeat = Math.max(0, rawElapsedBeat - sessionState.timingCompensationBeats);
+      sessionState.liveElapsedBeat = elapsedBeat;
+      flushMetronomeClicks(elapsedBeat);
+      const progress = clamp((elapsedBeat / currentTimeline.totalBeats) * 100, 0, 100);
+      progressValue.textContent = Math.round(progress) + "%";
+      progressFill.style.width = progress.toFixed(2) + "%";
+      countdownText.textContent = "進行中";
+      countdownText.classList.add("active");
+      statusChip.textContent = "正在跟譜";
+
+      const frequency = readFrequency();
+      if (!frequency) {
+        detectedNote.textContent = "--";
+        detectedNoteMeta.textContent = "這一拍沒抓到清楚音高";
+        detectedCents.textContent = "--";
+        detectedCentsMeta.textContent = "請單音拉清楚一點";
+      }
+
+      const currentIndex = getEventAtBeat(elapsedBeat);
+      if (currentIndex >= 0) {
+        setCurrentEvent(currentIndex, elapsedBeat);
+        const targetEvent = currentTimeline.events[currentIndex];
+        if (!targetEvent.rest && !targetEvent.unknown && elapsedBeat - targetEvent.startBeat >= targetEvent.durationBeats * noteJudgeStartRatioFor(targetEvent)) {
+          sessionState.assessments[currentIndex].expectedSamples += 1;
+        }
+        if (frequency || targetEvent.rest || targetEvent.unknown) {
+          recordCurrentPitch(currentIndex, frequency, elapsedBeat);
+        }
+      }
+
+      while (sessionState.finalizedIndex + 1 < currentTimeline.events.length && elapsedBeat >= currentTimeline.events[sessionState.finalizedIndex + 1].endBeat) {
+        sessionState.finalizedIndex += 1;
+        finalizeNote(sessionState.finalizedIndex);
+      }
+
+      if (elapsedBeat >= currentTimeline.totalBeats) {
+        while (sessionState.finalizedIndex + 1 < currentTimeline.events.length) {
+          sessionState.finalizedIndex += 1;
+          finalizeNote(sessionState.finalizedIndex);
+        }
+        stopSession(false);
+        return;
+      }
+
+      sessionState.rafId = requestAnimationFrame(tickSession);
+    }
+
+    let audioAttempt = 0;
+    async function startSession() {
+      const attempt = ++audioAttempt;
+      if (sessionState.active) return;
+      if (!currentTimeline || !currentTimeline.events.length) return;
+      if(currentTimeline.events.some(event=>event.unknown) || currentPracticeMeta.scoreData?.rows?.some(row=>row.measures.some(m=>m.cells.some(c=>c.uncertain)))) {
+        resultSummary.textContent="這份譜仍有不確定的音符。請先回編輯器核對，避免用錯譜評分。"; return;
+      }
+
+      clearNoteStates();
+      sessionState.assessments = buildAssessments();
+      sessionState.finalizedIndex = -1;
+      sessionState.currentIndex = -1;
+      sessionState.active = true;
+      sessionState.beatMs = 60000 / currentTempo;
+      sessionState.timingCompensationBeats = timingCompensationMs() / sessionState.beatMs;
+      sessionState.liveElapsedBeat = 0;
+      sessionState.lastMetronomeCueIndex = -1;
+      sessionState.readyAt = performance.now() + 3000;
+      sessionState.startAt = sessionState.readyAt;
+
+      startButton.disabled = true;
+      stopButton.disabled = false;
+      tempoRange.disabled = true;
+      tempoNumber.disabled = true;
+      tonicSelect.disabled = true;
+      statusChip.textContent = "準備開始";
+      countdownText.textContent = "準備 3";
+      countdownText.classList.add("active");
+      countdownOverlay.hidden = false;
+      countdownOverlay.classList.add("visible");
+      countdownNumber.textContent = "3";
+      progressValue.textContent = "0%";
+      progressFill.style.width = "0%";
+      detectedNote.textContent = "--";
+      detectedNoteMeta.textContent = "等待開拍";
+      detectedCents.textContent = "--";
+      detectedCentsMeta.textContent = "cents";
+
+      try {
+        await ensureAudio();
+        if (attempt !== audioAttempt || !sessionState.active) { releaseAudio(); return; }
+        sessionState.readyAt = performance.now() + 3000;
+        sessionState.startAt = sessionState.readyAt;
+      } catch (error) {
+        sessionState.active = false;
+        startButton.disabled = false;
+        stopButton.disabled = true;
+        tempoRange.disabled = false;
+        tempoNumber.disabled = false;
+        tonicSelect.disabled = currentPracticeMeta ? currentPracticeMeta.tonicLocked : false;
+        countdownText.classList.remove("active");
+        statusChip.textContent = "無法開始";
+        if (countdownTimer) { clearInterval(countdownTimer); countdownTimer = null; }
+        if (sessionState.rafId) { cancelAnimationFrame(sessionState.rafId); sessionState.rafId = 0; }
+        resetLiveDisplay();
+        countdownText.textContent = "請檢查麥克風後重試";
+        resultSummary.textContent = ErhuQuality.micError(error);
+        releaseAudio();
+        return;
+      }
+
+      let remaining = 3;
+      if (countdownTimer) {
+        clearInterval(countdownTimer);
+      }
+      triggerMetronomeClick(true);
+      countdownTimer = setInterval(function () {
+        remaining -= 1;
+        if (remaining > 0) {
+          countdownText.textContent = "準備 " + remaining;
+          countdownNumber.textContent = String(remaining);
+          triggerMetronomeClick(true);
+        } else if (remaining === 0) {
+          countdownText.textContent = "開始";
+          countdownNumber.textContent = "開始";
+        } else {
+          clearInterval(countdownTimer);
+          countdownTimer = null;
+        }
+      }, 1000);
+
+      sessionState.rafId = requestAnimationFrame(tickSession);
+    }
+
+    function applyTempoInput(nextValue) {
+      currentTempo = clampTempoValue(nextValue);
+      syncTempoControls();
+      updateUrl();
+    }
+
+    tempoRange.addEventListener("input", function () {
+      if (sessionState.active) return;
+      applyTempoInput(tempoRange.value);
+    });
+
+    tempoNumber.addEventListener("input", function () {
+      if (sessionState.active) return;
+      if (tempoNumber.value === "") return;
+      applyTempoInput(tempoNumber.value);
+    });
+
+    tempoNumber.addEventListener("change", function () {
+      if (tempoNumber.value === "") {
+        syncTempoControls();
+        return;
+      }
+      applyTempoInput(tempoNumber.value);
+    });
+
+    tonicSelect.addEventListener("change", function () {
+      if (sessionState.active) return;
+      currentTonic = tonicSelect.value;
+      renderSheet();
+      updateUrl();
+    });
+
+    metronomeToggle.addEventListener("click", function () {
+      metronomeEnabled = !metronomeEnabled;
+      if (metronomeEnabled && sessionState.active) {
+        const cues = (currentPracticeMeta && currentPracticeMeta.metronomeCues) || [];
+        let cueIndex = -1;
+        while (cueIndex + 1 < cues.length && cues[cueIndex + 1].beat < sessionState.liveElapsedBeat - 0.0001) {
+          cueIndex += 1;
+        }
+        sessionState.lastMetronomeCueIndex = cueIndex;
+      }
+      syncMetronomeToggle();
+      updateUrl();
+    });
+
+    startButton.addEventListener("click", startSession);
+    stopButton.addEventListener("click", function () {
+      if (!sessionState.active) return;
+      while (sessionState.finalizedIndex + 1 < currentTimeline.events.length && sessionState.finalizedIndex + 1 <= sessionState.currentIndex) {
+        sessionState.finalizedIndex += 1;
+        finalizeNote(sessionState.finalizedIndex);
+      }
+      stopSession(true);
+    });
+    resetButton.addEventListener("click", function () {
+      if (sessionState.active) {
+        stopSession(true);
+      }
+      clearNoteStates();
+      resetLiveDisplay();
+      overallScore.textContent = "--";
+      resultMeta.textContent = baseResultMetaText() + "｜尚未開始";
+      resultSummary.textContent = isScorePracticeMeta(currentPracticeMeta)
+        ? "這一輪會依照你現在選的譜，逐音判斷音準。"
+        : "這一輪會依照你現在選的音階練習，逐音判斷音準。";
+      correctCount.textContent = "0";
+      averageCents.textContent = "--";
+      beatCount.textContent = "0 / " + currentTimeline.totalBeats;
+      tempoResult.textContent = formatTempoValue(currentTempo);
+      problemList.innerHTML = "<div class=\"empty-state\">還沒開始演奏。完成一輪後，這裡會列出偏高、偏低或常跑到別的音的地方。</div>";
+    });
+
+    customScoreSelect.addEventListener("change", function () {
+      if (sessionState.active) return;
+      const selectedId = customScoreSelect.value;
+      if (!selectedId) {
+        currentPracticeType = PRACTICE_TYPE.SCALE;
+        currentCustomScoreId = "";
+        currentCustomScoreData = null;
+        syncCustomScoreSelect();
+        renderSheet();
+        updateUrl();
+        return;
+      }
+      const selected = customScores.find(function (item) { return item.id === selectedId; });
+      if (!selected) return;
+      currentPracticeType = PRACTICE_TYPE.CUSTOM;
+      currentCustomScoreId = selected.id;
+      currentCustomScoreData = selected.scoreData;
+      currentPieceTitle = "";
+      syncCustomScoreSelect();
+      renderSheet();
+      updateUrl();
+    });
+
+    window.ErhuAuth.onReady(async function (user) {
+      currentUser = user || null;
+      if (currentUser) {
+        await loadCustomScores();
+        renderSheet();
+        updateUrl();
+        loadHistory();
+      }
+    });
+
+    renderLevelTabs();
+    renderWeekTabs();
+    syncTempoControls();
+    syncMetronomeToggle();
+    tonicSelect.value = currentTonic;
+    syncCustomScoreSelect();
+    if (currentPracticeType !== PRACTICE_TYPE.CUSTOM) {
+      renderSheet();
+      updateUrl();
+    } else {
+      scoreSheet.innerHTML = "<div class=\"empty-state\">正在讀取你的自訂譜。</div>";
+    }
+  </script>
+</body>
+</html>

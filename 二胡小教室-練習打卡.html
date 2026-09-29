@@ -3,76 +3,83 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>二胡小教室 | 分級每週打卡</title>
+  <title>二胡小教室 | 檢定級數打卡</title>
+  <meta name="description" content="二胡檢定級數打卡可分初級、中級、高級保存完成紀錄，讓學生追蹤每一級進度並交給 AI 回報整理。" />
+  <link rel="canonical" href="https://erhu-auth.web.app/二胡小教室-練習打卡.html" />
+  <link rel="manifest" href="./site.webmanifest" />
+  <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+  <meta property="og:type" content="website" />
+  <meta property="og:locale" content="zh_TW" />
+  <meta property="og:title" content="二胡小教室 | 檢定級數打卡" />
+  <meta property="og:description" content="分級保存二胡檢定完成進度，讓後續 AI 規劃和回報能讀取紀錄。" />
+  <meta property="og:url" content="https://erhu-auth.web.app/二胡小教室-練習打卡.html" />
+  <meta property="og:image" content="https://erhu-auth.web.app/assets/scores/level1-lian-gong-yu-fu-dian.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="stylesheet" href="./erhu-theme.css?v=20260327f" />
   <style>
-    :root { --muted:#f1e6d8; --ink:#fff8ef; --accent:#ffe0ad; --shadow:0 22px 54px rgba(46,28,18,0.14); }
+    :root { --muted:#6c5749; --ink:#2b1b12; --accent:#bf7728; --shadow:0 22px 54px rgba(46,28,18,0.14); }
     * { box-sizing:border-box; }
     body { margin:0; font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif; background:linear-gradient(180deg,#f7efe3 0%,#fbf9f5 40%,#efe4d5 100%); color:#211914; }
     a { color:inherit; text-decoration:none; }
     .shell { width:min(1120px,calc(100% - 28px)); margin:0 auto; padding:24px 0 40px; }
-    .topbar { display:flex; justify-content:space-between; gap:16px; margin-bottom:18px; flex-wrap:wrap; }
-    .brand { font-size:22px; font-weight:800; letter-spacing:0.08em; }
-    .nav { display:flex; gap:14px; flex-wrap:wrap; color:#69584d; font-weight:700; }
-    .panel { padding:28px; border-radius:28px; background:linear-gradient(135deg,rgba(84,105,85,0.96),rgba(58,76,60,0.94)); color:var(--ink); box-shadow:var(--shadow); }
+    .panel { padding:28px; border-radius:28px; background:linear-gradient(180deg,rgba(255,251,246,0.98),rgba(245,233,220,0.96)); color:var(--ink); box-shadow:var(--shadow); border:1px solid rgba(123,77,45,0.12); }
     h1 { margin:0 0 10px; font-size:clamp(30px,5vw,46px); }
     p { color:var(--muted); line-height:1.8; }
     .tabs { display:flex; gap:12px; flex-wrap:wrap; margin:18px 0 0; }
-    .tab { padding:10px 16px; border-radius:999px; border:1px solid rgba(255,255,255,0.16); background:rgba(255,255,255,0.08); color:#fff8ef; font-weight:800; cursor:pointer; }
-    .tab.active { background:#ffe0ad; color:#46301a; border-color:transparent; }
+    .tab { padding:10px 16px; border-radius:999px; border:1px solid rgba(191,119,40,0.14); background:rgba(255,249,242,0.95); color:#7b4d2d; font-weight:800; cursor:pointer; }
+    .tab.active { background:linear-gradient(135deg,#efc06f,#ca8531); color:#46301a; border-color:transparent; }
     .tracker-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; margin-top:18px; }
-    .tracker-item { padding:16px; border-radius:18px; background:rgba(255,255,255,0.08); border:1px solid rgba(255,255,255,0.12); }
+    .tracker-item { padding:16px; border-radius:18px; background:rgba(255,255,255,0.88); border:1px solid rgba(123,77,45,0.1); }
     .tracker-item strong { display:block; margin-bottom:6px; color:var(--accent); }
-    .tracker-item label { display:flex; gap:8px; align-items:center; cursor:pointer; color:#fff8ef; }
-    .tracker-item input { width:18px; height:18px; accent-color:#ffd08f; }
+    .tracker-item label { display:flex; gap:8px; align-items:center; cursor:pointer; color:#5a4030; }
+    .tracker-item input { width:18px; height:18px; accent-color:#c97d2d; }
     .summary { margin-top:14px; color:var(--accent); font-weight:800; }
-    .button { display:inline-flex; align-items:center; justify-content:center; padding:12px 16px; border:1px solid rgba(255,255,255,0.16); border-radius:999px; background:rgba(255,255,255,0.14); color:#fff8ef; font-weight:800; cursor:pointer; margin-top:12px; }
+    .button { display:inline-flex; align-items:center; justify-content:center; padding:12px 16px; border:1px solid rgba(191,119,40,0.14); border-radius:999px; background:linear-gradient(135deg,#efc06f,#ca8531); color:#4d2f15; font-weight:800; cursor:pointer; margin-top:12px; }
     @media (max-width:860px) { .tracker-grid { grid-template-columns:1fr; } }
   </style>
-</head>
-<body>
+<link rel="stylesheet" href="./erhu-refined.css?v=20260928" />
+<script src="./erhu-quality.js?v=20260928"></script>
+<link rel="stylesheet" href="./erhu-studio-ui.css?v=20260929-polish"><script defer src="./erhu-studio-ui.js?v=20260929-polish"></script></head>
+<body class="erhu-site">
   <main class="shell">
     <header class="topbar">
       <div class="brand">二胡小教室</div>
       <nav class="nav">
         <a href="./">回首頁</a>
-        <a href="./二胡小教室.html">課程分級</a>
-        <a href="./二胡小教室-影片.html">影片工具</a>
-        <a href="./二胡小教室-小測驗.html">小測驗</a>
-        <a href="./二胡小教室-AI助教.html">AI 助教</a>
+        <a href="./二胡小教室.html#course-levels">課程分級</a>
+        <a href="./二胡小教室-AI練習規劃師.html">AI 規劃</a>
+        <a href="./二胡小教室-練習打卡.html">檢定打卡</a>
       </nav>
+      <a class="tuner-shortcut" href="./二胡小教室-調音器.html">調音器</a>
     </header>
     <section class="panel">
-      <h1>分級每週打卡</h1>
-      <p>初級、中級、高級各自分開打卡。你切換等級後，勾選的內容會各自保存在不同紀錄，不會互相覆蓋，登入不同學生也會透過 Firebase 分開同步保存。卡住時也可以直接進 AI 助教問當週怎麼練。</p>
+      <h1>檢定級數打卡</h1>
+      <p>初級、中級、高級各自分開打卡。你切換等級後，勾選的內容會各自保存在不同紀錄，不會互相覆蓋，登入不同學生也會透過 Firebase 分開同步保存。卡住時也可以直接進 AI 助教問這一級怎麼練。</p>
       <div class="tabs" id="levelTabs"></div>
       <div class="tracker-grid" id="trackerGrid"></div>
-      <div class="summary" id="trackerSummary">目前完成 0 / 10 週</div>
+      <div class="summary" id="trackerSummary">目前完成 0 / 0 級</div>
       <button class="button" id="resetTrackerButton" type="button">清除目前等級打卡</button>
     </section>
   <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
-  <script src="./firebase-init.js?v=20260323b"></script>
-  <script src="./auth.js?v=20260323b"></script>
+  <script src="./firebase-init.js?v=20260928"></script>
+  <script src="./auth.js?v=20260928"></script>
+  <script src="./exam-course-data.js?v=20260505c"></script>
+  <script src="./exam-progress.js?v=20260519a"></script>
   <script>
     window.ErhuAuth.requireAuth();
     window.ErhuAuth.attachAuthUI();
     const courseTracks = {
-      beginner: { label: "初級", items: [
-        "完成姿勢與持琴重整", "完成基本長弓穩定", "完成內外弦切換", "完成節奏與短句",
-        "完成左手按音基礎", "完成音階反覆校正", "完成分弓與連弓", "完成基礎旋律整合",
-        "完成完整段落演奏", "完成初級成果驗收"
-      ]},
-      intermediate: { label: "中級", items: [
-        "完成換把定位重整", "完成揉弦穩定起步", "完成音色控制訓練", "完成弓法組合進階",
-        "完成中速節奏穩定", "完成段落與換氣感", "完成耐力與不中斷演奏", "完成速度提升訓練",
-        "完成技巧整合到曲目", "完成中級成果錄影"
-      ]},
-      advanced: { label: "高級", items: [
-        "完成高強度長弓控制", "完成快速換把與定位", "完成複合弓法連接", "完成揉弦與表情深化",
-        "完成高速度節奏穩定", "完成段落推進與層次", "完成困難段拆解修正", "完成整首曲目連續演奏",
-        "完成錄影回看與舞台修正", "完成高級總驗收"
-      ]}
+      beginner: { label: "初級", items: window.ErhuExamData.levels.beginner.grades.map(function (item) {
+        return { grade: item.grade, text: "完成" + item.grade + "｜" + item.shortTitle };
+      })},
+      intermediate: { label: "中級", items: window.ErhuExamData.levels.intermediate.grades.map(function (item) {
+        return { grade: item.grade, text: "完成" + item.grade + "｜" + item.shortTitle };
+      })},
+      advanced: { label: "高級", items: window.ErhuExamData.levels.advanced.grades.map(function (item) {
+        return { grade: item.grade, text: "完成" + item.grade + "｜" + item.shortTitle };
+      })}
     };
 
     let currentLevel = "beginner";
@@ -91,6 +98,7 @@
         const button = document.createElement("button");
         button.type = "button";
         button.className = "tab";
+        button.setAttribute("aria-pressed", key === currentLevel ? "true" : "false");
         button.textContent = value.label;
         button.addEventListener("click", () => setLevel(key));
         levelTabs.appendChild(button);
@@ -101,11 +109,12 @@
       const snapshot = await trackerRef().get();
       const saved = snapshot.exists ? snapshot.data() : {};
       trackerGrid.innerHTML = "";
-      courseTracks[currentLevel].items.forEach((text, index) => {
+      courseTracks[currentLevel].items.forEach((itemData, index) => {
+        const gradeIndex = index + 1;
         const wrap = document.createElement("div");
         wrap.className = "tracker-item";
-        const checked = Boolean(saved["week_" + (index + 1)]);
-        wrap.innerHTML = "<strong>第 " + (index + 1) + " 週</strong><label><input type=\"checkbox\" data-track=\"week_" + (index + 1) + "\"" + (checked ? " checked" : "") + " /> " + text + "</label>";
+        const checked = window.ErhuExamProgress.isCompleted(saved, gradeIndex);
+        wrap.innerHTML = "<strong>" + itemData.grade + "</strong><label><input type=\"checkbox\" data-grade=\"" + gradeIndex + "\"" + (checked ? " checked" : "") + " /> " + itemData.text + "</label>";
         trackerGrid.appendChild(wrap);
       });
       bindTrackerEvents();
@@ -113,26 +122,29 @@
     }
 
     function bindTrackerEvents() {
-      trackerGrid.querySelectorAll("[data-track]").forEach((checkbox) => {
+      trackerGrid.querySelectorAll("[data-grade]").forEach((checkbox) => {
         checkbox.addEventListener("change", saveTracker);
       });
     }
 
     async function saveTracker() {
-      const state = {};
-      trackerGrid.querySelectorAll("[data-track]").forEach((checkbox) => {
-        state[checkbox.dataset.track] = checkbox.checked;
-      });
+      const state = window.ErhuExamProgress.buildTrackerPayload(
+        courseTracks[currentLevel].items.length,
+        function (gradeIndex) {
+          const checkbox = trackerGrid.querySelector("[data-grade=\"" + gradeIndex + "\"]");
+          return checkbox ? checkbox.checked : false;
+        }
+      );
       state.updatedAt = firebase.firestore.FieldValue.serverTimestamp();
       await trackerRef().set(state, { merge: true });
       updateSummary();
     }
 
     function updateSummary() {
-      const checkboxes = Array.from(trackerGrid.querySelectorAll("[data-track]"));
+      const checkboxes = Array.from(trackerGrid.querySelectorAll("[data-grade]"));
       const completed = checkboxes.filter((checkbox) => checkbox.checked).length;
-      const user = window.ErhuAuth.getCurrentUser() || "目前學生";
-      trackerSummary.textContent = user + "｜" + courseTracks[currentLevel].label + "目前完成 " + completed + " / " + checkboxes.length + " 週";
+      const user = window.ErhuAuth.getCurrentDisplayName();
+      trackerSummary.textContent = user + "｜" + courseTracks[currentLevel].label + "目前完成 " + completed + " / " + checkboxes.length + " 級";
     }
 
     function setLevel(levelKey) {
@@ -140,12 +152,13 @@
       document.querySelectorAll(".tab").forEach((tab, index) => {
         const key = Object.keys(courseTracks)[index];
         tab.classList.toggle("active", key === levelKey);
+        tab.setAttribute("aria-pressed", key === levelKey ? "true" : "false");
       });
       renderTracker();
     }
 
     document.getElementById("resetTrackerButton").addEventListener("click", () => {
-      trackerGrid.querySelectorAll("[data-track]").forEach((checkbox) => {
+      trackerGrid.querySelectorAll("[data-grade]").forEach((checkbox) => {
         checkbox.checked = false;
       });
       saveTracker();

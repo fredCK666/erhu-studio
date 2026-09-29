@@ -4,15 +4,18 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>二胡小教室 | 登入</title>
+  <meta name="description" content="登入二胡小教室後即可保存檢定級數、測驗、音準跟譜、掃描譜與 AI 練習紀錄。" />
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="canonical" href="https://erhu-auth.web.app/二胡小教室-登入.html" />
+  <link rel="manifest" href="./site.webmanifest" />
+  <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="./erhu-theme.css?v=20260327f" />
   <style>
     :root { --ink:#211914; --muted:#69584d; --paper:rgba(255,250,244,0.94); --line:rgba(83,57,39,0.12); --wood:#7b4d2d; --shadow:0 22px 54px rgba(46,28,18,0.14); }
     * { box-sizing:border-box; }
     body { margin:0; min-height:100vh; color:var(--ink); font-family:"Noto Sans TC","PingFang TC","Microsoft JhengHei",sans-serif; background:linear-gradient(180deg,#f7efe3 0%,#fbf9f5 40%,#efe4d5 100%); }
     a { color:inherit; text-decoration:none; }
     .shell { width:min(1120px,calc(100% - 28px)); margin:0 auto; padding:24px 0 40px; }
-    .topbar { display:flex; justify-content:space-between; gap:16px; margin-bottom:18px; flex-wrap:wrap; }
-    .brand { font-size:22px; font-weight:800; letter-spacing:0.08em; }
-    .home-link { color:var(--muted); font-weight:700; }
     .hero,.card { background:var(--paper); border:1px solid var(--line); border-radius:28px; box-shadow:var(--shadow); }
     .hero { padding:28px; margin-bottom:18px; }
     h1 { margin:0 0 10px; font-size:clamp(32px,5vw,50px); }
@@ -32,16 +35,24 @@
     ul { margin:0; padding-left:20px; color:var(--muted); line-height:1.8; }
     @media (max-width: 860px) { .grid { grid-template-columns:1fr; } }
   </style>
-</head>
-<body>
+<link rel="stylesheet" href="./erhu-refined.css?v=20260928" />
+<script src="./erhu-quality.js?v=20260928"></script>
+<link rel="stylesheet" href="./erhu-studio-ui.css?v=20260929-polish"><script defer src="./erhu-studio-ui.js?v=20260929-polish"></script></head>
+<body class="erhu-site">
   <main class="shell">
     <header class="topbar">
       <div class="brand">二胡小教室</div>
-      <a class="home-link" href="./">回首頁</a>
+      <nav class="nav">
+        <a href="./">回首頁</a>
+        <a href="./二胡小教室.html#course-levels">課程分級</a>
+        <a href="./二胡小教室-AI練習規劃師.html">AI 規劃</a>
+        <a href="./二胡小教室-練習打卡.html">檢定打卡</a>
+      </nav>
+      <a class="tuner-shortcut" href="./二胡小教室-調音器.html">調音器</a>
     </header>
     <section class="hero">
       <h1>先登入再開始學習</h1>
-      <p>請先輸入姓名與密碼登入。如果還沒有帳號，可以從登入表單下方進到註冊頁面建立新的學生帳號。現在登入資料與學習紀錄會同步到 Firebase。</p>
+      <p>登入後接續你的練習紀錄。舊帳號使用姓名登入，新帳號使用電子郵件登入；還沒有帳號，可在下方建立。</p>
     </section>
     <section class="grid">
       <article class="card">
@@ -49,39 +60,44 @@
         <ul>
           <li>先輸入姓名與密碼登入。</li>
           <li>還沒註冊時，再按下方入口前往註冊。</li>
-          <li>同一台裝置可以註冊多個不同姓名帳號。</li>
-          <li>現在改成 Firebase，同一個學生可跨裝置登入。</li>
+          <li>不同學生使用各自帳號，學習紀錄分開保存。</li>
+          <li>同一帳號可在不同裝置接續學習。</li>
         </ul>
       </article>
       <article class="card">
         <div class="eyebrow" id="modeBadge">登入</div>
         <div class="status" id="modeStatus">請先輸入姓名與密碼登入。</div>
         <div class="field">
-          <label for="nameInput">姓名</label>
+          <label for="nameInput" id="nameLabel">姓名或電子郵件</label>
           <input id="nameInput" type="text" autocomplete="username" />
         </div>
         <div class="field">
           <label for="passwordInput">密碼</label>
           <input id="passwordInput" type="password" autocomplete="current-password" />
         </div>
+        <div class="field" id="emailField" hidden><label for="emailInput">電子郵件（供登入及密碼復原）</label><input type="email" id="emailInput" autocomplete="email" /><p class="hint">新帳號以此信箱登入；姓名用於課程顯示。舊姓名帳號仍可照常登入。</p></div>
+        <button type="button" class="switch-link" id="togglePassword" aria-pressed="false">顯示密碼</button>
+        <p class="hint" id="passwordHint">密碼至少 6 個字元，建議使用較長且不重複的密碼。</p>
+        <p class="hint">使用前請閱讀<a href="./二胡小教室-AI使用與隱私.html">AI 使用與隱私說明</a>。</p>
         <button class="button" id="submitButton" type="button">登入</button>
         <div class="hint" id="modeHint"></div>
         <div class="switch-row">
           <span id="switchText">還沒註冊？</span>
           <button class="switch-link" id="switchModeButton" type="button">前往註冊</button>
         </div>
-        <div class="message" id="formMessage">尚未操作</div>
+        <details class="recovery"><summary>忘記密碼？</summary><p>電子郵件帳號可寄送重設信。舊姓名帳號未綁定真實信箱，需請授課老師核對身分後協助復原。</p><label for="recoveryEmail">註冊信箱</label><input type="email" id="recoveryEmail" autocomplete="email" /><button type="button" id="resetPasswordButton" class="button secondary">寄送重設信</button></details>
+        <div class="message" id="formMessage" role="status" aria-live="polite">尚未操作</div>
       </article>
     </section>
   </main>
   <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
-  <script src="./firebase-init.js?v=20260323b"></script>
-  <script src="./auth.js?v=20260323b"></script>
+  <script src="./firebase-init.js?v=20260928"></script>
+  <script src="./auth.js?v=20260928"></script>
   <script>
     const params = new URLSearchParams(window.location.search);
-    const next = params.get("next") || "./二胡小教室.html";
+    const next = window.ErhuAuth.sanitizeNextUrl(params.get("next"), "./二胡小教室.html");
     let currentMode = "login";
     const modeBadge = document.getElementById("modeBadge");
     const modeStatus = document.getElementById("modeStatus");
@@ -95,21 +111,27 @@
 
     window.ErhuAuth.redirectIfAuthenticated(next);
 
+    document.getElementById("togglePassword").addEventListener("click", function() { const visible=passwordInput.type==="password"; passwordInput.type=visible?"text":"password"; this.textContent=visible?"隱藏密碼":"顯示密碼";this.setAttribute("aria-pressed",String(visible)); });
+    document.getElementById("resetPasswordButton").addEventListener("click", async function(){ this.disabled=true; const result=await ErhuAuth.resetPassword(document.getElementById("recoveryEmail").value.trim());formMessage.textContent=result.message;this.disabled=false; });
     function renderMode() {
+      document.getElementById("emailField").hidden = currentMode !== "register";
+      passwordInput.autocomplete = currentMode === "register" ? "new-password" : "current-password";
+      passwordInput.minLength = currentMode === "register" ? 6 : 0;
+      document.getElementById("nameLabel").textContent = currentMode === "register" ? "顯示姓名" : "姓名或電子郵件";
       const loggedInUser = window.ErhuAuth.getCurrentUser();
       if (currentMode === "login") {
         modeBadge.textContent = "登入";
-        modeStatus.textContent = "請輸入已註冊的姓名與密碼登入。";
-        modeHint.textContent = "如果你已經註冊過，直接輸入自己的姓名和密碼即可。";
+        modeStatus.textContent = "請輸入姓名或電子郵件及密碼登入。";
+        modeHint.textContent = "舊帳號填姓名；新帳號填註冊時使用的電子郵件。";
         submitButton.textContent = "登入";
         switchText.textContent = "還沒註冊？";
         switchModeButton.textContent = "前往註冊";
       } else {
         modeBadge.textContent = "註冊新帳號";
-        modeStatus.textContent = "建立新的姓名與密碼，註冊成功後會直接登入。";
+        modeStatus.textContent = "填寫顯示姓名、電子郵件與密碼，建立你的學習帳號。";
         modeHint.textContent = loggedInUser
-          ? "目前登入：" + loggedInUser + "，你也可以直接再註冊新的學生帳號。"
-          : "註冊成功後，之後就用同一組姓名與密碼登入。";
+          ? "目前登入：" + loggedInUser.displayName + "，你也可以直接再註冊新的學生帳號。"
+          : "註冊成功後，以電子郵件及密碼登入，信箱也可用來復原帳號。";
         submitButton.textContent = "建立帳號";
         switchText.textContent = "已經註冊過？";
         switchModeButton.textContent = "返回登入";
@@ -123,21 +145,29 @@
 
     submitButton.addEventListener("click", async () => {
       const name = nameInput.value.trim();
-      const password = passwordInput.value.trim();
+      const password = passwordInput.value;
       if (!name || !password) {
         formMessage.textContent = "請先輸入姓名和密碼。";
         return;
       }
+      const email=document.getElementById("emailInput");
+      if (currentMode === "register" && (!email.value.trim() || !email.checkValidity() || password.length < 6)) { formMessage.textContent="請填寫有效信箱，密碼至少 6 個字元。"; return; }
+      submitButton.disabled = true;
       const result = currentMode === "login"
         ? window.ErhuAuth.login(name, password)
-        : window.ErhuAuth.register(name, password);
+        : window.ErhuAuth.register(name, password, email.value.trim());
       formMessage.textContent = "處理中...";
       const finalResult = await result;
+      submitButton.disabled = false;
       formMessage.textContent = finalResult.ok
-        ? (currentMode === "login" ? "登入成功，正在進入課程入口。" : "註冊成功，正在進入課程入口。")
+        ? (currentMode === "login" ? "登入成功，正在進入課程分級。" : "註冊成功，正在進入課程分級。")
         : finalResult.message;
       if (finalResult.ok) {
-        window.location.href = next;
+        const currentFirebaseUser = window.ErhuFirebase.auth.currentUser;
+        if (currentFirebaseUser) {
+          await currentFirebaseUser.getIdToken();
+        }
+        window.location.replace(next);
       }
     });
 

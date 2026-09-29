@@ -1,0 +1,19 @@
+{
+  "name": "AI 二胡考級檢定訓練",
+  "short_name": "二胡小教室",
+  "description": "二胡考級檢定課程、AI 助教、AI 練習規劃、掃描譜、音準跟譜、級數回報與比賽展示工具。",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#fff0cc",
+  "theme_color": "#fff0cc",
+  "lang": "zh-Hant",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}

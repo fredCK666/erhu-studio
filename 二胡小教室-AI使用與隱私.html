@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>二胡小教室 | AI 使用與隱私說明</title>
+  <meta name="description" content="二胡小教室 AI 使用與隱私說明，整理登入資料、Firestore 練習紀錄、麥克風音準偵測、AI 掃描譜與 AI 回報的資料處理方式。" />
+  <meta name="theme-color" content="#f7efe3" />
+  <link rel="canonical" href="https://erhu-auth.web.app/二胡小教室-AI使用與隱私.html" />
+  <link rel="manifest" href="./site.webmanifest" />
+  <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+  <meta property="og:type" content="website" />
+  <meta property="og:locale" content="zh_TW" />
+  <meta property="og:title" content="二胡小教室 | AI 使用與隱私說明" />
+  <meta property="og:description" content="說明網站如何使用 AI、麥克風、登入與練習紀錄，並標示 AI 回饋的限制與學生資料保護方式。" />
+  <meta property="og:url" content="https://erhu-auth.web.app/二胡小教室-AI使用與隱私.html" />
+  <meta property="og:image" content="https://erhu-auth.web.app/assets/scores/level1-lian-gong-yu-fu-dian.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="stylesheet" href="./erhu-theme.css?v=20260327f" />
+  <style>
+    :root {
+      --ink: #241913;
+      --muted: #6c5a4f;
+      --wood: #7b4d2d;
+      --paper: rgba(255, 250, 244, 0.94);
+      --line: rgba(113, 77, 52, 0.14);
+      --green: #5f7848;
+      --blue: #386b86;
+      --shadow: 0 20px 48px rgba(56, 36, 22, 0.1);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+      background:
+        radial-gradient(circle at 8% 6%, rgba(145, 119, 79, 0.18), transparent 20%),
+        radial-gradient(circle at 88% 12%, rgba(89, 120, 72, 0.14), transparent 20%),
+        linear-gradient(180deg, #f7efe3 0%, #fbf9f5 44%, #ead9c7 100%);
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    .shell {
+      width: min(1080px, calc(100% - 28px));
+      margin: 0 auto;
+      padding: 24px 0 44px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+      padding: 14px 18px;
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      background: rgba(255, 250, 244, 0.9);
+      box-shadow: 0 14px 34px rgba(56, 36, 22, 0.08);
+    }
+
+    .brand {
+      color: #3d2516;
+      font-size: 21px;
+      font-weight: 900;
+      letter-spacing: 0.12em;
+      white-space: nowrap;
+    }
+
+    .nav {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .nav a,
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 40px;
+      padding: 9px 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(100, 67, 47, 0.12);
+      background: rgba(255, 252, 248, 0.92);
+      color: #5d4130;
+      font-weight: 900;
+      font-size: 14px;
+    }
+
+    .hero,
+    .section {
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      background: var(--paper);
+      box-shadow: var(--shadow);
+    }
+
+    .hero {
+      overflow: hidden;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 310px;
+      gap: 22px;
+      align-items: center;
+      padding: clamp(26px, 5vw, 44px);
+    }
+
+    .hero-visual {
+      min-height: 260px;
+      border-radius: 20px;
+      background:
+        linear-gradient(180deg, rgba(36, 25, 19, 0.08), rgba(36, 25, 19, 0.3)),
+        url("./assets/scores/level1-lian-gong-yu-fu-dian.png") center top / cover no-repeat;
+      border: 1px solid rgba(113, 77, 52, 0.14);
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      margin-bottom: 12px;
+      padding: 7px 12px;
+      border-radius: 999px;
+      background: rgba(123, 77, 45, 0.1);
+      color: var(--wood);
+      font-size: 13px;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+    }
+
+    h1 {
+      margin: 0 0 14px;
+      font-size: clamp(36px, 6vw, 62px);
+      line-height: 1.08;
+      text-wrap: balance;
+    }
+
+    h2 {
+      margin: 0 0 12px;
+      font-size: clamp(26px, 4vw, 38px);
+      line-height: 1.18;
+    }
+
+    h3 {
+      margin: 0 0 8px;
+      font-size: 22px;
+    }
+
+    p,
+    li {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.85;
+    }
+
+    .section {
+      margin-top: 18px;
+      padding: clamp(22px, 4vw, 34px);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .card {
+      padding: 20px;
+      border-radius: 18px;
+      border: 1px solid var(--line);
+      background: rgba(255, 252, 248, 0.9);
+    }
+
+    .card strong {
+      display: inline-flex;
+      margin-bottom: 8px;
+      color: var(--blue);
+      font-size: 14px;
+      font-weight: 900;
+      letter-spacing: 0.06em;
+    }
+
+    .data-table {
+      width: 100%;
+      margin-top: 14px;
+      border-collapse: collapse;
+      overflow: hidden;
+      border-radius: 18px;
+      background: rgba(255, 252, 248, 0.9);
+      box-shadow: 0 0 0 1px var(--line);
+    }
+
+    .data-table th,
+    .data-table td {
+      padding: 14px;
+      text-align: left;
+      vertical-align: top;
+      border-bottom: 1px solid var(--line);
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    .data-table th {
+      width: 180px;
+      color: var(--wood);
+      font-weight: 900;
+      background: rgba(123, 77, 45, 0.08);
+    }
+
+    .data-table tr:last-child th,
+    .data-table tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .notice {
+      margin-top: 16px;
+      padding: 16px;
+      border-radius: 16px;
+      border: 1px solid rgba(95, 120, 72, 0.18);
+      background: rgba(95, 120, 72, 0.1);
+      color: #4d643f;
+      font-weight: 800;
+      line-height: 1.8;
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 18px;
+    }
+
+    @media (max-width: 820px) {
+      .hero,
+      .grid {
+        grid-template-columns: 1fr;
+      }
+
+      .hero-visual {
+        min-height: 210px;
+      }
+
+      .data-table,
+      .data-table tbody,
+      .data-table tr,
+      .data-table th,
+      .data-table td {
+        display: block;
+        width: 100%;
+      }
+
+      .data-table th {
+        border-bottom: 0;
+      }
+    }
+  </style>
+<link rel="stylesheet" href="./erhu-refined.css?v=20260928" />
+<script src="./erhu-quality.js?v=20260928"></script>
+<link rel="stylesheet" href="./erhu-studio-ui.css?v=20260929-polish"><script defer src="./erhu-studio-ui.js?v=20260929-polish"></script></head>
+<body class="erhu-site">
+  <main class="shell">
+    <header class="topbar">
+      <div class="brand">二胡小教室</div>
+      <nav class="nav" aria-label="主要導覽">
+        <a href="./">回首頁</a>
+        <a href="./二胡小教室-比賽展示.html">比賽展示</a>
+        <a href="./二胡小教室.html#course-levels">課程分級</a>
+        <a href="./二胡小教室-AI音準評分.html?v=20260609v">音準跟譜</a>
+        <a href="./二胡小教室-AI錯音複習師.html?v=20260409a">級數回報</a>
+      </nav>
+    </header>
+
+    <section class="hero" aria-labelledby="pageTitle">
+      <div>
+        <span class="eyebrow">AI AND PRIVACY</span>
+        <h1 id="pageTitle">AI 使用與隱私說明</h1>
+        <p>這頁說明二胡小教室如何使用 AI、登入、麥克風與練習紀錄。核心原則是：音準練習先在瀏覽器端即時判斷，需要保存時才寫入學生帳號資料；AI 回饋是練習輔助，不宣稱等同正式考級評分。</p>
+        <div class="actions">
+          <a class="button" href="./二胡小教室-比賽展示.html">回比賽展示</a>
+          <a class="button" href="./二胡小教室.html#course-levels">進入課程</a>
+        </div>
+      </div>
+      <div class="hero-visual" aria-hidden="true"></div>
+    </section>
+
+    <section class="section" aria-labelledby="aiTitle">
+      <span class="eyebrow">HOW AI IS USED</span>
+      <h2 id="aiTitle">AI 功能範圍</h2>
+      <div class="grid">
+        <article class="card">
+          <strong>AI 助教</strong>
+          <h3>回答二胡學習問題</h3>
+          <p>使用者輸入問題後，由雲端函式呼叫 AI 產生回覆。適合技巧、曲目、節奏與練習方向詢問。</p>
+        </article>
+        <article class="card">
+          <strong>AI 練習規劃師</strong>
+          <h3>整理今天的練習流程</h3>
+          <p>依據使用者選擇的等級、級數、可練時間、弱點與練習狀態，生成可執行的練習順序。</p>
+        </article>
+        <article class="card">
+          <strong>AI 掃描譜</strong>
+          <h3>把圖片轉成可編輯譜面</h3>
+          <p>使用者上傳譜面圖片後，由 AI 辨識簡譜結構。使用者可以在譜面編輯器中修正後再保存。</p>
+        </article>
+        <article class="card">
+          <strong>AI 級數回報</strong>
+          <h3>把紀錄整理成學習建議</h3>
+          <p>系統讀取該使用者的打卡、測驗與音準紀錄，產生本級狀態、常見弱點與下一輪練習方向。</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="section" aria-labelledby="dataTitle">
+      <span class="eyebrow">DATA HANDLING</span>
+      <h2 id="dataTitle">資料如何處理</h2>
+      <table class="data-table">
+        <tbody>
+          <tr>
+            <th scope="row">登入資料</th>
+            <td>帳號由 Firebase Authentication 管理。新帳號使用顯示姓名、電子郵件及密碼；電子郵件用於登入和帳號復原。舊姓名帳號仍可使用。需要保存練習紀錄、譜面或回報時，網站會要求登入。</td>
+          </tr>
+          <tr>
+            <th scope="row">練習紀錄</th>
+            <td>打卡、測驗、音準跟譜結果與自訂譜資料會保存在 Firestore，並以使用者 UID 分開管理。</td>
+          </tr>
+          <tr>
+            <th scope="row">麥克風</th>
+            <td>AI 音準跟譜使用瀏覽器麥克風做即時音高偵測。音準判斷以當下音訊推算頻率與 cents 偏差，目的為練習回饋。</td>
+          </tr>
+          <tr>
+            <th scope="row">譜面圖片</th>
+            <td>按下掃描後，選取的譜面圖片會經雲端函式送至 OpenAI 辨識。原圖對照僅在目前頁面保留；雲端保存的是你確認保存的譜面資料。本次更新沒有建立訓練資料集，也不會自動把學生修譜提交模型訓練。辨識後請核對音符和記號，結果不保證完全正確。</td>
+          </tr>
+          <tr>
+            <th scope="row">權限限制</th>
+            <td>後端函式會驗證 Firebase ID token。Firestore 規則限制學生只能存取自己的資料，避免不同帳號互相讀寫。</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="notice">本網站不提供練習影片上傳、影片截圖分析或影片評分流程；AI 功能集中在掃描譜、練習規劃、音準跟譜與級數回報。</div>
+    </section>
+
+    <section class="section" aria-labelledby="limitsTitle">
+      <span class="eyebrow">LIMITATIONS</span>
+      <h2 id="limitsTitle">AI 與音準結果的限制</h2>
+      <div class="grid">
+        <article class="card">
+          <strong>AI 回覆</strong>
+          <h3>需要由老師或使用者判斷</h3>
+          <p>AI 可能受到輸入內容、譜面清晰度或上下文不足影響。重要曲目處理、正式檢定準備與演奏判斷仍應由老師確認。</p>
+        </article>
+        <article class="card">
+          <strong>音準偵測</strong>
+          <h3>會受環境與設備影響</h3>
+          <p>麥克風品質、背景噪音、音量、揉弦與二胡泛音都可能影響偵測。分數應用來找練習方向，不等同正式考級成績。</p>
+        </article>
+      </div>
+    </section>
+  </main>
+</body>
+</html>

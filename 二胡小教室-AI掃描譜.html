@@ -1,0 +1,910 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>二胡小教室 | AI 掃描譜</title>
+  <meta name="description" content="AI 掃描譜可將二胡簡譜圖片辨識成站內可編輯譜面，保存後可接到譜面編輯器與 AI 音準跟譜練習。" />
+  <link rel="canonical" href="https://erhu-auth.web.app/%E4%BA%8C%E8%83%A1%E5%B0%8F%E6%95%99%E5%AE%A4-AI%E6%8E%83%E6%8F%8F%E8%AD%9C.html" />
+  <link rel="manifest" href="./site.webmanifest" />
+  <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+  <meta property="og:type" content="website" />
+  <meta property="og:locale" content="zh_TW" />
+  <meta property="og:title" content="二胡小教室 | AI 掃描譜" />
+  <meta property="og:description" content="上傳簡譜圖片，AI 先轉成可編輯譜面，再接到跟譜音準練習。" />
+  <meta property="og:url" content="https://erhu-auth.web.app/%E4%BA%8C%E8%83%A1%E5%B0%8F%E6%95%99%E5%AE%A4-AI%E6%8E%83%E6%8F%8F%E8%AD%9C.html" />
+  <meta property="og:image" content="https://erhu-auth.web.app/assets/scores/level1-lian-gong-yu-fu-dian.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="stylesheet" href="./erhu-theme.css?v=20260327f" />
+  <style>
+    :root {
+      --ink: #1f1713;
+      --wood: #7d4b2b;
+      --muted: #756255;
+      --line: rgba(125, 75, 43, 0.12);
+      --card: rgba(255, 251, 244, 0.93);
+      --ok: #18794e;
+      --warn: #b54708;
+      --danger: #b42318;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+      background:
+        radial-gradient(circle at 12% 0%, rgba(255, 219, 145, 0.55), transparent 28%),
+        linear-gradient(180deg, #f7efe4 0%, #efe1cf 100%);
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    .shell {
+      width: min(1280px, calc(100% - 28px));
+      margin: 0 auto;
+      padding: 18px 0 34px;
+    }
+
+    .topbar,
+    .hero,
+    .panel {
+      border: 1px solid var(--line);
+      background: var(--card);
+      border-radius: 24px;
+      box-shadow: 0 18px 42px rgba(93, 57, 30, 0.08);
+      backdrop-filter: blur(10px);
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 14px;
+      padding: 16px 20px;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+    }
+
+    .brand {
+      font-size: 22px;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+    }
+
+    .nav {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      color: var(--muted);
+      font-weight: 800;
+    }
+
+    .hero,
+    .panel {
+      padding: 22px 24px;
+      margin-bottom: 14px;
+    }
+
+    .eyebrow {
+      color: var(--wood);
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: 0.18em;
+      margin-bottom: 10px;
+    }
+
+    .hero h1 {
+      margin: 0 0 8px;
+      font-size: clamp(30px, 5vw, 48px);
+    }
+
+    .hero p,
+    .muted {
+      color: var(--muted);
+      line-height: 1.8;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: minmax(0, 0.86fr) minmax(360px, 0.64fr);
+      gap: 14px;
+      align-items: start;
+    }
+
+    .field {
+      display: grid;
+      gap: 7px;
+      margin-bottom: 14px;
+    }
+
+    .field label {
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 900;
+      letter-spacing: 0.04em;
+    }
+
+    input,
+    textarea {
+      width: 100%;
+      border: 1px solid rgba(125, 75, 43, 0.18);
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.92);
+      color: var(--ink);
+      padding: 12px 13px;
+      font: inherit;
+    }
+
+    textarea {
+      min-height: 92px;
+      resize: vertical;
+      line-height: 1.65;
+    }
+
+    .upload-box {
+      border: 1px dashed rgba(125, 75, 43, 0.34);
+      border-radius: 20px;
+      padding: 18px;
+      background: rgba(255, 255, 255, 0.55);
+    }
+
+    .button-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 14px;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px 16px;
+      border: 0;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #ffd66b, #e7861d);
+      color: #4a2f18;
+      font-weight: 900;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .button.secondary {
+      background: rgba(125, 75, 43, 0.1);
+      color: var(--wood);
+    }
+
+    .button.danger {
+      background: rgba(180, 35, 24, 0.1);
+      color: var(--danger);
+    }
+
+    .button:disabled {
+      opacity: 0.48;
+      cursor: not-allowed;
+    }
+
+    .status {
+      margin-top: 12px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: rgba(24, 121, 78, 0.08);
+      color: var(--ok);
+      line-height: 1.75;
+    }
+
+    .status.warn {
+      background: rgba(181, 71, 8, 0.1);
+      color: var(--warn);
+    }
+
+    .status.error {
+      background: rgba(180, 35, 24, 0.1);
+      color: var(--danger);
+    }
+
+    .file-list,
+    .library-list,
+    .warning-list {
+      display: grid;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .file-pill,
+    .score-item,
+    .warning-item {
+      padding: 12px 14px;
+      border-radius: 16px;
+      background: rgba(255, 255, 255, 0.78);
+      border: 1px solid rgba(125, 75, 43, 0.08);
+      line-height: 1.7;
+    }
+
+    .score-item {
+      display: grid;
+      gap: 8px;
+    }
+
+    .score-item strong {
+      color: #382217;
+    }
+
+    .score-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .preview-card {
+      overflow: auto;
+      max-height: 660px;
+      padding: 16px;
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.9);
+      border: 1px solid rgba(125, 75, 43, 0.08);
+    }
+
+    .score-preview {
+      display: grid;
+      gap: 12px;
+      min-width: 760px;
+    }
+
+    .score-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      align-items: flex-start;
+      margin-bottom: 6px;
+      color: #473124;
+      font-weight: 900;
+      line-height: 1.7;
+    }
+
+    .score-title {
+      text-align: center;
+      font-size: 26px;
+      font-weight: 900;
+      color: #2f1c13;
+    }
+
+    .score-row {
+      display: flex;
+      gap: 8px;
+      align-items: stretch;
+    }
+
+    .score-prefix {
+      flex: 0 0 32px;
+      display: grid;
+      place-items: center;
+      white-space: pre-line;
+      font-weight: 900;
+      font-size: 22px;
+      color: #3b2418;
+    }
+
+    .measure-row {
+      flex: 1;
+      display: grid;
+      grid-template-columns: repeat(var(--measure-count, 1), minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .measure {
+      position: relative;
+      display: grid;
+      grid-template-columns: repeat(var(--unit-count, 8), minmax(0, 1fr));
+      grid-template-rows: 18px 18px auto;
+      gap: 4px;
+      min-height: 84px;
+      padding: 10px 8px;
+      border-right: 2px solid rgba(125, 75, 43, 0.18);
+    }
+
+    .cell {
+      grid-row: 3;
+      display: flex;
+      justify-content: center;
+      align-items: end;
+      font-size: 24px;
+      font-weight: 900;
+      color: #382217;
+    }
+
+    .jianpu-note {
+      display: inline-grid;
+      justify-items: center;
+      min-width: 18px;
+      line-height: 1;
+    }
+
+    .jianpu-high {
+      min-height: 10px;
+      font-size: 15px;
+      line-height: 0.85;
+    }
+
+    .jianpu-digit {
+      font-size: 24px;
+      line-height: 1;
+    }
+
+    .jianpu-low {
+      min-height: 8px;
+      font-size: 13px;
+      line-height: 0.7;
+    }
+
+    .jianpu-rhythm-dot {
+      margin-left: 2px;
+      align-self: end;
+      color: #25170f;
+      font-size: 28px;
+      font-weight: 950;
+      line-height: 0.8;
+      transform: translateY(-3px);
+    }
+
+    .jianpu-tail {
+      margin-left: 1px;
+      align-self: end;
+      font-size: 24px;
+      font-weight: 900;
+      line-height: 1;
+    }
+
+    .guide {
+      grid-row: 1;
+      justify-self: center;
+      font-size: 12px;
+      font-weight: 900;
+      color: #5a3822;
+      white-space: pre;
+    }
+
+    .marker {
+      position: absolute;
+      top: -4px;
+      left: 50%;
+      transform: translateX(-50%);
+      color: var(--wood);
+      font-size: 11px;
+      font-weight: 900;
+    }
+
+    .empty {
+      padding: 18px;
+      border-radius: 18px;
+      background: rgba(125, 75, 43, 0.07);
+      color: var(--muted);
+      line-height: 1.8;
+    }
+
+    @media (max-width: 960px) {
+      .grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+<link rel="stylesheet" href="./erhu-refined.css?v=20260928" />
+<script src="./erhu-quality.js?v=20260928"></script>
+<script src="./score-renderer.js?v=20260929-layout"></script><link rel="stylesheet" href="./erhu-studio-ui.css?v=20260929-polish"><script defer src="./erhu-studio-ui.js?v=20260929-polish"></script><style>
+body.studio-redesign[data-studio-page="scan"] main > .grid {
+  grid-template-columns: minmax(0, 1fr) !important;
+  width: 100%; max-width: 1200px; margin-inline: auto;
+}
+body.studio-redesign[data-studio-page="scan"] main > .grid > .panel {
+  width: 100%; max-width: 860px; box-sizing: border-box; justify-self: center;
+}
+/* Keep both the source and the transcription in the normal page flow. */
+body.studio-redesign[data-studio-page="scan"] .preview-card {
+  max-height: none; overflow: visible; min-width: 0;
+}
+body.studio-redesign[data-studio-page="scan"] #sourceImages {
+  display: grid; gap: 20px; max-height: none; overflow: visible; min-width: 0;
+}
+body.studio-redesign[data-studio-page="scan"] #sourceImages img {
+  display: block; width: 100%; height: auto; max-height: none;
+}
+body.studio-redesign[data-studio-page="scan"] #previewBox {
+  min-width: 0; max-width: 100%; box-sizing: border-box; color: #36271d;
+}
+body.studio-redesign[data-studio-page="scan"] .engraved-row { overflow: visible; }
+body.studio-redesign[data-studio-page="scan"] .engraved-row svg {
+  min-width: 0 !important; max-width: 100%; height: auto; max-height: none !important;
+}
+#scanResultHeading { margin: 28px 0 14px; color: #493327; }
+#scanReview label { display: flex; align-items: start; gap: 10px; color: #493327; }
+#scanReview input { width: 18px; height: 18px; flex: 0 0 18px; margin: 4px 0; accent-color: #785238; }
+#scanSaveActions { border-top: 1px solid #dbc7b1; padding-top: 18px; }
+</style></head>
+<body class="erhu-site">
+  <main class="shell">
+    <header class="topbar">
+      <div class="brand">二胡小教室</div>
+      <nav class="nav">
+        <a href="./">回首頁</a>
+        <a href="./二胡小教室-譜面編輯器.html">譜面編輯器</a>
+        <a href="./二胡小教室-AI音準評分.html?v=20260609v">AI 跟譜</a>
+        <a href="./二胡小教室.html#course-levels">課程分級</a>
+      </nav>
+      <a class="tuner-shortcut" href="./二胡小教室-調音器.html">調音器</a>
+    </header>
+
+    <section class="hero">
+      <div class="eyebrow">AI SCORE SCANNER</div>
+      <h1>AI 掃描譜</h1>
+      <p>上傳簡譜圖片，辨識後對照原圖確認，再保存或編輯。</p>
+    </section>
+
+    <section class="grid">
+      <section class="panel">
+        <div class="eyebrow">UPLOAD</div>
+        <h2>上傳譜面圖片</h2>
+        <div class="field">
+          <label for="titleInput">曲名</label>
+          <input id="titleInput" type="text" placeholder="例如：田園春色、賽馬、自己的練習曲" />
+        </div>
+        <div class="field">
+          <label for="notesInput">補充給 AI 的資訊</label>
+          <textarea id="notesInput" placeholder="例如：1=D，4/4，請先辨識主旋律，請保留指法與連弓，看不清楚的記號請標示位置。"></textarea>
+        </div>
+        <div class="upload-box">
+          <div class="field">
+            <label for="imageInput">譜面截圖或照片，最多 4 張</label>
+            <input id="imageInput" type="file" accept="image/png,image/jpeg,image/webp" multiple />
+          </div>
+          <div class="muted">請上傳清晰、平整的簡譜。辨識後需核對音符、節奏與記號。</div>
+          <div class="file-list" id="fileList"></div>
+        </div>
+        <div class="button-row">
+          <button class="button" id="scanButton" type="button">開始 AI 掃描</button>
+
+        </div>
+        <div class="status" id="statusBox">請先選圖片，再開始 AI 掃描。</div>
+      </section>
+
+      <aside class="panel">
+        <div class="eyebrow">MY SCORES</div>
+        <h2>我的掃描譜</h2>
+        <div class="library-list" id="libraryList">
+          <div class="empty">登入後會顯示你保存過的自訂譜。</div>
+        </div>
+      </aside>
+    </section>
+
+    <section class="panel">
+      <div class="eyebrow">PREVIEW</div>
+      <h2>掃描預覽</h2>
+      <div class="preview-card">
+        <h3 id="scanResultHeading">辨識結果</h3>
+        <div id="previewBox" class="empty">掃描完成後，這裡會先顯示 AI 辨識出的簡譜。保存後再去編輯器修細節。</div>
+      </div>
+      <div class="warning-list" id="warningList"></div>
+      <div id="scanReview" hidden><label><input type="checkbox" id="reviewedScore">我已對照原譜，確認音符、節奏及記號</label></div>
+      <p class="muted">先對照上方原譜與辨識結果；需要修正時，可保存草稿後進入編輯器。</p>
+      <div class="button-row" id="scanSaveActions">
+        <button class="button secondary" id="saveButton" type="button" disabled>保存成我的譜</button>
+        <a class="button secondary" id="editLink" href="#" hidden>到編輯器細修</a>
+        <a class="button secondary" id="pitchLink" href="#" hidden>到 AI 跟譜練習</a>
+      </div>
+    </section>
+  </main>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+  <script src="./firebase-init.js?v=20260929scan"></script>
+  <script src="./auth.js?v=20260928"></script>
+  <script>
+    window.ErhuAuth.requireAuth();
+    window.ErhuAuth.attachAuthUI();
+
+    const titleInput = document.getElementById("titleInput");
+    const notesInput = document.getElementById("notesInput");
+    const imageInput = document.getElementById("imageInput");
+    const fileList = document.getElementById("fileList");
+    const scanButton = document.getElementById("scanButton");
+    const saveButton = document.getElementById("saveButton");
+    const editLink = document.getElementById("editLink");
+    const pitchLink = document.getElementById("pitchLink");
+    const statusBox = document.getElementById("statusBox");
+    const previewBox = document.getElementById("previewBox");
+    const warningList = document.getElementById("warningList");
+    const libraryList = document.getElementById("libraryList");
+
+    const originalPanel=document.createElement("section");originalPanel.className="source-comparison";
+    originalPanel.innerHTML='<h3>原譜對照</h3><p>保留原圖供逐行核對。原圖僅留在此頁，不會隨保存上傳；重新開啟時可再次選圖。</p><div id="sourceImages"></div>';
+    document.getElementById("scanResultHeading").before(originalPanel);
+    titleInput.value=new URLSearchParams(location.search).get("title")||"";
+
+    let currentUser = null;
+    let selectedFiles = [];
+    let scannedScore = null;
+    let savedScoreId = "";
+
+    function setStatus(text, mode) {
+      statusBox.textContent = text;
+      statusBox.className = "status" + (mode ? " " + mode : "");
+    }
+
+    function customScoreCollection() {
+      return window.ErhuFirebase.db.collection("students").doc(currentUser.uid).collection("customScores");
+    }
+
+    function customScoreLinks(scoreId) {
+      return {
+        edit: "./二胡小教室-譜面編輯器.html?customScoreId=" + encodeURIComponent(scoreId),
+        pitch: "./二胡小教室-AI音準評分.html?practice=custom&customScoreId=" + encodeURIComponent(scoreId)
+      };
+    }
+
+    function drawCanvasToFit(sourceCanvas, width, height) {
+      const canvas = document.createElement("canvas");
+      canvas.width = width;
+      canvas.height = height;
+      const context = canvas.getContext("2d");
+      context.fillStyle = "#ffffff";
+      context.fillRect(0, 0, width, height);
+      context.drawImage(sourceCanvas, 0, 0, width, height);
+      return canvas;
+    }
+
+    function canvasToScanDataUrl(sourceCanvas) {
+      const maxChars = 1_200_000;
+      let canvas = sourceCanvas;
+      let quality = 0.94;
+      let dataUrl = canvas.toDataURL("image/png");
+      if (dataUrl.length > maxChars) dataUrl = canvas.toDataURL("image/jpeg", quality);
+      while (dataUrl.length > maxChars && quality > 0.82) {
+        quality -= 0.04;
+        dataUrl = canvas.toDataURL("image/jpeg", quality);
+      }
+      while (dataUrl.length > maxChars && canvas.width > 1800) {
+        const nextWidth = Math.max(1800, Math.round(canvas.width * 0.86));
+        const nextHeight = Math.max(240, Math.round(canvas.height * (nextWidth / canvas.width)));
+        canvas = drawCanvasToFit(canvas, nextWidth, nextHeight);
+        quality = 0.90;
+        dataUrl = canvas.toDataURL("image/jpeg", quality);
+      }
+      if (dataUrl.length > maxChars) throw new Error("圖片過於複雜，請裁成清楚的單行或半頁後重試，以保留細小記號。");
+      return dataUrl;
+    }
+
+    function fileToImageDataUrls(file, maxChunks) {
+      return new Promise(function (resolve, reject) {
+        const reader = new FileReader();
+        reader.onerror = function () { reject(new Error("read-file-failed")); };
+        reader.onload = function () {
+          const image = new Image();
+          image.onerror = function () { reject(new Error("load-image-failed")); };
+          image.onload = function () {
+            try {
+            const scale = Math.min(1, 2400 / image.width, 10000 / image.height);
+            const scaledWidth = Math.max(1, Math.round(image.width * scale));
+            const scaledHeight = Math.max(1, Math.round(image.height * scale));
+            const sourceCanvas = document.createElement("canvas");
+            sourceCanvas.width = scaledWidth;
+            sourceCanvas.height = scaledHeight;
+            const sourceContext = sourceCanvas.getContext("2d");
+            sourceContext.fillStyle = "#ffffff";
+            sourceContext.fillRect(0, 0, scaledWidth, scaledHeight);
+            sourceContext.drawImage(image, 0, 0, scaledWidth, scaledHeight);
+
+            const chunkCount = Math.max(1, Math.min((maxChunks || 6) - 1, Math.ceil(scaledHeight / 850)));
+            const overlap = chunkCount > 1 ? Math.round(scaledHeight * 0.06) : 0;
+            const chunkHeight = Math.ceil(scaledHeight / chunkCount);
+            // Full-page context preserves row/bar boundaries before detail crops.
+            const chunks = [canvasToScanDataUrl(sourceCanvas)];
+            for (let chunkIndex = 0; chunkIndex < chunkCount; chunkIndex += 1) {
+              const y = Math.max(0, chunkIndex * chunkHeight - overlap);
+              const bottom = Math.min(scaledHeight, (chunkIndex + 1) * chunkHeight + overlap);
+              const height = Math.max(1, bottom - y);
+              const canvas = document.createElement("canvas");
+              canvas.width = scaledWidth;
+              canvas.height = height;
+              canvas.getContext("2d").drawImage(sourceCanvas, 0, y, scaledWidth, height, 0, 0, scaledWidth, height);
+              chunks.push(canvasToScanDataUrl(canvas));
+            }
+            resolve(chunkCount === 1 ? chunks.slice(0, 1) : chunks);
+            } catch(error) { reject(error); }
+          };
+          image.src = reader.result;
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    let sourceUrls=[];
+    function renderFiles() {
+      sourceUrls.forEach(url=>URL.revokeObjectURL(url)); sourceUrls=[];
+      document.getElementById("sourceImages").replaceChildren();
+      fileList.innerHTML = "";
+      if (!selectedFiles.length) {
+        return;
+      }
+      selectedFiles.forEach(function (file, index) {
+        const item = document.createElement("div");
+        item.className = "file-pill";
+        item.textContent = "第 " + (index + 1) + " 張｜" + file.name + "｜" + Math.round(file.size / 1024) + " KB";
+        fileList.appendChild(item);
+        const source=document.createElement("img"); source.src=URL.createObjectURL(file); sourceUrls.push(source.src);source.alt="原譜第 "+(index+1)+" 頁："+file.name;source.loading="lazy";
+        document.getElementById("sourceImages").appendChild(source);
+      });
+    }
+
+    function renderSpan(measure, cells, starts, spans) {
+      (spans || []).forEach(function (span) {
+        if (!Array.isArray(span) || !span[2]) return;
+        const start = Math.max(0, Math.min(cells.length - 1, Number(span[0]) || 0));
+        const end = Math.max(start, Math.min(cells.length - 1, Number(span[1]) || start));
+        const guide = document.createElement("div");
+        guide.className = "guide";
+        guide.style.gridColumn = (starts[start] + 1) + " / " + (starts[end] + cells[end].units + 1);
+        guide.textContent = span[2];
+        measure.appendChild(guide);
+      });
+    }
+
+    function renderJianpuLabel(label) {
+      const matched = String(label || "").match(/^([1-7])('+)?(,*)?(\.)?(.*)$/);
+      if (!matched) {
+        return String(label || "");
+      }
+      const highDots = (matched[2] || "").length;
+      const lowDots = (matched[3] || "").length;
+      const rhythmDot = matched[4] || "";
+      const tail = matched[5] || "";
+      return (
+        "<span class=\"jianpu-note\">" +
+          "<span class=\"jianpu-high\">" + (highDots ? "●".repeat(highDots) : "") + "</span>" +
+          "<span class=\"jianpu-digit\">" + matched[1] + "</span>" +
+          "<span class=\"jianpu-low\">" + (lowDots ? "●".repeat(lowDots) : "") + "</span>" +
+        "</span>" +
+        (rhythmDot ? "<span class=\"jianpu-rhythm-dot\">.</span>" : "") +
+        (tail ? "<span class=\"jianpu-tail\">" + tail + "</span>" : "")
+      );
+    }
+
+    function renderPreview(score) {
+      return ErhuScoreRenderer.render(score, previewBox);
+    }
+
+    function renderWarnings(warnings) {
+      warningList.innerHTML = "";
+      (warnings || []).forEach(function (warning) {
+        const item = document.createElement("div");
+        item.className = "warning-item";
+        item.textContent = warning;
+        warningList.appendChild(item);
+      });
+    }
+
+    async function scanScore() {
+      if (!currentUser) {
+        setStatus("請先登入。", "error");
+        return;
+      }
+      if (!selectedFiles.length) {
+        setStatus("請先選擇譜面圖片。", "warn");
+        return;
+      }
+      scanButton.disabled = true;
+      imageInput.disabled = true;
+      saveButton.disabled = true;
+      editLink.hidden = true;
+      pitchLink.hidden = true;
+      setStatus("正在切分譜面圖片並送 AI 掃描，可能需要 1 到 3 分鐘。");
+      let requestTimer = null;
+      try {
+        const pageResults = [];
+        const allWarnings = [];
+        const originalScores = [];
+        for (let pageIndex=0; pageIndex<selectedFiles.length; pageIndex++) {
+          const images = await fileToImageDataUrls(selectedFiles[pageIndex], 6);
+          setStatus("正在辨識第 " + (pageIndex+1) + " / " + selectedFiles.length + " 頁：先核對譜行與小節，再逐行辨識音符與連弓。整頁需要較久，請保留此頁。");
+          const idToken = await window.ErhuFirebase.auth.currentUser.getIdToken();
+          const payloadText=JSON.stringify({ title:titleInput.value.trim(), notes:
+            "忠實轉錄本頁，依原圖順序保留所有譜行、小節、休止、延音、減時線、附點、高低八度點、連弓、弓法、指法、反覆與表情。區塊有重疊，不要重複轉錄。看不清楚用 ? 並列出位置，禁止猜音或補齊小節。四分音符 units=4。" + notesInput.value.trim(),
+            page:pageIndex+1, images, imageLayout:"overview-first", schemaVersion:3 });
+          if(payloadText.length>8_000_000) throw Error("此頁圖片資料太大，請裁成半頁後重試。");
+          const controller=new AbortController();
+          requestTimer=setTimeout(()=>controller.abort(),300000);
+          const response=await fetch(window.ErhuFirebase.scanScoreUrl,{method:"POST",headers:{"Content-Type":"application/json","Authorization":"Bearer "+idToken},body:payloadText,signal:controller.signal});
+          clearTimeout(requestTimer);requestTimer=null;
+          let data; try {data=await response.json();} catch {throw Error("伺服器回覆格式有誤，請稍後重試。");}
+          if(!response.ok || !data.score)throw Error(data.message||"第 "+(pageIndex+1)+" 頁辨識失敗，請重試。");
+          if(!/^20260929-scan-/.test(data.score.scanVersion || "")) throw Error("掃描服務尚未更新，請先部署新版掃描 Functions，再重新掃描。");
+          const validation=ErhuQuality.validateScore(data.score);
+          allWarnings.push(...(data.warnings||[]).map(w=>"第 "+(pageIndex+1)+" 頁："+w), ...validation.warnings.map(w=>"第 "+(pageIndex+1)+" 頁："+w));
+          originalScores.push(data.score);
+          pageResults.push(...data.score.rows.map(row=>({...row,sourcePage:pageIndex+1})));
+        }
+        const data={score:{...originalScores[0],rows:pageResults,scanVersion:originalScores[0].scanVersion,reviewed:false},warnings:allWarnings};
+        scannedScore = data.score;
+        savedScoreId = "";
+        if (!titleInput.value.trim()) {
+          titleInput.value = scannedScore.title || "";
+        }
+        renderPreview(scannedScore);
+        document.getElementById("scanReview").hidden=false;
+        document.getElementById("reviewedScore").checked=false;
+        renderWarnings(data.warnings || []);
+        saveButton.disabled = false;
+        setStatus("已完成辨識草稿，共 " + pageResults.length + " 行。請對照原圖，黃色音符與警示需要確認；尚未確認前請先保存並編輯。");
+      } catch (error) {
+        console.error("scan score failed", error);
+        const errorText = error && error.message ? error.message : "unknown-error";
+        const message = /abort/i.test(errorText) || (error && error.name === "AbortError")
+          ? "AI 掃描逾時。請先裁掉空白邊、保留譜面本體後再掃一次。"
+          : errorText;
+        setStatus("AI 掃描失敗：" + message, "error");
+      } finally {
+        if (requestTimer) {
+          clearTimeout(requestTimer);
+        }
+        scanButton.disabled = false;
+        imageInput.disabled = false;
+      }
+    }
+
+    async function saveScore() {
+      if (!currentUser || !scannedScore) return;
+      saveButton.disabled = true;
+      setStatus("正在保存到你的自訂譜。");
+      try {
+        scannedScore.reviewed = document.getElementById("reviewedScore").checked;
+        scannedScore.title = titleInput.value.trim() || scannedScore.title || "自訂練習譜";
+        if (scannedScore.header) {
+          scannedScore.header.title = scannedScore.title;
+        }
+        const payload = {
+          title: scannedScore.title,
+          searchTitle: scannedScore.title.replace(/\s+/g, "").toLowerCase(),
+          scoreDataJson: window.ErhuScoreStorage.write(scannedScore),
+          source: "ai-scan",
+          reviewStatus: scannedScore.reviewed ? "reviewed" : "needs-review",
+          scanVersion: scannedScore.scanVersion,
+          imageCount: selectedFiles.length,
+          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        };
+        if (savedScoreId) {
+          payload.scoreData = firebase.firestore.FieldValue.delete();
+          await customScoreCollection().doc(savedScoreId).set(payload, { merge: true });
+        } else {
+          payload.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+          const doc = await customScoreCollection().add(payload);
+          savedScoreId = doc.id;
+        }
+        const links = customScoreLinks(savedScoreId);
+        editLink.href = links.edit;
+        pitchLink.href = links.pitch;
+        editLink.hidden = false;
+        pitchLink.hidden = !scannedScore.reviewed;
+        setStatus("已保存成你的譜。可以進編輯器細修，或直接到 AI 跟譜練習。");
+        await loadLibrary();
+      } catch (error) {
+        console.error("save custom score failed", error);
+        setStatus("保存失敗：" + (error && error.message ? error.message : "unknown-error"), "error");
+        saveButton.disabled = false;
+      }
+    }
+
+    async function loadLibrary() {
+      if (!currentUser) return;
+      try {
+        const snapshot = await customScoreCollection().orderBy("updatedAt", "desc").limit(12).get();
+        if (snapshot.empty) {
+          libraryList.innerHTML = "<div class=\"empty\">還沒有保存過的自訂譜。先在左邊上傳圖片掃描。</div>";
+          return;
+        }
+        libraryList.innerHTML = "";
+        snapshot.forEach(function (doc) {
+          const data = doc.data() || {};
+          const links = customScoreLinks(doc.id);
+          const title = data.title || "未命名自訂譜";
+          const item = document.createElement("div");
+          item.className = "score-item";
+
+          const titleNode = document.createElement("strong");
+          titleNode.textContent = title;
+
+          const metaNode = document.createElement("div");
+          metaNode.className = "muted";
+          metaNode.textContent = ErhuQuality.date(data.updatedAt) + "｜" + (data.reviewStatus === "reviewed" ? "已確認" : "待核對") + "｜來源：" + (data.source === "ai-scan" ? "AI 掃描" : "自訂") + "｜可進編輯器細修，也可直接跟譜。";
+
+          const actions = document.createElement("div");
+          actions.className = "score-actions";
+
+          const editAnchor = document.createElement("a");
+          editAnchor.className = "button secondary";
+          editAnchor.href = links.edit;
+          editAnchor.textContent = "編輯";
+
+          const pitchAnchor = document.createElement("a");
+          pitchAnchor.className = "button secondary";
+          pitchAnchor.href = links.pitch;
+          pitchAnchor.textContent = "AI 跟譜";
+
+          const deleteButton = document.createElement("button");
+          deleteButton.className = "button secondary danger";
+          deleteButton.type = "button";
+          deleteButton.textContent = "刪除譜";
+          deleteButton.addEventListener("click", function () {
+            deleteScore(doc.id, title, deleteButton);
+          });
+
+          actions.appendChild(editAnchor);
+          if(data.reviewStatus === "reviewed") actions.appendChild(pitchAnchor);
+          actions.appendChild(deleteButton);
+          item.appendChild(titleNode);
+          item.appendChild(metaNode);
+          item.appendChild(actions);
+          libraryList.appendChild(item);
+        });
+      } catch (error) {
+        console.error("load custom scores failed", error);
+        libraryList.innerHTML = "<div class=\"empty\">讀取自訂譜失敗，請稍後再試。</div>";
+      }
+    }
+
+    async function deleteScore(scoreId, title, button) {
+      if (!currentUser || !scoreId) return;
+      const confirmed = window.confirm("確定要刪除「" + title + "」嗎？刪除後這份譜會從我的掃描譜移除。");
+      if (!confirmed) return;
+      if (button) {
+        button.disabled = true;
+        button.textContent = "刪除中";
+      }
+      setStatus("正在刪除「" + title + "」。");
+      try {
+        await customScoreCollection().doc(scoreId).delete();
+        if (savedScoreId === scoreId) {
+          savedScoreId = "";
+          editLink.hidden = true;
+          pitchLink.hidden = true;
+          saveButton.disabled = !scannedScore;
+        }
+        setStatus("已刪除「" + title + "」。");
+        await loadLibrary();
+      } catch (error) {
+        console.error("delete custom score failed", error);
+        setStatus("刪除失敗：" + (error && error.message ? error.message : "unknown-error"), "error");
+        if (button) {
+          button.disabled = false;
+          button.textContent = "刪除譜";
+        }
+      }
+    }
+
+    imageInput.addEventListener("change", function (event) {
+      const files=Array.from(event.target.files||[]);
+      if(files.length>4 || files.some(file=>!/^image\/(png|jpeg|webp)$/.test(file.type)||file.size>20*1024*1024)) {
+        imageInput.value=""; setStatus("每次最多 4 頁，支援 PNG、JPEG、WebP，每張不超過 20 MB。請重新選擇。","error"); return;
+      }
+      selectedFiles=files;
+      scannedScore = null;
+      savedScoreId = "";
+      saveButton.disabled = true;
+      editLink.hidden = true;
+      pitchLink.hidden = true;
+      renderFiles();
+      previewBox.textContent="選好原譜，開始辨識後會在這裡顯示結果。"; warningList.replaceChildren(); document.getElementById("scanReview").hidden=true;
+      setStatus(selectedFiles.length ? "已選擇 " + selectedFiles.length + " 張圖片，可以開始 AI 掃描。" : "請先選擇譜面圖片。");
+    });
+
+    scanButton.addEventListener("click", scanScore);
+    saveButton.addEventListener("click", saveScore);
+
+    window.ErhuAuth.onReady(async function (user) {
+      currentUser = user;
+      await loadLibrary();
+    });
+  </script>
+</body>
+</html>

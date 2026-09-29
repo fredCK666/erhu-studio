@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>二胡小教室 | TAECT 2026 作品展示版</title>
+  <meta name="description" content="TAECT 2026 作品展示版整理二胡小教室的作品定位、AI 學習流程、音準跟譜技術、展示流程與資料安全說明。" />
+  <meta name="theme-color" content="#f4eadc" />
+  <link rel="canonical" href="https://erhu-auth.web.app/二胡小教室-比賽展示.html" />
+  <link rel="manifest" href="./site.webmanifest" />
+  <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+  <meta property="og:type" content="website" />
+  <meta property="og:locale" content="zh_TW" />
+  <meta property="og:title" content="二胡小教室 | TAECT 2026 作品展示版" />
+  <meta property="og:description" content="從掃描譜、譜面編輯、AI 音準跟譜到級數回報，展示二胡考級檢定訓練平台如何協助學生練習。" />
+  <meta property="og:url" content="https://erhu-auth.web.app/二胡小教室-比賽展示.html" />
+  <meta property="og:image" content="https://erhu-auth.web.app/assets/scores/level1-lian-gong-yu-fu-dian.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="stylesheet" href="./erhu-theme.css?v=20260327f" />
+  <style>
+    :root {
+      --ink: #231812;
+      --muted: #6a5a4e;
+      --wood: #7b4d2d;
+      --paper: #fffaf4;
+      --line: rgba(113, 77, 52, 0.14);
+      --gold: #d99a33;
+      --green: #607b4b;
+      --red: #bb6049;
+      --blue: #386b86;
+      --shadow: 0 22px 54px rgba(56, 36, 22, 0.12);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+      background:
+        radial-gradient(circle at 8% 0%, rgba(217, 154, 51, 0.22), transparent 20%),
+        radial-gradient(circle at 92% 18%, rgba(96, 123, 75, 0.16), transparent 18%),
+        linear-gradient(180deg, #f4eadc 0%, #fbf7ef 42%, #ead9c7 100%);
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    .shell {
+      width: min(1180px, calc(100% - 28px));
+      margin: 0 auto;
+      padding: 24px 0 44px;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-bottom: 16px;
+      padding: 14px 18px;
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      background: rgba(255, 250, 244, 0.9);
+      box-shadow: 0 14px 34px rgba(56, 36, 22, 0.08);
+    }
+
+    .brand {
+      color: #3d2516;
+      font-size: 21px;
+      font-weight: 900;
+      letter-spacing: 0.12em;
+      white-space: nowrap;
+    }
+
+    .nav {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .nav a,
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 40px;
+      padding: 9px 14px;
+      border-radius: 999px;
+      border: 1px solid rgba(100, 67, 47, 0.12);
+      background: rgba(255, 252, 248, 0.92);
+      color: #5d4130;
+      font-weight: 900;
+      font-size: 14px;
+    }
+
+    .button.primary {
+      background: linear-gradient(135deg, #d9a143, #af6931);
+      color: #fffaf5;
+      border-color: transparent;
+      box-shadow: 0 14px 28px rgba(124, 77, 44, 0.2);
+    }
+
+    .hero {
+      position: relative;
+      overflow: hidden;
+      min-height: min(620px, calc(100vh - 96px));
+      display: grid;
+      align-items: end;
+      padding: clamp(34px, 7vw, 74px);
+      border-radius: 34px;
+      color: #fffaf5;
+      background:
+        linear-gradient(180deg, rgba(33, 22, 15, 0.24), rgba(33, 22, 15, 0.88)),
+        url("./assets/scores/level1-lian-gong-yu-fu-dian.png") center top / cover no-repeat;
+      box-shadow: var(--shadow);
+    }
+
+    .hero-content {
+      max-width: 850px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      margin-bottom: 14px;
+      padding: 7px 12px;
+      border-radius: 999px;
+      background: rgba(255, 250, 244, 0.16);
+      color: #ffe0a6;
+      font-size: 13px;
+      font-weight: 900;
+      letter-spacing: 0.1em;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(44px, 7vw, 82px);
+      line-height: 1.04;
+      text-wrap: balance;
+    }
+
+    h2 {
+      margin: 0 0 12px;
+      font-size: clamp(28px, 4vw, 44px);
+      line-height: 1.16;
+      text-wrap: balance;
+    }
+
+    h3 {
+      margin: 0 0 10px;
+      font-size: 22px;
+      line-height: 1.28;
+    }
+
+    p,
+    li {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.85;
+    }
+
+    .hero p {
+      max-width: 770px;
+      margin-top: 16px;
+      color: rgba(255, 247, 238, 0.94);
+      font-size: clamp(17px, 2.3vw, 23px);
+    }
+
+    .hero-actions {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 24px;
+    }
+
+    .hero .button {
+      min-height: 48px;
+      padding: 12px 18px;
+    }
+
+    .hero .button:not(.primary) {
+      background: rgba(255, 250, 244, 0.16);
+      color: #fffaf5;
+      border-color: rgba(255, 250, 244, 0.24);
+    }
+
+    .band {
+      margin-top: 18px;
+      padding: clamp(24px, 4vw, 36px);
+      border-top: 1px solid var(--line);
+    }
+
+    .band.surface {
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      background: rgba(255, 250, 244, 0.9);
+      box-shadow: var(--shadow);
+    }
+
+    .section-head {
+      max-width: 760px;
+      margin-bottom: 18px;
+    }
+
+    .section-head .eyebrow {
+      background: rgba(123, 77, 45, 0.1);
+      color: var(--wood);
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .grid.two {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .card {
+      min-height: 100%;
+      padding: 20px;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      background: rgba(255, 252, 248, 0.9);
+      box-shadow: 0 12px 26px rgba(56, 36, 22, 0.06);
+    }
+
+    .card strong {
+      display: inline-flex;
+      margin-bottom: 8px;
+      color: var(--wood);
+      font-size: 14px;
+      font-weight: 900;
+      letter-spacing: 0.06em;
+    }
+
+    .step-list {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 10px;
+      counter-reset: step;
+    }
+
+    .step {
+      counter-increment: step;
+      position: relative;
+      min-height: 172px;
+      padding: 48px 16px 16px;
+      border-radius: 18px;
+      border: 1px solid rgba(113, 77, 52, 0.12);
+      background: linear-gradient(180deg, rgba(255, 252, 248, 0.96), rgba(246, 235, 222, 0.9));
+    }
+
+    .step::before {
+      content: counter(step);
+      position: absolute;
+      top: 14px;
+      left: 14px;
+      width: 28px;
+      height: 28px;
+      display: grid;
+      place-items: center;
+      border-radius: 999px;
+      background: #3d2516;
+      color: #fffaf5;
+      font-weight: 900;
+      font-size: 14px;
+    }
+
+    .metric-row {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 14px;
+    }
+
+    .metric {
+      padding: 18px;
+      border-radius: 18px;
+      background: #f7efe3;
+      border: 1px solid rgba(113, 77, 52, 0.12);
+    }
+
+    .metric b {
+      display: block;
+      color: var(--ink);
+      font-size: clamp(26px, 4vw, 42px);
+      line-height: 1;
+    }
+
+    .metric span {
+      display: block;
+      margin-top: 8px;
+      color: var(--muted);
+      font-weight: 800;
+    }
+
+    .submission-summary {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .summary-item {
+      padding: 16px;
+      border-radius: 16px;
+      background: rgba(255, 252, 248, 0.9);
+      border: 1px solid rgba(113, 77, 52, 0.12);
+    }
+
+    .summary-item span {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--blue);
+      font-size: 13px;
+      font-weight: 900;
+      letter-spacing: 0.06em;
+    }
+
+    .summary-item strong {
+      display: block;
+      color: var(--ink);
+      font-size: 18px;
+      line-height: 1.45;
+    }
+
+    .demo-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .demo-card {
+      display: grid;
+      gap: 12px;
+      padding: 18px;
+      border-radius: 18px;
+      border: 1px solid rgba(113, 77, 52, 0.12);
+      background: rgba(255, 252, 248, 0.92);
+      box-shadow: 0 12px 26px rgba(56, 36, 22, 0.06);
+    }
+
+    .demo-card strong {
+      color: var(--wood);
+      font-size: 14px;
+      font-weight: 900;
+      letter-spacing: 0.06em;
+    }
+
+    .demo-screen {
+      min-height: 138px;
+      padding: 14px;
+      border-radius: 16px;
+      background: linear-gradient(180deg, #fffaf4, #f2e4d2);
+      border: 1px solid rgba(113, 77, 52, 0.12);
+    }
+
+    .demo-score-lines,
+    .demo-report-lines {
+      display: grid;
+      gap: 8px;
+    }
+
+    .demo-score-lines span,
+    .demo-report-lines span {
+      display: block;
+      height: 12px;
+      border-radius: 999px;
+      background: rgba(123, 77, 45, 0.18);
+    }
+
+    .demo-score-lines span:nth-child(2),
+    .demo-report-lines span:nth-child(2) {
+      width: 82%;
+      background: rgba(56, 107, 134, 0.22);
+    }
+
+    .demo-score-lines span:nth-child(3),
+    .demo-report-lines span:nth-child(3) {
+      width: 64%;
+      background: rgba(96, 123, 75, 0.22);
+    }
+
+    .demo-pitch {
+      display: grid;
+      gap: 10px;
+      margin-top: 4px;
+    }
+
+    .demo-pitch span {
+      display: grid;
+      grid-template-columns: 52px minmax(0, 1fr);
+      gap: 8px;
+      align-items: center;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 900;
+    }
+
+    .demo-pitch i {
+      display: block;
+      height: 10px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, #607b4b, #d99a33);
+    }
+
+    .demo-pitch span:nth-child(2) i { width: 74%; }
+    .demo-pitch span:nth-child(3) i { width: 56%; }
+
+    .demo-chip-row {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .demo-chip-row span {
+      display: inline-flex;
+      padding: 7px 9px;
+      border-radius: 999px;
+      background: rgba(96, 123, 75, 0.12);
+      color: #50673f;
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .architecture-flow {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 10px;
+      align-items: stretch;
+    }
+
+    .arch-node {
+      display: grid;
+      align-content: center;
+      min-height: 118px;
+      padding: 16px;
+      border-radius: 18px;
+      border: 1px solid rgba(113, 77, 52, 0.12);
+      background: rgba(255, 252, 248, 0.92);
+    }
+
+    .arch-node span {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--blue);
+      font-size: 13px;
+      font-weight: 900;
+      letter-spacing: 0.06em;
+    }
+
+    .arch-node strong {
+      display: block;
+      color: var(--ink);
+      font-size: 17px;
+      line-height: 1.45;
+    }
+
+    .workflow {
+      display: grid;
+      grid-template-columns: 0.95fr 1.05fr;
+      gap: 20px;
+      align-items: center;
+    }
+
+    .score-preview {
+      overflow: hidden;
+      border-radius: 20px;
+      border: 1px solid rgba(113, 77, 52, 0.14);
+      background: #fffaf4;
+      box-shadow: 0 14px 30px rgba(56, 36, 22, 0.08);
+    }
+
+    .score-preview img {
+      display: block;
+      width: 100%;
+      aspect-ratio: 1095 / 623;
+      object-fit: cover;
+      object-position: center top;
+    }
+
+    .pipeline {
+      display: grid;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .pipeline-item {
+      display: grid;
+      grid-template-columns: 94px minmax(0, 1fr);
+      gap: 12px;
+      align-items: start;
+      padding: 14px;
+      border-radius: 16px;
+      background: rgba(255, 252, 248, 0.86);
+      border: 1px solid rgba(113, 77, 52, 0.12);
+    }
+
+    .pipeline-item span {
+      color: var(--blue);
+      font-weight: 900;
+      font-size: 13px;
+      letter-spacing: 0.06em;
+    }
+
+    .tech-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .formula {
+      margin-top: 12px;
+      padding: 16px;
+      border-radius: 16px;
+      background: #231812;
+      color: #fffaf5;
+      overflow-x: auto;
+      font-family: "SFMono-Regular", Consolas, monospace;
+      font-size: 14px;
+      line-height: 1.7;
+      white-space: nowrap;
+    }
+
+    .status-list {
+      display: grid;
+      gap: 10px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .status-list li {
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: rgba(96, 123, 75, 0.1);
+      color: #4f6740;
+      font-weight: 800;
+    }
+
+    .footer-actions {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 20px;
+    }
+
+    @media (max-width: 980px) {
+      .grid,
+      .grid.two,
+      .tech-grid,
+      .workflow,
+      .step-list,
+      .metric-row,
+      .submission-summary,
+      .demo-grid,
+      .architecture-flow {
+        grid-template-columns: 1fr;
+      }
+
+      .hero {
+        min-height: 540px;
+        padding: 28px;
+      }
+
+      .pipeline-item {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+<link rel="stylesheet" href="./erhu-refined.css?v=20260928" />
+<script src="./erhu-quality.js?v=20260928"></script>
+<link rel="stylesheet" href="./erhu-studio-ui.css?v=20260929-polish"><script defer src="./erhu-studio-ui.js?v=20260929-polish"></script></head>
+<body class="erhu-site">
+  <main class="shell">
+    <header class="topbar">
+      <div class="brand">二胡小教室</div>
+      <nav class="nav" aria-label="主要導覽">
+        <a href="./">回首頁</a>
+        <a href="./二胡小教室.html#course-levels">課程分級</a>
+        <a href="./二胡小教室-AI掃描譜.html">AI 掃描譜</a>
+        <a href="./二胡小教室-AI音準評分.html?v=20260609v">音準跟譜</a>
+        <a href="./二胡小教室-AI錯音複習師.html?v=20260409a">級數回報</a>
+        <a href="./二胡小教室-AI使用與隱私.html">AI/隱私</a>
+      </nav>
+    </header>
+
+    <section class="hero" aria-labelledby="pageTitle">
+      <div class="hero-content">
+        <span class="eyebrow">PROJECT SHOWCASE</span>
+        <h1 id="pageTitle">AI 二胡考級檢定訓練</h1>
+        <p>二胡小教室把傳統二胡考級練習拆成可操作的 AI 學習流程：學生掃譜、修譜、跟譜演奏、取得音準結果，再由 AI 整理級數回報。</p>
+        <div class="hero-actions">
+          <a class="button primary" href="#quick-demo">學習流程總覽</a>
+          <a class="button" href="#demo-route">看展示流程</a>
+          <a class="button" href="./二胡小教室.html#course-levels">進入作品</a>
+          <a class="button" href="./二胡小教室-AI使用與隱私.html">資料與 AI 說明</a>
+        </div>
+      </div>
+    </section>
+
+    <section class="band surface" aria-labelledby="submissionTitle">
+      <div class="section-head">
+        <span class="eyebrow">SUBMISSION SUMMARY</span>
+        <h2 id="submissionTitle">作品資訊摘要</h2>
+        <p>作品以二胡考級檢定練習為核心，整合課程分級、AI 譜面處理、音準跟譜與學習回報。</p>
+      </div>
+      <div class="submission-summary">
+        <div class="summary-item">
+          <span>作品名稱</span>
+          <strong>AI 二胡考級檢定訓練</strong>
+        </div>
+        <div class="summary-item">
+          <span>作品形式</span>
+          <strong>網站網頁 / APP 工具 / AI 教學輔助系統</strong>
+        </div>
+        <div class="summary-item">
+          <span>教學對象</span>
+          <strong>二胡考級學生、自主練習者與教師輔助教學</strong>
+        </div>
+        <div class="summary-item">
+          <span>展示入口</span>
+          <strong>課程分級、AI 掃描譜、音準跟譜、級數回報、AI/隱私說明</strong>
+        </div>
+      </div>
+    </section>
+
+    <section class="band" id="quick-demo" aria-labelledby="quickDemoTitle">
+      <div class="section-head">
+        <span class="eyebrow">LEARNING FLOW</span>
+        <h2 id="quickDemoTitle">學習流程總覽</h2>
+        <p>四個核心功能串成完整練習流程，從譜面輸入、人工修正、逐音音準判斷到級數回報，形成可追蹤的二胡考級訓練路徑。</p>
+      </div>
+      <div class="demo-grid">
+        <article class="demo-card">
+          <strong>AI 掃描譜</strong>
+          <div class="demo-screen" aria-hidden="true">
+            <div class="demo-score-lines">
+              <span style="width: 92%;"></span>
+              <span></span>
+              <span></span>
+              <span style="width: 72%;"></span>
+            </div>
+          </div>
+          <p>把簡譜圖片轉為站內可編輯資料，讓紙本或截圖譜面能進入數位練習流程。</p>
+        </article>
+        <article class="demo-card">
+          <strong>譜面編輯器</strong>
+          <div class="demo-screen" aria-hidden="true">
+            <div class="demo-chip-row">
+              <span>調性</span><span>小節</span><span>連弓</span><span>節奏</span><span>指法</span>
+            </div>
+          </div>
+          <p>保留使用者修正權，避免 AI 辨識錯誤直接影響後續音準跟譜結果。</p>
+        </article>
+        <article class="demo-card">
+          <strong>AI 音準跟譜</strong>
+          <div class="demo-screen" aria-hidden="true">
+            <div class="demo-pitch">
+              <span>準音<i style="width: 88%;"></i></span>
+              <span>偏高<i></i></span>
+              <span>偏低<i></i></span>
+            </div>
+          </div>
+          <p>用 Web Audio 即時偵測演奏音高，逐音標示偏高、偏低與需要回練的音。</p>
+        </article>
+        <article class="demo-card">
+          <strong>AI 級數回報</strong>
+          <div class="demo-screen" aria-hidden="true">
+            <div class="demo-report-lines">
+              <span style="width: 96%;"></span>
+              <span></span>
+              <span></span>
+              <span style="width: 70%;"></span>
+            </div>
+          </div>
+          <p>整合打卡、測驗與音準紀錄，產出本級表現摘要與下一輪練習方向。</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="band surface" aria-labelledby="valueTitle">
+      <div class="section-head">
+        <span class="eyebrow">WHY IT MATTERS</span>
+        <h2 id="valueTitle">作品主軸</h2>
+        <p>多數二胡練習工具只處理單一問題，學生仍要自己把課程、譜面、音準與練習紀錄接起來。這個作品把「考級準備」變成一條連續流程，讓學生每次練習都有清楚的下一步。</p>
+      </div>
+      <div class="grid">
+        <article class="card">
+          <strong>學生痛點</strong>
+          <h3>練習安排</h3>
+          <p>考級內容多，指定曲、自選曲、音階、測驗與弱點常常分散在不同地方，低年級或自學者很難自己安排。</p>
+        </article>
+        <article class="card">
+          <strong>作品解法</strong>
+          <h3>課程與工具</h3>
+          <p>先選等級與級數，再把 AI 問答、練習規劃、掃描譜、音準跟譜與級數回報接在同一個學習脈絡。</p>
+        </article>
+        <article class="card">
+          <strong>作品亮點</strong>
+          <h3>練習流程</h3>
+          <p>網站會保存打卡、測驗與音準紀錄，AI 回報能根據實際資料整理學生下一步，而不是只產生一般建議。</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="band" id="demo-route" aria-labelledby="demoTitle">
+      <div class="section-head">
+        <span class="eyebrow">PRESENTATION FLOW</span>
+        <h2 id="demoTitle">完整操作流程</h2>
+        <p>操作流程分為五個步驟，依序連接課程資料、AI 譜面辨識、使用者修正、即時音準偵測與學習回報。</p>
+      </div>
+      <div class="step-list">
+        <article class="step">
+          <h3>課程分級</h3>
+          <p>進入十級課程，說明作品不是泛用練習器，而是以二胡考級為中心設計。</p>
+        </article>
+        <article class="step">
+          <h3>AI 掃描譜</h3>
+          <p>用譜面圖片轉成站內資料，展示生成式 AI 如何把非結構化譜面變成可練習內容。</p>
+        </article>
+        <article class="step">
+          <h3>譜面編輯器</h3>
+          <p>讓使用者修正 AI 結果，避免 AI 辨識錯誤直接進入練習，保留老師與學生的控制權。</p>
+        </article>
+        <article class="step">
+          <h3>AI 音準跟譜</h3>
+          <p>開麥克風逐音判斷音準，示範系統如何把練習從「拉完」變成「知道哪個音不準」。</p>
+        </article>
+        <article class="step">
+          <h3>AI 級數回報</h3>
+          <p>整合打卡、測驗與音準紀錄，產生本級總結與下一輪練習建議。</p>
+        </article>
+      </div>
+      <div class="metric-row" aria-label="作品功能摘要">
+        <div class="metric"><b>10</b><span>考級級數</span></div>
+        <div class="metric"><b>5</b><span>AI 學習工具</span></div>
+        <div class="metric"><b>逐音</b><span>音準跟譜</span></div>
+        <div class="metric"><b>4</b><span>可回看資料類型</span></div>
+      </div>
+    </section>
+
+    <section class="band surface" aria-labelledby="workflowTitle">
+      <div class="workflow">
+        <figure class="score-preview">
+          <img src="./assets/scores/level1-lian-gong-yu-fu-dian.png" alt="第一級連弓與附點音符練習譜面，展示站內跟譜素材" width="1095" height="623" loading="lazy" />
+        </figure>
+        <div>
+          <span class="eyebrow">PRODUCT FLOW</span>
+          <h2 id="workflowTitle">核心流程已可實際操作</h2>
+          <p>本平台已把譜面資料、使用者登入、練習紀錄與 AI 服務串起來，並透過後端驗證與音準判斷維持資料與練習流程的一致性。</p>
+          <div class="pipeline">
+            <div class="pipeline-item"><span>SCAN</span><p>Functions 代呼叫 AI 掃描譜面，前端保存結構化簡譜資料。</p></div>
+            <div class="pipeline-item"><span>EDIT</span><p>譜面編輯器讓使用者修正曲名、調性、節奏、連弓與裝飾資訊。</p></div>
+            <div class="pipeline-item"><span>PITCH</span><p>Web Audio 讀取麥克風，逐音比較目標音高與演奏音高。</p></div>
+            <div class="pipeline-item"><span>REPORT</span><p>Firestore 保存練習紀錄，AI 級數回報把資料整理成老師式建議。</p></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="band" aria-labelledby="techTitle">
+      <div class="section-head">
+        <span class="eyebrow">TECHNICAL EXPLANATION</span>
+        <h2 id="techTitle">AI 與音準技術說明</h2>
+        <p>以下說明系統如何結合 AI 服務、瀏覽器音訊分析與 Firebase 資料權限，讓作品不只停留在文字問答。</p>
+      </div>
+      <div class="tech-grid">
+        <article class="card">
+          <strong>音準跟譜怎麼判斷</strong>
+          <h3>頻率轉音高，再換算 cents 偏差</h3>
+          <p>系統從麥克風取得音訊，估算當下頻率，再轉成 MIDI 音高並和譜面目標音比較。結果會以 cents 表示偏高或偏低，並換算成本音分數。</p>
+          <div class="formula">midi = 69 + 12 * log2(frequency / 440)<br />cents = 1200 * log2(detectedHz / targetHz)</div>
+        </article>
+        <article class="card">
+          <strong>AI 在哪裡發揮作用</strong>
+          <h3>AI 處理理解、整理與回饋</h3>
+          <p>AI 掃描譜負責把圖片轉成可編輯的站內譜面；AI 助教與規劃師提供課程脈絡建議；AI 級數回報則讀取學生紀錄後產生下一步練習方向。</p>
+        </article>
+        <article class="card">
+          <strong>資料與安全</strong>
+          <h3>前端登入，後端驗證，資料按使用者分開</h3>
+          <p>需要保存資料的功能會要求登入。Functions 驗證 Firebase ID token，Firestore 規則限制學生只能存取自己的練習紀錄。</p>
+        </article>
+        <article class="card">
+          <strong>限制與誠實揭露</strong>
+          <h3>音準結果是練習輔助，不是正式檢定成績</h3>
+          <p>瀏覽器麥克風、環境噪音與演奏方式都會影響偵測。網站會把 AI 與音準結果定位成練習回饋，正式學習判斷仍應由老師或考級標準確認。</p>
+        </article>
+      </div>
+    </section>
+
+    <section class="band surface" aria-labelledby="architectureTitle">
+      <div class="section-head">
+        <span class="eyebrow">SYSTEM ARCHITECTURE</span>
+        <h2 id="architectureTitle">系統架構圖</h2>
+        <p>系統由前端互動、登入權限、資料保存、AI 服務與音準分析組成，支援從課程練習到學習回報的完整流程。</p>
+      </div>
+      <div class="architecture-flow" aria-label="二胡小教室系統架構">
+        <div class="arch-node"><span>FRONTEND</span><strong>HTML / CSS / JavaScript<br />課程與練習介面</strong></div>
+        <div class="arch-node"><span>AUTH</span><strong>Firebase Auth<br />登入與身分識別</strong></div>
+        <div class="arch-node"><span>DATA</span><strong>Firestore<br />練習紀錄與自訂譜</strong></div>
+        <div class="arch-node"><span>FUNCTIONS</span><strong>Cloud Functions<br />後端驗證與 AI 呼叫</strong></div>
+        <div class="arch-node"><span>AI</span><strong>OpenAI<br />掃描譜與學習回報</strong></div>
+        <div class="arch-node"><span>AUDIO</span><strong>Web Audio<br />即時音準分析</strong></div>
+      </div>
+    </section>
+
+  </main>
+</body>
+</html>

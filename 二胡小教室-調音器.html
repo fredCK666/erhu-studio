@@ -1,0 +1,1074 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>二胡小教室 | 內外弦調音器</title>
+  <meta name="description" content="用麥克風即時偵測二胡內弦 D4 與外弦 A4 的音高，幫助你快速完成調音。" />
+  <link rel="canonical" href="https://erhu-auth.web.app/二胡小教室-調音器.html" />
+  <link rel="manifest" href="./site.webmanifest" />
+  <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+  <meta property="og:type" content="website" />
+  <meta property="og:locale" content="zh_TW" />
+  <meta property="og:title" content="二胡小教室 | 內外弦調音器" />
+  <meta property="og:description" content="用麥克風即時偵測內弦 D4 與外弦 A4，快速完成二胡調音。" />
+  <meta property="og:url" content="https://erhu-auth.web.app/二胡小教室-調音器.html" />
+  <meta property="og:image" content="https://erhu-auth.web.app/assets/scores/level1-lian-gong-yu-fu-dian.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="stylesheet" href="./erhu-theme.css?v=20260327f" />
+  <style>
+    :root {
+      --ink: #211914;
+      --muted: #69584d;
+      --paper: rgba(255, 250, 244, 0.94);
+      --line: rgba(123, 77, 45, 0.12);
+      --wood: #7b4d2d;
+      --shadow: 0 22px 54px rgba(46, 28, 18, 0.14);
+      --good: #63834b;
+      --warn: #b87c3c;
+      --bad: #b85d43;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", san-serif;
+      background: linear-gradient(180deg, #f7efe3 0%, #fbf9f5 40%, #efe4d5 100%);
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    .shell {
+      width: min(1180px, calc(100% - 28px));
+      margin: 0 auto;
+      padding: 14px 0 16px;
+    }
+
+    .hero,
+    .panel,
+    .side-card {
+      background: var(--paper);
+      border: 1px solid var(--line);
+      border-radius: 28px;
+      box-shadow: var(--shadow);
+    }
+
+    .hero {
+      padding: 16px 20px;
+      margin-bottom: 10px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      margin-bottom: 6px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(123, 77, 45, 0.1);
+      color: var(--wood);
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+    }
+
+    h1 {
+      margin: 0 0 4px;
+      font-size: clamp(28px, 4vw, 38px);
+    }
+
+    h2 {
+      margin: 0 0 10px;
+      font-size: 26px;
+    }
+
+    p,
+    li {
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.2fr) minmax(300px, 0.8fr);
+      gap: 10px;
+    }
+
+    .panel {
+      padding: 18px 20px;
+    }
+
+    .side-stack {
+      display: grid;
+      gap: 10px;
+    }
+
+    .side-card {
+      padding: 14px 16px;
+    }
+
+    .target-switch {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin-bottom: 10px;
+    }
+
+    .target-button {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding: 13px 16px;
+      border-radius: 22px;
+      border: 1px solid rgba(123, 77, 45, 0.12);
+      background: linear-gradient(180deg, rgba(255, 252, 248, 0.98), rgba(244, 233, 220, 0.96));
+      color: var(--wood);
+      text-align: left;
+      cursor: pointer;
+      box-shadow: 0 14px 28px rgba(74, 46, 23, 0.08);
+      transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+    }
+
+    .target-button:hover {
+      transform: translateY(-2px);
+    }
+
+    .target-button.active {
+      border-color: rgba(123, 77, 45, 0.3);
+      background: linear-gradient(180deg, rgba(248, 239, 229, 0.99), rgba(223, 196, 168, 0.96));
+      box-shadow: 0 18px 34px rgba(93, 58, 35, 0.16);
+    }
+
+    .target-note {
+      font-size: 24px;
+      font-weight: 900;
+      color: #3b2416;
+    }
+
+    .target-hint {
+      font-size: 13px;
+      color: var(--muted);
+    }
+
+    .meter-card {
+      padding: 16px 18px;
+      border-radius: 30px;
+      border: 1px solid rgba(123, 77, 45, 0.12);
+      background:
+        radial-gradient(circle at 50% 18%, rgba(255, 255, 255, 0.54), transparent 22%),
+        linear-gradient(180deg, rgba(255, 253, 250, 0.99), rgba(242, 230, 218, 0.96));
+    }
+
+    .meter-header {
+      display: flex;
+      justify-content: space-between;
+      gap: 16px;
+      align-items: start;
+      flex-wrap: wrap;
+      margin-bottom: 4px;
+    }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 40px;
+      padding: 8px 14px;
+      border-radius: 999px;
+      background: rgba(123, 77, 45, 0.1);
+      color: var(--wood);
+      font-weight: 900;
+    }
+
+    .status-badge.good {
+      background: rgba(99, 131, 75, 0.14);
+      color: var(--good);
+    }
+
+    .status-badge.warn {
+      background: rgba(184, 124, 60, 0.14);
+      color: var(--warn);
+    }
+
+    .status-badge.bad {
+      background: rgba(184, 93, 67, 0.14);
+      color: var(--bad);
+    }
+
+    .tuner-stage {
+      display: grid;
+      gap: 12px;
+      margin-top: 2px;
+    }
+
+    .dial-shell {
+      position: relative;
+      width: min(820px, 100%);
+      margin: 0 auto;
+      padding: 10px 0 24px;
+    }
+
+    .dial {
+      position: relative;
+      width: 100%;
+      height: 440px;
+    }
+
+    .gauge-frame {
+      position: absolute;
+      left: 50%;
+      top: 2px;
+      width: min(680px, 92%);
+      aspect-ratio: 1;
+      transform: translateX(-50%);
+      pointer-events: none;
+    }
+
+    .gauge-frame::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      background:
+        conic-gradient(
+          from 270deg,
+          rgba(198, 193, 187, 0.98) 0deg 58deg,
+          rgba(214, 184, 128, 0.98) 58deg 80deg,
+          rgba(128, 171, 92, 0.98) 80deg 100deg,
+          rgba(214, 184, 128, 0.98) 100deg 122deg,
+          rgba(198, 193, 187, 0.98) 122deg 180deg,
+          transparent 180deg 360deg
+        );
+      -webkit-mask:
+        radial-gradient(farthest-side, transparent calc(100% - 36px), #000 calc(100% - 35px)),
+        linear-gradient(#000 0 0);
+      -webkit-mask-composite: source-in;
+      mask:
+        radial-gradient(farthest-side, transparent calc(100% - 36px), #000 calc(100% - 35px)),
+        linear-gradient(#000 0 0);
+      mask-composite: intersect;
+      filter: drop-shadow(0 14px 22px rgba(125, 93, 66, 0.16));
+    }
+
+    .gauge-frame::after {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: 62px;
+      width: 320px;
+      height: 320px;
+      border-radius: 50%;
+      transform: translateX(-50%);
+      background: radial-gradient(circle, rgba(255,255,255,0.62), rgba(255,255,255,0.08) 58%, transparent 72%);
+      pointer-events: none;
+    }
+
+    .gauge-base {
+      position: absolute;
+      left: 50%;
+      bottom: 52px;
+      width: min(470px, 72%);
+      height: 68px;
+      border-radius: 999px;
+      transform: translateX(-50%);
+      background: radial-gradient(circle at 50% 0%, rgba(224, 202, 173, 0.74), rgba(224, 202, 173, 0.18) 60%, transparent 100%);
+      filter: blur(12px);
+      pointer-events: none;
+    }
+
+    .dial-endpoint {
+      position: absolute;
+      top: 224px;
+      font-size: 34px;
+      color: rgba(123, 77, 45, 0.24);
+      font-weight: 700;
+      z-index: 2;
+    }
+
+    .dial-endpoint.left {
+      left: 34px;
+    }
+
+    .dial-endpoint.right {
+      right: 34px;
+    }
+
+    .needle-wrap {
+      position: absolute;
+      left: 50%;
+      top: 118px;
+      width: 8px;
+      height: 206px;
+      transform: translateX(-50%) rotate(0deg);
+      transform-origin: 50% calc(100% - 14px);
+      transition: transform 0.12s ease-out;
+      z-index: 3;
+    }
+
+    .needle-line {
+      position: absolute;
+      left: 50%;
+      bottom: 30px;
+      width: 4px;
+      height: 152px;
+      border-radius: 999px;
+      background: linear-gradient(180deg, #7b4d2d, #c08654);
+      box-shadow: 0 4px 12px rgba(61, 37, 21, 0.16);
+      transform: translateX(-50%);
+    }
+
+    .needle-cap {
+      position: absolute;
+      left: 50%;
+      bottom: 0;
+      width: 24px;
+      height: 24px;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #9b6a45, #5b3520);
+      border: 3px solid rgba(255, 248, 241, 0.96);
+      box-shadow: 0 8px 16px rgba(61, 37, 21, 0.18);
+      transform: translateX(-50%);
+    }
+
+    .dial-center {
+      position: absolute;
+      left: 50%;
+      top: 286px;
+      width: min(140px, 30%);
+      transform: translateX(-50%);
+      display: grid;
+      justify-items: center;
+      gap: 0;
+      z-index: 5;
+    }
+
+    .mic-button {
+      width: 76px;
+      height: 76px;
+      border: 0;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #8d5c3d, #6a3f27);
+      color: #fffdf8;
+      font-size: 32px;
+      font-weight: 900;
+      cursor: pointer;
+      box-shadow: 0 16px 28px rgba(101, 67, 43, 0.24);
+      pointer-events: auto;
+    }
+
+    .mic-button.active {
+      background: linear-gradient(135deg, #86b65e, #6f9e4a);
+      box-shadow: 0 16px 30px rgba(102, 134, 77, 0.26);
+    }
+
+    .dial-stop {
+      margin-top: 10px;
+      min-width: 88px;
+      min-height: 38px;
+      padding: 0 14px;
+      border: 1px solid rgba(156, 111, 72, 0.14);
+      border-radius: 999px;
+      background: linear-gradient(180deg, rgba(249, 239, 229, 0.98), rgba(236, 217, 197, 0.96));
+      color: #6a4733;
+      font: inherit;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 8px 16px rgba(101, 67, 43, 0.08);
+    }
+
+    .note-display {
+      min-height: 88px;
+      padding: 4px 0 10px;
+      font-size: clamp(58px, 9vw, 92px);
+      line-height: 1.02;
+      font-weight: 900;
+      color: #2f1d12;
+      letter-spacing: 0.02em;
+      text-align: center;
+      margin-top: -4px;
+      overflow: visible;
+      text-shadow: 0 8px 20px rgba(255,255,255,0.46);
+    }
+
+    .sub-display {
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 700;
+      text-align: center;
+      margin-top: 10px;
+    }
+
+    .reading-row {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: -10px;
+    }
+
+    .reading-box {
+      padding: 10px 12px;
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.74);
+      border: 1px solid rgba(123, 77, 45, 0.08);
+      text-align: center;
+    }
+
+    .reading-box strong {
+      display: block;
+      margin-bottom: 6px;
+      color: var(--muted);
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .reading-box span {
+      color: #2f1d12;
+      font-size: clamp(18px, 2.4vw, 24px);
+      font-weight: 900;
+    }
+
+    .guidance {
+      color: var(--wood);
+      font-weight: 800;
+      line-height: 1.5;
+      text-align: center;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 160px;
+      min-height: 42px;
+      padding: 0 18px;
+      border-radius: 999px;
+      border: 0;
+      font: inherit;
+      font-weight: 900;
+      cursor: pointer;
+    }
+
+    .button.primary {
+      background: linear-gradient(135deg, #cda37c, #9b6b45);
+      color: #fffaf6;
+      box-shadow: 0 16px 30px rgba(101, 67, 43, 0.18);
+    }
+
+    .button.secondary {
+      background: linear-gradient(180deg, rgba(249, 239, 229, 0.98), rgba(236, 217, 197, 0.96));
+      color: #6a4733;
+      border: 1px solid rgba(156, 111, 72, 0.12);
+    }
+
+    .mic-note {
+      margin-top: 6px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    ul {
+      margin: 0;
+      padding-left: 20px;
+    }
+
+    .quick-list {
+      display: grid;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .quick-item {
+      padding: 10px 12px;
+      border-radius: 18px;
+      background: rgba(255, 255, 255, 0.7);
+      border: 1px solid rgba(123, 77, 45, 0.08);
+    }
+
+    .quick-item strong {
+      color: #3b2416;
+    }
+
+    .hero p {
+      margin: 0;
+    }
+
+    .side-card ul {
+      margin: 0;
+      padding-left: 18px;
+    }
+
+    .side-card li + li {
+      margin-top: 4px;
+    }
+
+    @media (min-width: 980px) {
+      body {
+        overflow: auto;
+      }
+
+      .shell {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .layout {
+        flex: 1;
+        min-height: 0;
+        align-items: stretch;
+      }
+    }
+
+    @media (max-width: 900px) {
+      body {
+        overflow: auto;
+      }
+
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      .panel {
+        padding: 20px 16px;
+      }
+    }
+
+    @media (max-width: 720px) {
+      .target-switch {
+        grid-template-columns: 1fr;
+      }
+
+      .reading-row {
+        grid-template-columns: 1fr;
+      }
+
+      .dial-shell {
+        width: 100%;
+      }
+
+      .dial {
+        height: 380px;
+      }
+
+      .gauge-frame {
+        width: min(520px, 96%);
+        top: 20px;
+      }
+
+      .gauge-frame::after {
+        top: 74px;
+        width: 250px;
+        height: 250px;
+      }
+
+      .gauge-base {
+        bottom: 88px;
+        width: min(320px, 74%);
+      }
+
+      .needle-wrap {
+        top: 120px;
+        height: 180px;
+      }
+
+      .needle-line {
+        height: 126px;
+      }
+
+      .dial-center {
+        top: 270px;
+      }
+
+      .mic-button {
+        width: 82px;
+        height: 82px;
+        font-size: 34px;
+      }
+
+      .dial-stop {
+        min-width: 84px;
+      }
+
+      .note-display {
+        min-height: 78px;
+        margin-top: 0;
+      }
+    }
+  </style>
+<link rel="stylesheet" href="./erhu-refined.css?v=20260928" />
+<script src="./erhu-quality.js?v=20260928"></script>
+<link rel="stylesheet" href="./erhu-studio-ui.css?v=20260929-polish"><script defer src="./erhu-studio-ui.js?v=20260929-polish"></script></head>
+<body class="erhu-site">
+  <main class="shell">
+    <header class="topbar">
+      <div class="brand">二胡小教室</div>
+      <nav class="nav">
+        <a href="./">回首頁</a>
+        <a href="./二胡小教室.html#course-levels">課程分級</a>
+        <a href="./二胡小教室-AI練習規劃師.html">AI 規劃</a>
+        <a href="./二胡小教室-練習打卡.html">檢定打卡</a>
+      </nav>
+      <a class="tuner-shortcut active" href="./二胡小教室-調音器.html">調音器</a>
+    </header>
+
+    <section class="hero">
+      <div class="eyebrow">ERHU TUNER</div>
+      <h1>二胡內外弦調音器</h1>
+      <p>按下麥克風開始收音，拉單一空弦後看指示線靠近中間。這裡目前設定成內弦 <strong>D4</strong>、外弦 <strong>A4</strong>。</p>
+    </section>
+
+    <section class="layout">
+      <section class="panel">
+        <div class="target-switch">
+          <button class="target-button active" id="targetInner" type="button">
+            <span class="target-note">內弦 D4</span>
+            <span class="target-hint">靠身體那一弦，標準音是 Do。</span>
+          </button>
+          <button class="target-button" id="targetOuter" type="button">
+            <span class="target-note">外弦 A4</span>
+            <span class="target-hint">外側那一弦，標準音是 So。</span>
+          </button>
+        </div>
+
+        <div class="meter-card">
+          <div class="meter-header">
+            <div class="status-badge warn" id="statusBadge">等待麥克風</div>
+            <div>
+              <h2 id="targetTitle">目前目標：內弦 D4</h2>
+              <p id="targetDescription">請單獨拉內弦空弦，讓調音器判斷你目前距離 D4 還差多少。</p>
+            </div>
+          </div>
+
+          <div class="tuner-stage">
+            <div class="dial-shell">
+              <div class="dial" id="meterDial">
+                <div class="gauge-frame"></div>
+                <div class="gauge-base"></div>
+                <div class="dial-endpoint left">♭</div>
+                <div class="dial-endpoint right">♯</div>
+                <div class="needle-wrap" id="needleWrap">
+                  <div class="needle-line"></div>
+                  <div class="needle-cap"></div>
+                </div>
+                <div class="dial-center">
+                  <button class="mic-button" id="startButton" type="button" aria-label="開始調音">🎤</button>
+                  <button class="dial-stop" id="stopButton" type="button">停止</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="note-display" id="noteValue">--</div>
+            <div class="sub-display" id="guidanceText">點一下麥克風開始調音</div>
+
+            <div class="reading-row">
+              <div class="reading-box">
+                <strong>目標音</strong>
+                <span id="targetNoteValue">D4</span>
+              </div>
+              <div class="reading-box">
+                <strong>目前頻率</strong>
+                <span id="frequencyValue">-- Hz</span>
+              </div>
+              <div class="reading-box">
+                <strong>距離目標</strong>
+                <span id="centsValue">-- cents</span>
+              </div>
+            </div>
+
+            <div class="guidance" id="detailGuidanceText">請按下開始收音，然後拉單一空弦。</div>
+          </div>
+
+          <div class="mic-note" id="micNote">第一次使用時，瀏覽器會要求開啟麥克風權限。若你是直接打開本機檔案，請改用 localhost 或 https 網址。</div>
+        </div>
+      </section>
+
+      <aside class="side-stack">
+        <section class="side-card">
+          <div class="eyebrow">標準調弦</div>
+          <div class="quick-list">
+            <div class="quick-item"><strong>內弦</strong><br />標準音：D4（Re）。先選內弦，再慢慢拉空弦調到接近準音。</div>
+            <div class="quick-item"><strong>外弦</strong><br />標準音：A4（La）。換到外弦後再調，不要兩條弦一起發聲。</div>
+          </div>
+        </section>
+
+        <section class="side-card">
+          <div class="eyebrow">使用提醒</div>
+          <ul>
+            <li>先在安靜環境調音，避免背景聲影響判斷。</li>
+            <li>一次只拉一條空弦，調整時動作要慢。</li>
+            <li>顯示「偏低」時慢慢轉緊；顯示「偏高」時慢慢放鬆。</li>
+            <li>若偵測到別的音名，通常是弦沒單獨拉乾淨或環境太吵。</li>
+          </ul>
+        </section>
+      </aside>
+    </section>
+  <p class="access-note">調音器顯示固定音名：內弦 D4（Re）、外弦 A4（La）。D 調簡譜採首調唱名，D 為 1（Do）、A 為 5（Sol）；兩者指同一音高。</p></main>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+  <script src="./firebase-init.js?v=20260928"></script>
+  <script src="./auth.js?v=20260928"></script>
+  <script>
+    window.ErhuAuth.attachAuthUI({
+      showGuestActions: true,
+      guestHref: "./二胡小教室-登入.html?next=" + encodeURIComponent("./二胡小教室-調音器.html"),
+      guestLabel: "登入"
+    });
+
+    const STRINGS = {
+      inner: {
+        key: "inner",
+        label: "內弦",
+        note: "D4",
+        frequency: 293.66,
+        description: "請單獨拉內弦空弦，讓調音器判斷你目前距離 D4 還差多少。"
+      },
+      outer: {
+        key: "outer",
+        label: "外弦",
+        note: "A4",
+        frequency: 440.0,
+        description: "請單獨拉外弦空弦，讓調音器判斷你目前距離 A4 還差多少。"
+      }
+    };
+
+    const NOTE_NAMES = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
+
+    const targetInner = document.getElementById("targetInner");
+    const targetOuter = document.getElementById("targetOuter");
+    const targetTitle = document.getElementById("targetTitle");
+    const targetDescription = document.getElementById("targetDescription");
+    const targetNoteValue = document.getElementById("targetNoteValue");
+    const noteValue = document.getElementById("noteValue");
+    const frequencyValue = document.getElementById("frequencyValue");
+    const centsValue = document.getElementById("centsValue");
+    const guidanceText = document.getElementById("guidanceText");
+    const detailGuidanceText = document.getElementById("detailGuidanceText");
+    const statusBadge = document.getElementById("statusBadge");
+    const needleWrap = document.getElementById("needleWrap");
+    const startButton = document.getElementById("startButton");
+    const stopButton = document.getElementById("stopButton");
+    const micNote = document.getElementById("micNote");
+
+    let selectedTarget = STRINGS.inner;
+    let audioContext = null;
+    let analyser = null;
+    let sourceNode = null;
+    let mediaStream = null;
+    let rafId = 0;
+    let sampleBuffer = null;
+    let smoothedFrequency = null;
+
+    function noteNameFromFrequency(frequency) {
+      const midi = Math.round(12 * (Math.log(frequency / 440) / Math.log(2)) + 69);
+      const note = NOTE_NAMES[((midi % 12) + 12) % 12];
+      const octave = Math.floor(midi / 12) - 1;
+      return note + octave;
+    }
+
+    function centsFromTarget(frequency, targetFrequency) {
+      return 1200 * (Math.log(frequency / targetFrequency) / Math.log(2));
+    }
+
+    function autoCorrelate(buffer, sampleRate) {
+      let size = buffer.length;
+      let rms = 0;
+      for (let index = 0; index < size; index += 1) {
+        const value = buffer[index];
+        rms += value * value;
+      }
+      rms = Math.sqrt(rms / size);
+      if (rms < 0.01) {
+        return null;
+      }
+
+      let start = 0;
+      let end = size - 1;
+      const threshold = 0.2;
+      for (let index = 0; index < size / 2; index += 1) {
+        if (Math.abs(buffer[index]) < threshold) {
+          start = index;
+          break;
+        }
+      }
+      for (let index = 1; index < size / 2; index += 1) {
+        if (Math.abs(buffer[size - index]) < threshold) {
+          end = size - index;
+          break;
+        }
+      }
+
+      const trimmed = buffer.slice(start, end);
+      size = trimmed.length;
+      const correlations = new Array(size).fill(0);
+      for (let offset = 0; offset < size; offset += 1) {
+        for (let index = 0; index < size - offset; index += 1) {
+          correlations[offset] += trimmed[index] * trimmed[index + offset];
+        }
+      }
+
+      let dip = 0;
+      while (dip + 1 < size && correlations[dip] > correlations[dip + 1]) {
+        dip += 1;
+      }
+
+      let bestOffset = -1;
+      let bestCorrelation = -1;
+      for (let offset = dip; offset < size; offset += 1) {
+        if (correlations[offset] > bestCorrelation) {
+          bestCorrelation = correlations[offset];
+          bestOffset = offset;
+        }
+      }
+
+      if (bestOffset <= 0) {
+        return null;
+      }
+
+      const left = correlations[bestOffset - 1] || 0;
+      const center = correlations[bestOffset] || 0;
+      const right = correlations[bestOffset + 1] || 0;
+      const a = (left + right - 2 * center) / 2;
+      const b = (right - left) / 2;
+      let refinedOffset = bestOffset;
+      if (a) {
+        refinedOffset = bestOffset - b / (2 * a);
+      }
+
+      if (!refinedOffset) {
+        return null;
+      }
+
+      return sampleRate / refinedOffset;
+    }
+
+    function updateStatus(toneState, message) {
+      statusBadge.className = "status-badge " + toneState;
+      statusBadge.textContent = message;
+    }
+
+    function resetDisplay(message) {
+      noteValue.textContent = "--";
+      frequencyValue.textContent = "-- Hz";
+      centsValue.textContent = "-- cents";
+      needleWrap.style.transform = "translateX(-50%) rotate(0deg)";
+      guidanceText.textContent = message;
+      detailGuidanceText.textContent = message;
+    }
+
+    function renderDetectedPitch(frequency) {
+      const noteName = noteNameFromFrequency(frequency);
+      const cents = centsFromTarget(frequency, selectedTarget.frequency);
+      const angle = Math.max(-82, Math.min(82, (cents / 50) * 82));
+      const absCents = Math.abs(cents);
+      const direction = cents < 0 ? "偏低" : "偏高";
+
+      noteValue.textContent = noteName;
+      frequencyValue.textContent = frequency.toFixed(1) + " Hz";
+      centsValue.textContent = (cents >= 0 ? "+" : "") + cents.toFixed(1) + " cents";
+      needleWrap.style.transform = "translateX(-50%) rotate(" + angle + "deg)";
+
+      if (absCents <= 5) {
+        updateStatus("good", "已接近準音");
+        guidanceText.textContent = selectedTarget.label + "已經很接近 " + selectedTarget.note + "，微調就可以。";
+        detailGuidanceText.textContent = guidanceText.textContent;
+        return;
+      }
+
+      if (absCents <= 18) {
+        updateStatus("warn", direction);
+        guidanceText.textContent = direction === "偏低"
+          ? selectedTarget.label + "還有點偏低，慢慢轉緊一點。"
+          : selectedTarget.label + "有點偏高，慢慢放鬆一點。";
+        detailGuidanceText.textContent = guidanceText.textContent;
+        return;
+      }
+
+      if (absCents > 180) {
+        updateStatus("bad", "音差較大");
+        guidanceText.textContent = "目前更接近 " + noteName + "，請確認你正在拉" + selectedTarget.label + "空弦。";
+        detailGuidanceText.textContent = guidanceText.textContent;
+        return;
+      }
+
+      updateStatus("bad", direction);
+      guidanceText.textContent = direction === "偏低"
+        ? selectedTarget.label + "明顯偏低，請慢慢轉緊，邊調邊看指針。"
+        : selectedTarget.label + "明顯偏高，請慢慢放鬆，邊調邊看指針。";
+      detailGuidanceText.textContent = guidanceText.textContent;
+    }
+
+    function getMicrophoneErrorMessage(error) {
+      if (!window.isSecureContext) {
+        return "目前不是安全網址。請不要直接開 file:// 檔案，改用 localhost 或 https 再試一次。";
+      }
+
+      if (!error || !error.name) {
+        return "麥克風暫時無法使用，請確認瀏覽器權限和裝置輸入來源。";
+      }
+
+      if (error.name === "NotAllowedError" || error.name === "PermissionDeniedError") {
+        return "麥克風權限被拒絕。請在瀏覽器網址列旁把麥克風改成允許後重試。";
+      }
+
+      if (error.name === "NotFoundError" || error.name === "DevicesNotFoundError") {
+        return "找不到可用的麥克風裝置，請先確認電腦或手機有可用麥克風。";
+      }
+
+      if (error.name === "NotReadableError" || error.name === "TrackStartError") {
+        return "麥克風目前被其他 App 佔用，請先關掉其他錄音、通話或會議軟體後再試。";
+      }
+
+      if (error.name === "OverconstrainedError" || error.name === "ConstraintNotSatisfiedError") {
+        return "目前裝置不支援這組收音設定，我已改用較寬鬆的方式處理，請再試一次。";
+      }
+
+      return "麥克風暫時無法使用，請確認瀏覽器權限和裝置輸入來源。";
+    }
+
+    function analysePitch() {
+      if (!analyser || !sampleBuffer) {
+        return;
+      }
+
+      analyser.getFloatTimeDomainData(sampleBuffer);
+      const rawFrequency = autoCorrelate(sampleBuffer, audioContext.sampleRate);
+
+      if (!rawFrequency || rawFrequency < 150 || rawFrequency > 900) {
+        resetDisplay("請拉單一空弦，並讓麥克風靠近琴筒一點。");
+        updateStatus("warn", "等待聲音");
+        rafId = requestAnimationFrame(analysePitch);
+        return;
+      }
+
+      if (!smoothedFrequency || Math.abs(rawFrequency - smoothedFrequency) / smoothedFrequency > 0.2) {
+        smoothedFrequency = rawFrequency;
+      } else {
+        smoothedFrequency = smoothedFrequency * 0.65 + rawFrequency * 0.35;
+      }
+
+      renderDetectedPitch(smoothedFrequency);
+      rafId = requestAnimationFrame(analysePitch);
+    }
+
+    async function startListening() {
+      if (!window.isSecureContext) {
+        updateStatus("bad", "無法收音");
+        micNote.textContent = "目前不是安全網址。請不要直接開 file:// 檔案，改用 localhost 或 https 網址。";
+        return;
+      }
+
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        updateStatus("bad", "裝置不支援");
+        micNote.textContent = "這個瀏覽器不支援麥克風調音。";
+        return;
+      }
+
+      const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+      if (!AudioContextClass) {
+        updateStatus("bad", "裝置不支援");
+        micNote.textContent = "這個瀏覽器不支援音高偵測。";
+        return;
+      }
+
+      if (mediaStream || rafId) {
+        stopListening();
+      }
+
+      try {
+        mediaStream = await navigator.mediaDevices.getUserMedia({
+          audio: {
+            echoCancellation: false,
+            noiseSuppression: false,
+            autoGainControl: false
+          }
+        });
+
+        audioContext = audioContext || new AudioContextClass();
+        if (audioContext.state === "suspended") {
+          await audioContext.resume();
+        }
+
+        analyser = audioContext.createAnalyser();
+        analyser.fftSize = 2048;
+        analyser.smoothingTimeConstant = 0.15;
+        sampleBuffer = new Float32Array(analyser.fftSize);
+
+        sourceNode = audioContext.createMediaStreamSource(mediaStream);
+        sourceNode.connect(analyser);
+
+        smoothedFrequency = null;
+        updateStatus("warn", "收音中");
+        micNote.textContent = "收音中，請一次只拉一條空弦。";
+        guidanceText.textContent = "開始收音，請慢慢拉" + selectedTarget.label + "空弦。";
+        detailGuidanceText.textContent = guidanceText.textContent;
+        startButton.classList.add("active");
+
+        if (rafId) {
+          cancelAnimationFrame(rafId);
+        }
+        rafId = requestAnimationFrame(analysePitch);
+      } catch (error) {
+        console.error("startListening failed", error);
+        updateStatus("bad", "無法收音");
+        micNote.textContent = getMicrophoneErrorMessage(error);
+      }
+    }
+
+    function stopListening() {
+      if (rafId) {
+        cancelAnimationFrame(rafId);
+        rafId = 0;
+      }
+      if (sourceNode) {
+        sourceNode.disconnect();
+        sourceNode = null;
+      }
+      if (mediaStream) {
+        mediaStream.getTracks().forEach(function (track) {
+          track.stop();
+        });
+        mediaStream = null;
+      }
+      analyser = null;
+      sampleBuffer = null;
+      smoothedFrequency = null;
+      updateStatus("warn", "已停止");
+      micNote.textContent = "已停止收音。需要時再重新開始。";
+      startButton.classList.remove("active");
+      resetDisplay("請按下開始收音，然後拉單一空弦。");
+    }
+
+    function setTarget(targetKey) {
+      selectedTarget = STRINGS[targetKey];
+      targetInner.classList.toggle("active", targetKey === "inner");
+      targetOuter.classList.toggle("active", targetKey === "outer");
+      targetTitle.textContent = "目前目標：" + selectedTarget.label + " " + selectedTarget.note;
+      targetDescription.textContent = selectedTarget.description;
+      targetNoteValue.textContent = selectedTarget.note;
+      resetDisplay("請切換好目標後，再拉" + selectedTarget.label + "空弦。");
+    }
+
+    targetInner.addEventListener("click", function () {
+      setTarget("inner");
+    });
+
+    targetOuter.addEventListener("click", function () {
+      setTarget("outer");
+    });
+
+    startButton.addEventListener("click", function () {
+      startListening();
+    });
+
+    stopButton.addEventListener("click", function () {
+      stopListening();
+    });
+
+    window.addEventListener("pagehide", function () {
+      stopListening();
+    });
+  </script>
+</body>
+</html>

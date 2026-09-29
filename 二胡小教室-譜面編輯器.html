@@ -1,0 +1,2039 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>二胡小教室 | 譜面編輯器</title>
+  <meta name="description" content="二胡譜面編輯器可細修 AI 掃描後的簡譜，調整音符、節拍、弓法與指法，保存後接到 AI 音準跟譜。" />
+  <link rel="canonical" href="https://erhu-auth.web.app/二胡小教室-譜面編輯器.html" />
+  <link rel="manifest" href="./site.webmanifest" />
+  <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+  <meta property="og:type" content="website" />
+  <meta property="og:locale" content="zh_TW" />
+  <meta property="og:title" content="二胡小教室 | 譜面編輯器" />
+  <meta property="og:description" content="細修掃描譜，保存成可直接跟譜練習的二胡簡譜。" />
+  <meta property="og:url" content="https://erhu-auth.web.app/二胡小教室-譜面編輯器.html" />
+  <meta property="og:image" content="https://erhu-auth.web.app/assets/scores/level1-lian-gong-yu-fu-dian.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <link rel="stylesheet" href="./erhu-theme.css?v=20260327f" />
+  <style>
+    :root {
+      --ink: #1f1713;
+      --wood: #7d4b2b;
+      --muted: #7d6255;
+      --card: rgba(255, 251, 244, 0.92);
+      --line: rgba(125, 75, 43, 0.12);
+      --accent: #d8882f;
+      --ok: #18794e;
+      --warn: #b54708;
+      --danger: #b42318;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      font-family: "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(255, 235, 196, 0.56), transparent 30%),
+        linear-gradient(180deg, #f7efe4 0%, #efe3d2 100%);
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    .shell {
+      width: min(1440px, calc(100% - 28px));
+      margin: 0 auto;
+      padding: 18px 0 30px;
+    }
+
+    .topbar,
+    .panel,
+    .hero {
+      border: 1px solid var(--line);
+      background: var(--card);
+      border-radius: 24px;
+      box-shadow: 0 18px 42px rgba(93, 57, 30, 0.08);
+      backdrop-filter: blur(10px);
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 14px;
+      padding: 16px 20px;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+    }
+
+    .brand {
+      font-size: 22px;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+    }
+
+    .nav {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      color: var(--muted);
+      font-weight: 800;
+    }
+
+    .hero {
+      padding: 22px 24px;
+      margin-bottom: 14px;
+    }
+
+    .eyebrow {
+      color: var(--wood);
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: 0.18em;
+      margin-bottom: 10px;
+    }
+
+    .hero h1 {
+      margin: 0 0 8px;
+      font-size: clamp(28px, 4vw, 40px);
+    }
+
+    .hero p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.8;
+    }
+
+    .toolbar,
+    .meta-grid,
+    .editor-grid {
+      display: grid;
+      gap: 14px;
+    }
+
+    .toolbar {
+      grid-template-columns: minmax(260px, 1.1fr) repeat(4, auto);
+      align-items: end;
+    }
+
+    .panel {
+      padding: 18px 20px;
+      margin-bottom: 14px;
+    }
+
+    .panel h2 {
+      margin: 0 0 12px;
+      font-size: 22px;
+    }
+
+    .field {
+      display: grid;
+      gap: 6px;
+    }
+
+    .field label,
+    .row-heading {
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+    }
+
+    .field input,
+    .field textarea,
+    .field select {
+      width: 100%;
+      border: 1px solid rgba(125, 75, 43, 0.18);
+      border-radius: 14px;
+      background: rgba(255, 255, 255, 0.9);
+      color: var(--ink);
+      padding: 11px 12px;
+      font: inherit;
+    }
+
+    .field textarea {
+      resize: vertical;
+      min-height: 64px;
+      line-height: 1.55;
+      font-family: "SFMono-Regular", "Menlo", "Consolas", monospace;
+      font-size: 13px;
+    }
+
+    .button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      padding: 12px 16px;
+      border: 0;
+      border-radius: 999px;
+      background: linear-gradient(135deg, #ffd66b, #e7861d);
+      color: #4a2f18;
+      font-weight: 900;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .button.secondary {
+      background: rgba(125, 75, 43, 0.1);
+      color: var(--wood);
+    }
+
+    .status {
+      margin-top: 12px;
+      padding: 12px 14px;
+      border-radius: 14px;
+      background: rgba(24, 121, 78, 0.08);
+      color: var(--ok);
+      line-height: 1.7;
+    }
+
+    .status.warn {
+      background: rgba(181, 71, 8, 0.1);
+      color: var(--warn);
+    }
+
+    .status.error {
+      background: rgba(180, 35, 24, 0.1);
+      color: var(--danger);
+    }
+
+    .meta-grid {
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    .switch-field {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding-top: 28px;
+    }
+
+    .switch-field input {
+      width: 18px;
+      height: 18px;
+    }
+
+    .preview-box {
+      padding: 14px;
+      border-radius: 20px;
+      background: rgba(255, 255, 255, 0.88);
+      border: 1px solid rgba(125, 75, 43, 0.08);
+      overflow: visible;
+      width: 100%;
+      min-width: 0;
+      box-sizing: border-box;
+    }
+
+    .score-follow-sheet {
+      display: grid;
+      gap: 8px;
+      min-width: 0;
+      width: 100%;
+    }
+
+    .score-follow-header {
+      display: grid;
+      gap: 4px;
+      margin-bottom: 8px;
+    }
+
+    .score-follow-title {
+      color: #2f1c13;
+      font-size: 25px;
+      font-weight: 900;
+      text-align: center;
+    }
+
+    .score-follow-meta {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      align-items: flex-start;
+    }
+
+    .score-follow-meta-left {
+      display: grid;
+      gap: 2px;
+      color: #473124;
+      font-size: 17px;
+      font-weight: 800;
+    }
+
+    .score-follow-meta-right {
+      color: var(--wood);
+      font-size: 16px;
+      font-weight: 800;
+      text-align: right;
+    }
+
+    .score-follow-row {
+      display: flex;
+      gap: 4px;
+      align-items: flex-start;
+    }
+
+    .score-follow-prefix {
+      flex: 0 0 24px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 96px;
+      color: #3b2418;
+      font-size: 24px;
+      font-weight: 900;
+      line-height: 0.88;
+      white-space: pre-line;
+    }
+
+    .score-follow-measure-row {
+      flex: 1;
+      display: grid;
+      grid-template-columns: none;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      min-width: 0;
+    }
+
+    .score-follow-measure {
+      position: relative;
+      display: grid;
+      grid-template-columns: repeat(var(--unit-count, 8), minmax(0, 1fr));
+      grid-template-rows: var(--bow-height, 0px) var(--guide-height, 0px) var(--upper-height, 0px) var(--slur-height, 0px) auto 16px;
+      gap: 2px 0;
+      align-items: start;
+      width: 100%;
+      min-width: 0;
+      padding: 12px 8px 0 0;
+      border-right: 2px solid rgba(125, 75, 43, 0.18);
+    }
+
+    .score-follow-measure:last-child {
+      padding-right: 0;
+      border-right: 0;
+    }
+
+    .score-follow-bow {
+      grid-row: 1;
+      align-self: end;
+      justify-self: center;
+      color: #2e1f17;
+      font-size: 15px;
+      font-weight: 900;
+      line-height: 1;
+      white-space: pre;
+      padding: 0 1px;
+      transform: translateY(-1px);
+    }
+
+    .score-follow-guide {
+      grid-row: 2;
+      align-self: end;
+      justify-self: center;
+      color: #2e1f17;
+      font-size: 13px;
+      font-weight: 900;
+      line-height: 1.05;
+      white-space: pre;
+      padding: 0 1px;
+      transform: translateY(1px);
+    }
+
+    .score-follow-slur {
+      grid-row: 4;
+      height: 12px;
+      border: 1.5px solid rgba(125, 75, 43, 0.62);
+      border-bottom: 0;
+      border-radius: 16px 16px 0 0;
+      margin: 2px 1px 0;
+    }
+
+    .score-follow-underline {
+      grid-row: 6;
+      align-self: start;
+      border-top: 1.5px solid #2f2118;
+      margin: 0 1px;
+    }
+
+    .score-follow-underline.double {
+      box-shadow: 0 3.5px 0 0 #2f2118;
+    }
+
+    .score-follow-marker {
+      position: absolute;
+      top: -8px;
+      left: 50%;
+      transform: translateX(-50%);
+      padding: 0 4px;
+      background: rgba(255, 255, 255, 0.94);
+      color: var(--wood);
+      font-size: 10px;
+      font-weight: 900;
+      line-height: 1.2;
+    }
+
+    .score-follow-cell {
+      grid-row: 5;
+      display: inline-flex;
+      align-items: flex-end;
+      justify-content: center;
+      min-width: 0;
+      padding: 0;
+      position: relative;
+      padding-top: 3px;
+    }
+
+    .score-follow-main {
+      display: inline-flex;
+      align-items: flex-start;
+      justify-content: center;
+      color: #382217;
+      font-size: 19px;
+      font-weight: 900;
+      line-height: 1;
+      padding-top: 2px;
+    }
+
+    .score-follow-jianpu {
+      display: inline-grid;
+      justify-items: center;
+      min-width: 18px;
+      line-height: 1;
+    }
+
+    .score-follow-octave {
+      min-height: 10px;
+      color: #20140e;
+      font-size: 15px;
+      font-weight: 900;
+      line-height: 0.85;
+    }
+
+    .score-follow-digit {
+      margin-top: 1px;
+      color: #382217;
+      font-size: 22px;
+      font-weight: 900;
+      line-height: 1;
+    }
+
+    .score-follow-low-octave {
+      min-height: 8px;
+      color: #20140e;
+      font-size: 13px;
+      font-weight: 900;
+      line-height: 0.7;
+    }
+
+    .score-follow-low-octave-marker {
+      grid-row: 6;
+      justify-self: center;
+      align-self: start;
+      color: #20140e;
+      font-size: 13px;
+      font-weight: 900;
+      letter-spacing: 0.02em;
+      line-height: 0.7;
+      pointer-events: none;
+      transform: translateY(4px);
+    }
+
+    .score-follow-tail {
+      margin-left: 1px;
+      align-self: flex-end;
+      color: #382217;
+      font-size: 22px;
+      font-weight: 900;
+      line-height: 1;
+    }
+
+    .score-follow-rhythm-dot {
+      margin-left: 2px;
+      align-self: flex-end;
+      color: #25170f;
+      font-size: 28px;
+      font-weight: 950;
+      line-height: 0.8;
+      transform: translateY(-3px);
+    }
+
+    .score-follow-upper-note {
+      grid-row: 3;
+      align-self: end;
+      justify-self: center;
+      color: #382217;
+      font-size: 12px;
+      font-weight: 900;
+      line-height: 1;
+      white-space: nowrap;
+      transform: translateX(-9px);
+    }
+
+    .editor-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .row-editor {
+      border: 1px solid rgba(125, 75, 43, 0.12);
+      border-radius: 20px;
+      padding: 16px;
+      background: rgba(255, 253, 249, 0.88);
+    }
+
+    .row-editor-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+    }
+
+    .row-editor h3 {
+      margin: 0;
+      font-size: 19px;
+    }
+
+    .row-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .measure-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+    }
+
+    .measure-card {
+      border: 1px solid rgba(125, 75, 43, 0.12);
+      border-radius: 18px;
+      padding: 14px;
+      background: rgba(255, 255, 255, 0.92);
+    }
+
+    .measure-card h4 {
+      margin: 0 0 10px;
+      font-size: 16px;
+    }
+
+    .measure-toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+
+    .measure-tip {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+      line-height: 1.6;
+    }
+
+    .measure-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .mini-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 7px 11px;
+      border: 1px solid rgba(125, 75, 43, 0.16);
+      border-radius: 999px;
+      background: rgba(125, 75, 43, 0.06);
+      color: var(--wood);
+      font-size: 12px;
+      font-weight: 900;
+      cursor: pointer;
+    }
+
+    .mini-button.danger {
+      color: var(--danger);
+    }
+
+    .note-table {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+    }
+
+    .note-row {
+      display: grid;
+      grid-template-columns:
+        62px
+        minmax(88px, 0.9fr)
+        minmax(126px, 1.15fr)
+        minmax(88px, 0.75fr)
+        minmax(88px, 0.85fr)
+        minmax(140px, 1.2fr)
+        minmax(84px, 0.75fr)
+        minmax(84px, 0.75fr)
+        72px;
+      gap: 8px;
+      align-items: center;
+      min-width: 900px;
+    }
+
+    .note-row.head {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: 0.03em;
+      padding: 0 4px;
+      white-space: nowrap;
+    }
+
+    .note-index {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 40px;
+      border-radius: 12px;
+      background: rgba(125, 75, 43, 0.08);
+      color: var(--wood);
+      font-size: 12px;
+      font-weight: 900;
+    }
+
+    .note-row input,
+    .note-row select {
+      width: 100%;
+      min-height: 40px;
+      border: 1px solid rgba(125, 75, 43, 0.18);
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.94);
+      color: var(--ink);
+      padding: 8px 10px;
+      font: inherit;
+      white-space: nowrap;
+    }
+
+    .note-remove {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 40px;
+      padding: 0 10px;
+      border: 1px solid rgba(180, 35, 24, 0.14);
+      border-radius: 12px;
+      background: rgba(180, 35, 24, 0.06);
+      color: var(--danger);
+      font-size: 12px;
+      font-weight: 900;
+      cursor: pointer;
+    }
+
+    .note-help {
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.7;
+    }
+
+    .output-box textarea {
+      min-height: 260px;
+    }
+
+    @media (max-width: 1180px) {
+      .toolbar,
+      .meta-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .switch-field {
+        padding-top: 0;
+      }
+
+      .measure-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .note-row {
+        grid-template-columns: 1fr 1fr;
+        min-width: 0;
+      }
+
+      .note-row.head {
+        display: none;
+      }
+
+      .note-index {
+        grid-column: 1 / -1;
+        justify-content: flex-start;
+        padding: 0 12px;
+      }
+
+      .note-remove {
+        grid-column: 1 / -1;
+      }
+    }
+    /* Give the full score the page width; wrap whole measures instead of scrolling. */
+    body.erhu-site.studio-redesign .studio-editor-workspace {
+      grid-template-columns: minmax(0, 1fr) !important;
+    }
+    body.erhu-site.studio-redesign .studio-editor-workspace > .panel {
+      min-width: 0;
+    }
+    #previewSheet {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 22px 0;
+      padding: 12px 4px;
+    }
+    #previewSheet .score-follow-header {
+      grid-column: 1 / -1;
+      overflow-wrap: anywhere;
+    }
+    #previewSheet .score-follow-row,
+    #previewSheet .score-follow-measure-row { display: contents; }
+    #previewSheet .score-follow-prefix {
+      grid-column: 1 / -1;
+      justify-content: flex-start;
+      min-height: 0;
+      font-size: 18px;
+      line-height: 1.4;
+    }
+    #previewSheet .score-follow-measure {
+      width: 100% !important;
+      padding: 6px 14px 0;
+      border-right: 1px solid #9e806a;
+    }
+    #previewSheet .score-follow-digit { font-size: 25px; font-weight: 700; }
+    @media (max-width: 760px) {
+      #previewSheet { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      #previewSheet .score-follow-measure { padding: 6px 8px 0; }
+    }
+    @media (max-width: 380px) {
+      #previewSheet { grid-template-columns: minmax(0, 1fr); }
+    }
+  </style>
+<link rel="stylesheet" href="./erhu-refined.css?v=20260928" />
+<script src="./erhu-quality.js?v=20260928"></script>
+<link rel="stylesheet" href="./erhu-studio-ui.css?v=20260929-polish"><script defer src="./erhu-studio-ui.js?v=20260929-polish"></script><link rel="stylesheet" href="./erhu-score-reference.css?v=20260929"><script defer src="./erhu-score-reference.js?v=20260929"></script><link rel="stylesheet" href="./erhu-direct-edit.css?v=20260929-wide"><script defer src="./erhu-direct-edit.js?v=20260929"></script><style>
+.score-follow-underline.triple{box-shadow:0 3.5px 0 0 #2f2118,0 7px 0 0 #2f2118}
+.score-follow-measure:has(.score-follow-marker){margin-top:30px}
+.score-follow-marker{max-width:100%;white-space:normal;text-align:center}
+.score-source-reference{margin:18px 0;padding:12px;border:1px solid #d6bea5;border-radius:8px}
+.score-source-reference img{display:block;width:100%;height:auto;margin-top:12px}
+</style></head>
+<body class="erhu-site">
+  <main class="shell">
+    <header class="topbar">
+      <div class="brand">二胡小教室</div>
+      <nav class="nav">
+        <a href="./">回首頁</a>
+        <a href="./二胡小教室-AI掃描譜.html">AI 掃描譜</a>
+        <a id="backLink" href="./二胡小教室-週課程.html">回級數課程</a>
+        <a href="./二胡小教室.html#course-levels">課程分級</a>
+      </nav>
+    </header>
+
+    <section class="hero">
+      <div class="eyebrow">SCORE EDITOR</div>
+      <h1>譜面編輯器</h1>
+      <p>上面對照預覽，下面逐小節修改。草稿只保存在此瀏覽器；「我的譜」按儲存後同步至帳號雲端，內建教材的修改則僅套用於此瀏覽器。</p>
+    </section>
+
+    <section class="panel">
+      <div class="toolbar">
+        <div class="field">
+          <label for="pieceSelect">選擇曲子</label>
+          <select id="pieceSelect"></select>
+        </div>
+        <button class="button secondary" id="previewButton" type="button">更新預覽</button>
+        <button class="button" id="saveButton" type="button">儲存並套用</button>
+        <button class="button secondary" id="resetButton" type="button">清除本地修改</button>
+        <button class="button secondary" id="copyButton" type="button">複製程式碼</button>
+      </div>
+      <div class="status" id="statusBox">目前顯示網站預設譜面。你修改下面欄位後會自動保存草稿。</div>
+    </section>
+
+    <section class="panel">
+      <h2>譜面預覽</h2>
+      <div class="preview-box">
+        <div class="score-follow-sheet" id="previewSheet"></div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>基本設定</h2>
+      <div class="meta-grid">
+        <div class="field">
+          <label for="displayTitle">顯示標題</label>
+          <input id="displayTitle" type="text" />
+        </div>
+        <div class="field">
+          <label for="headerLeft1">左上第 1 行</label>
+          <input id="headerLeft1" type="text" />
+        </div>
+        <div class="field">
+          <label for="headerLeft2">左上第 2 行</label>
+          <input id="headerLeft2" type="text" />
+        </div>
+        <div class="field">
+          <label for="headerRight">右上文字</label>
+          <input id="headerRight" type="text" />
+        </div>
+        <div class="field">
+          <label for="scoreNote">附註</label>
+          <input id="scoreNote" type="text" />
+        </div>
+        <div class="field">
+          <label for="beatUnits">每拍單位數</label>
+          <input id="beatUnits" type="number" min="1" step="1" />
+        </div>
+        <div class="field switch-field">
+          <input id="autoUnderlines" type="checkbox" />
+          <label for="autoUnderlines">自動重算下面底線</label>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <h2>逐小節編輯</h2>
+      <div class="editor-grid" id="editorGrid"></div>
+    </section>
+
+    <section class="panel output-box">
+      <h2>譜面資料</h2>
+      <div class="field">
+        <label for="exportText">目前編輯結果</label>
+        <textarea id="exportText" readonly></textarea>
+      </div>
+    </section>
+  </main>
+
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
+  <script src="./firebase-init.js?v=20260928"></script>
+  <script src="./auth.js?v=20260928"></script>
+  <script src="./exam-piece-scores.js?v=20260929-zizhu"></script>
+  <script>
+    window.ErhuAuth.requireAuth();
+    window.ErhuAuth.attachAuthUI();
+
+    const scoreApi = window.ErhuPieceScores;
+    const helpers = scoreApi.helpers;
+    const params = new URLSearchParams(window.location.search);
+    const customScoreId = params.get("customScoreId") || "";
+    let pieceCatalog = scoreApi.listPieces().filter(function (piece) { return piece.hasRows; });
+    const pieceSelect = document.getElementById("pieceSelect");
+    const editorGrid = document.getElementById("editorGrid");
+    const previewSheet = document.getElementById("previewSheet");
+    const exportText = document.getElementById("exportText");
+    const statusBox = document.getElementById("statusBox");
+    const backLink = document.getElementById("backLink");
+    const backHref = params.get("back");
+    const displayTitleInput = document.getElementById("displayTitle");
+    const headerLeft1Input = document.getElementById("headerLeft1");
+    const headerLeft2Input = document.getElementById("headerLeft2");
+    const headerRightInput = document.getElementById("headerRight");
+    const scoreNoteInput = document.getElementById("scoreNote");
+    const beatUnitsInput = document.getElementById("beatUnits");
+    const autoUnderlinesInput = document.getElementById("autoUnderlines");
+
+    let currentUser = null;
+    let currentTitle = "";
+    let currentStorageKey = "";
+    let currentBaseScore = null;
+    let currentCustomScoreId = customScoreId;
+    let refreshTimer = 0;
+    let isLoadingPiece = false;
+
+    if (backHref) {
+      backLink.href = backHref;
+    }
+
+    function setStatus(text, mode) {
+      statusBox.textContent = text;
+      statusBox.className = "status" + (mode ? " " + mode : "");
+    }
+
+    function formatSavedTime(value) {
+      if (!value) {
+        return "";
+      }
+      const date = new Date(value);
+      if (Number.isNaN(date.getTime())) {
+        return "";
+      }
+      return date.toLocaleString("zh-TW", {
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit"
+      });
+    }
+
+    function jsString(value) {
+      return JSON.stringify(String(value || ""));
+    }
+
+    function parseJianpuText(raw) {
+      const noteMatch = String(raw || "").match(/^([1-7])('+)?(,*)?(\.)?(.*)$/);
+      if (!noteMatch) {
+        return ErhuQuality.escape(raw);
+      }
+      const digit = noteMatch[1];
+      const highDots = (noteMatch[2] || "").length;
+      const lowDots = (noteMatch[3] || "").length;
+      const rhythmDot = noteMatch[4] || "";
+      const tail = noteMatch[5] || "";
+      return (
+        "<span class=\"score-follow-jianpu\">" +
+          "<span class=\"score-follow-octave\">" + (highDots ? "●".repeat(highDots) : "") + "</span>" +
+          "<span class=\"score-follow-digit\">" + digit + "</span>" +
+        "</span>" +
+        (rhythmDot ? "<span class=\"score-follow-rhythm-dot\">.</span>" : "") +
+        (tail ? "<span class=\"score-follow-tail\">" + ErhuQuality.escape(tail) + "</span>" : "")
+      );
+    }
+
+    function lowOctaveText(label) {
+      const matched = String(label || "").match(/^[1-7](?:'+)?(,*)/);
+      const count = matched ? (matched[1] || "").length : 0;
+      return count ? "●".repeat(count) : "";
+    }
+
+    function normalizeTextSpan(spanData) {
+      if (Array.isArray(spanData)) {
+        return {
+          start: Number(spanData[0]) || 0,
+          end: Number(spanData[1]) || Number(spanData[0]) || 0,
+          text: String(spanData[2] || "")
+        };
+      }
+      return {
+        start: Number(spanData && spanData.start) || 0,
+        end: Number(spanData && spanData.end) || Number(spanData && spanData.start) || 0,
+        text: String((spanData && spanData.text) || "")
+      };
+    }
+
+    function renderTextSpans(measure, cells, cellStarts, spans, className) {
+      (spans || []).forEach(function (spanData) {
+        const spanMeta = normalizeTextSpan(spanData);
+        if (!spanMeta.text) {
+          return;
+        }
+        const tokens = spanMeta.text.trim().split(/\s+/).filter(Boolean);
+        const start = Math.max(0, Math.min(cells.length - 1, spanMeta.start));
+        const end = Math.max(start, Math.min(cells.length - 1, spanMeta.end));
+        if (tokens.length > 1) {
+          tokens.forEach(function (token, tokenIndex) {
+            const target = Math.min(end, start + tokenIndex);
+            const mark = document.createElement("div");
+            mark.className = className;
+            mark.style.gridColumn = ((cellStarts[target] + 1) + " / " + (cellStarts[target] + cells[target].units + 1)).split(" / ").map(function (n) { return Number(n) * 2 - 1; }).join(" / ");
+            mark.textContent = token;
+            measure.appendChild(mark);
+          });
+          return;
+        }
+        const mark = document.createElement("div");
+        mark.className = className;
+        mark.style.gridColumn = ((cellStarts[start] + 1) + " / " + (cellStarts[end] + cells[end].units + 1)).split(" / ").map(function (n) { return Number(n) * 2 - 1; }).join(" / ");
+        mark.textContent = spanMeta.text;
+        measure.appendChild(mark);
+      });
+    }
+
+    function buildCellTextMap(cells, spans) {
+      const textMap = {};
+      (spans || []).forEach(function (spanData) {
+        const spanMeta = normalizeTextSpan(spanData);
+        if (!spanMeta.text) {
+          return;
+        }
+        const start = Math.max(0, Math.min(cells.length - 1, spanMeta.start));
+        const end = Math.max(start, Math.min(cells.length - 1, spanMeta.end));
+        const tokens = spanMeta.text.trim().split(/\s+/).filter(Boolean);
+        if (tokens.length === end - start + 1) {
+          tokens.forEach(function (token, offset) {
+            textMap[start + offset] = token;
+          });
+          return;
+        }
+        textMap[start] = spanMeta.text;
+      });
+      return textMap;
+    }
+
+    function buildAutoUnderlines(cells, beatUnits, totalUnits) {
+      const ranges = [];
+      const starts = [];
+      const singleCovered = new Array(cells.length).fill(false);
+      const doubleCovered = new Array(cells.length).fill(false);
+      let cursor = 0;
+      cells.forEach(function (cellData) {
+        starts.push(cursor);
+        cursor += cellData.units;
+      });
+      const measureUnits = Math.max(totalUnits || 0, cursor);
+      const beatSize = Math.max(1, Number(beatUnits) || 4);
+      for (let beatStart = 0; beatStart < measureUnits; beatStart += beatSize) {
+        const beatEnd = beatStart + beatSize;
+        const single = [];
+        const double = [];
+        cells.forEach(function (cellData, cellIndex) {
+          const start = starts[cellIndex];
+          const end = start + cellData.units;
+          if (start >= beatStart && end <= beatEnd && cellData.units < beatSize) {
+            single.push(cellIndex);
+          }
+          if (start >= beatStart && end <= beatEnd && cellData.units < beatSize / 2) {
+            double.push(cellIndex);
+          }
+        });
+        if (single.length) {
+          ranges.push([single[0], single[single.length - 1], 1]);
+          for (let singleIndex = single[0]; singleIndex <= single[single.length - 1]; singleIndex += 1) {
+            singleCovered[singleIndex] = true;
+          }
+        }
+        if (double.length) {
+          let groupStart = double[0];
+          let previous = double[0];
+          for (let index = 1; index <= double.length; index += 1) {
+            const current = double[index];
+            if (current === previous + 1) {
+              previous = current;
+              continue;
+            }
+            ranges.push([groupStart, previous, 2]);
+            for (let doubleIndex = groupStart; doubleIndex <= previous; doubleIndex += 1) {
+              doubleCovered[doubleIndex] = true;
+              singleCovered[doubleIndex] = true;
+            }
+            groupStart = current;
+            previous = current;
+          }
+        }
+      }
+      cells.forEach(function (cellData, cellIndex) {
+        if (cellData.units < beatSize / 2 && !doubleCovered[cellIndex]) {
+          ranges.push([cellIndex, cellIndex, 2]);
+          doubleCovered[cellIndex] = true;
+          singleCovered[cellIndex] = true;
+        }
+        if (cellData.units < beatSize && !singleCovered[cellIndex]) {
+          ranges.push([cellIndex, cellIndex, 1]);
+          singleCovered[cellIndex] = true;
+        }
+      });
+      return ranges;
+    }
+
+    function renderScore(scoreData) {
+      previewSheet.innerHTML = "";
+      previewSheet.className = "score-follow-sheet";
+
+      if (scoreData && scoreData.header) {
+        const header = document.createElement("div");
+        header.className = "score-follow-header";
+        header.innerHTML =
+          "<div class=\"score-follow-title\">" + (scoreData.header.title || "") + "</div>" +
+          "<div class=\"score-follow-meta\">" +
+            "<div class=\"score-follow-meta-left\">" +
+              (Array.isArray(scoreData.header.left) ? scoreData.header.left.map(function (item) {
+                return "<div>" + item + "</div>";
+              }).join("") : "") +
+            "</div>" +
+            "<div class=\"score-follow-meta-right\">" + (scoreData.header.right || "") + "</div>" +
+          "</div>";
+        previewSheet.appendChild(header);
+      }
+
+      (scoreData.rows || []).forEach(function (rowData, sourceRowIndex) {
+        const rowWrap = document.createElement("div");
+        rowWrap.className = "score-follow-row";
+
+        if (rowData.prefix) {
+          const prefix = document.createElement("div");
+          prefix.className = "score-follow-prefix";
+          prefix.textContent = rowData.prefix;
+          rowWrap.appendChild(prefix);
+        }
+
+        const measureRow = document.createElement("div");
+        measureRow.className = "score-follow-measure-row";
+        measureRow.style.setProperty("--measure-count", String((rowData.measures || []).length || 1));
+
+        (rowData.measures || []).forEach(function (measureData, sourceMeasureIndex) {
+          const cells = (measureData.cells || []).map(function (cellData) {
+            if (typeof cellData === "string") {
+              return { label: cellData, units: 1 };
+            }
+            return {
+              label: cellData.label || "",
+              units: Number(cellData.units) > 0 ? Number(cellData.units) : 1
+            };
+          });
+          if (!cells.length) {
+            return;
+          }
+
+          const cellStarts = [];
+          let unitCursor = 0;
+          cells.forEach(function (cellData) {
+            cellStarts.push(unitCursor);
+            unitCursor += cellData.units;
+          });
+
+          const unitCount = Math.max(Number(measureData.totalUnits) || 0, unitCursor, 8);
+          const measure = document.createElement("div");
+          measure.className = "score-follow-measure";
+          measure.dataset.sourceRow = sourceRowIndex;
+          measure.dataset.sourceMeasure = sourceMeasureIndex;
+          measure.tabIndex = 0;
+          measure.setAttribute("role", "button");
+          measure.setAttribute("aria-label", "編輯第 " + (sourceRowIndex + 1) + " 行第 " + (sourceMeasureIndex + 1) + " 小節");
+          measure.style.setProperty("--unit-count", String(unitCount * 2));
+          measure.style.width = Math.max(140, cells.length * 44, unitCount * 10) + "px";
+          measure.style.maxWidth = "100%";
+          measure.style.boxSizing = "border-box";
+          measure.style.flex = "0 1 auto";
+          measure.style.setProperty("--bow-height", (measureData.bows || []).length ? "22px" : "0px");
+          measure.style.setProperty("--guide-height", (measureData.fingerings || measureData.guides || []).length ? "20px" : "0px");
+          measure.style.setProperty("--upper-height", (measureData.upperNotes || []).length ? "16px" : "0px");
+          measure.style.setProperty("--slur-height", (measureData.slurs || []).length ? "16px" : "0px");
+
+          if (measureData.marker) {
+            const marker = document.createElement("div");
+            marker.className = "score-follow-marker";
+            marker.textContent = measureData.marker;
+            measure.appendChild(marker);
+          }
+
+          renderTextSpans(measure, cells, cellStarts, measureData.bows || [], "score-follow-bow");
+          renderTextSpans(measure, cells, cellStarts, measureData.fingerings || measureData.guides || [], "score-follow-guide");
+          const upperNoteMap = buildCellTextMap(cells, measureData.upperNotes || []);
+          Object.keys(upperNoteMap).forEach(function (key) {
+            const cellIndex = Number(key);
+            if (!Number.isFinite(cellIndex) || !cells[cellIndex]) {
+              return;
+            }
+            const upperNote = document.createElement("div");
+            upperNote.className = "score-follow-upper-note";
+            upperNote.style.gridColumn = ((cellStarts[cellIndex] + 1) + " / " + (cellStarts[cellIndex] + cells[cellIndex].units + 1)).split(" / ").map(function (n) { return Number(n) * 2 - 1; }).join(" / ");
+            upperNote.textContent = upperNoteMap[cellIndex];
+            measure.appendChild(upperNote);
+          });
+
+          (measureData.slurs || []).forEach(function (slurRange) {
+            const start = Math.max(0, Number(slurRange[0]) || 0);
+            const end = Math.min(cells.length - 1, Number(slurRange[1]) || 0);
+            if (end < start) {
+              return;
+            }
+            const slur = document.createElement("div");
+            slur.className = "score-follow-slur";
+            slur.style.gridColumn = ((cellStarts[start] + 1) + " / " + (cellStarts[end] + cells[end].units + 1)).split(" / ").map(function (n) { return Number(n) * 2 - 1; }).join(" / ");
+            measure.appendChild(slur);
+          });
+
+          cells.forEach(function (cellData, cellIndex) {
+            const startUnit = cellStarts[cellIndex];
+            const endUnit = startUnit + cellData.units;
+            const cell = document.createElement("div");
+            cell.className = "score-follow-cell";
+            cell.dataset.sourceNote = cellIndex;
+            cell.style.gridColumn = ((startUnit + 1) + " / " + (endUnit + 1)).split(" / ").map(function (n) { return Number(n) * 2 - 1; }).join(" / ");
+            cell.innerHTML = "<span class=\"score-follow-main\">" + parseJianpuText(cellData.label) + "</span>";
+            measure.appendChild(cell);
+            const lowDots = lowOctaveText(cellData.label);
+            if (lowDots) {
+              const lowMarker = document.createElement("div");
+              lowMarker.className = "score-follow-low-octave-marker";
+              lowMarker.style.gridColumn = ((startUnit + 1) + " / " + (endUnit + 1)).split(" / ").map(function (n) { return Number(n) * 2 - 1; }).join(" / ");
+              lowMarker.textContent = lowDots;
+              measure.appendChild(lowMarker);
+            }
+          });
+
+          const underlineRanges = scoreData.autoUnderlines
+            ? buildAutoUnderlines(cells, scoreData.beatUnits || 4, unitCount)
+            : (measureData.underlines || []);
+          underlineRanges.forEach(function (underlineRange) {
+            const start = Math.max(0, Number(underlineRange[0]) || 0);
+            const end = Math.min(cells.length - 1, Number(underlineRange[1]) || 0);
+            if (end < start) {
+              return;
+            }
+            const underline = document.createElement("div");
+            underline.className = "score-follow-underline" + ((Number(underlineRange[2]) || 1) >= 3 ? " triple" : (Number(underlineRange[2]) || 1) >= 2 ? " double" : " single");
+            underline.style.gridColumn = ((cellStarts[start] + 1) + " / " + (cellStarts[end] + cells[end].units + 1)).split(" / ").map(function (n) { return Number(n) * 2 - 1; }).join(" / ");
+            measure.appendChild(underline);
+          });
+
+          measureRow.appendChild(measure);
+        });
+
+        ["--bow-height", "--guide-height", "--upper-height", "--slur-height"].forEach(function (lane) {
+          const height = Math.max(0, ...Array.from(measureRow.children, m => parseInt(m.style.getPropertyValue(lane), 10) || 0));
+          Array.from(measureRow.children).forEach(m => m.style.setProperty(lane, height + "px"));
+        });
+        rowWrap.appendChild(measureRow);
+        previewSheet.appendChild(rowWrap);
+      });
+      // Reflow source rows visually without modifying stored musical content.
+      const displayedMeasures = Array.from(previewSheet.querySelectorAll(".score-follow-measure"));
+      ["--bow-height", "--guide-height", "--upper-height", "--slur-height"].forEach(function (lane) {
+        const height = Math.max(0, ...displayedMeasures.map(m => parseInt(m.style.getPropertyValue(lane), 10) || 0));
+        displayedMeasures.forEach(m => m.style.setProperty(lane, height + "px"));
+      });
+    }
+
+    const UNIT_OPTIONS = [
+      { value: 0.5, label: "32 分音" },
+      { value: 1.5, label: "附點 16 分" },
+      { value: 1, label: "16 分音" },
+      { value: 2, label: "8 分音" },
+      { value: 3, label: "附點 8 分" },
+      { value: 4, label: "4 分音" },
+      { value: 6, label: "附點 4 分" },
+      { value: 8, label: "2 分音" },
+      { value: 12, label: "附點 2 分" },
+      { value: 16, label: "全音符" }
+    ];
+    const BOWING_OPTIONS = ["", "V", "ㄇ"];
+
+    function cellExpression(cellData) {
+      const label = String(cellData.label || "");
+      const units = Number(cellData.units) || 1;
+      if (units === 4) return "q(" + jsString(label) + ")";
+      if (units === 2) return "e(" + jsString(label) + ")";
+      if (units === 1) return "s(" + jsString(label) + ")";
+      if (units === 8 && /-$/.test(label)) return "h(" + jsString(label.replace(/-$/, "")) + ")";
+      if (units === 16 && /---$/.test(label)) return "w(" + jsString(label.replace(/---$/, "")) + ")";
+      return "n(" + jsString(label) + ", " + units + ")";
+    }
+
+    function serializeList(items, formatter) {
+      return (items || []).map(formatter).join(", ");
+    }
+
+    function parseLabelParts(label) {
+      const raw = String(label || "").trim();
+      const matched = raw.match(/^([1-7](?:'+)?(?:,*)?)(\.?)(-*)$/);
+      if (!matched) {
+        return {
+          pitch: raw,
+          unitsHint: null
+        };
+      }
+      return {
+        pitch: matched[1],
+        unitsHint: matched[2] ? matched[2] + matched[3] : matched[3]
+      };
+    }
+
+    function buildLabelFromPitchUnits(pitch, units) {
+      const safePitch = String(pitch || "").trim();
+      if (!safePitch) {
+        return "";
+      }
+      const safeUnits = Number(units) || 1;
+      if (safeUnits === 1.5 || safeUnits === 3 || safeUnits === 6) {
+        return safePitch + ".";
+      }
+      if (safeUnits === 8) {
+        return safePitch + "-";
+      }
+      if (safeUnits === 12) {
+        return safePitch + ".-";
+      }
+      if (safeUnits === 16) {
+        return safePitch + "---";
+      }
+      return safePitch;
+    }
+
+    function createDefaultNote() {
+      return {
+        pitch: "1",
+        units: 4,
+        bowing: "",
+        fingering: "",
+        upperNote: "",
+        slurGroup: "",
+        underlineDepth: 0
+      };
+    }
+
+    function createDefaultMeasure() {
+      return {
+        cells: [
+          { label: "1", units: 4 }
+        ]
+      };
+    }
+
+    function createDefaultRow() {
+      return {
+        prefix: "",
+        measures: [createDefaultMeasure()]
+      };
+    }
+
+    function buildNotation(rows) {
+      return rows.map(function (rowData) {
+        return (rowData.measures || []).map(function (measureData) {
+          return (measureData.cells || []).map(function (cellData) {
+            return String(cellData.label || "");
+          }).join(" ");
+        }).join(" | ");
+      }).join("\n");
+    }
+
+    function applyTextSpansToNotes(notes, spans, fieldName) {
+      (spans || []).forEach(function (spanData) {
+        const spanMeta = normalizeTextSpan(spanData);
+        const start = Math.max(0, Math.min(notes.length - 1, spanMeta.start));
+        const end = Math.max(start, Math.min(notes.length - 1, spanMeta.end));
+        const tokens = String(spanMeta.text || "").trim().split(/\s+/).filter(Boolean);
+        if (!tokens.length) {
+          return;
+        }
+        if (tokens.length === end - start + 1) {
+          tokens.forEach(function (token, offset) {
+            if (notes[start + offset]) {
+              notes[start + offset][fieldName] = token;
+            }
+          });
+          return;
+        }
+        if (notes[start]) {
+          notes[start][fieldName] = spanMeta.text;
+        }
+      });
+    }
+
+    function notesFromMeasureData(measureData) {
+      const notes = (measureData.cells || []).map(function (cellData) {
+        const parts = parseLabelParts(cellData.label);
+        return {
+          pitch: parts.pitch || "",
+          units: Number(cellData.units) || 1,
+          bowing: "",
+          fingering: "",
+          upperNote: "",
+          slurGroup: "",
+          underlineDepth: 0
+        };
+      });
+
+      applyTextSpansToNotes(notes, measureData.bows || [], "bowing");
+      applyTextSpansToNotes(notes, measureData.fingerings || measureData.guides || [], "fingering");
+      applyTextSpansToNotes(notes, measureData.upperNotes || [], "upperNote");
+
+      (measureData.slurs || []).forEach(function (slurRange, slurIndex) {
+        const start = Math.max(0, Math.min(notes.length - 1, Number(slurRange[0]) || 0));
+        const end = Math.max(start, Math.min(notes.length - 1, Number(slurRange[1]) || 0));
+        const groupId = String.fromCharCode(65 + (slurIndex % 26));
+        for (let noteIndex = start; noteIndex <= end; noteIndex += 1) {
+          if (notes[noteIndex]) {
+            notes[noteIndex].slurGroup = groupId;
+          }
+        }
+      });
+
+      (measureData.underlines || []).forEach(function (underlineRange) {
+        const start = Math.max(0, Math.min(notes.length - 1, Number(underlineRange[0]) || 0));
+        const end = Math.max(start, Math.min(notes.length - 1, Number(underlineRange[1]) || 0));
+        const depth = Math.max(0, Number(underlineRange[2]) || 1);
+        for (let noteIndex = start; noteIndex <= end; noteIndex += 1) {
+          if (notes[noteIndex]) {
+            notes[noteIndex].underlineDepth = depth;
+          }
+        }
+      });
+
+      return notes.length ? notes : [createDefaultNote()];
+    }
+
+    function unitOptionsMarkup(selectedValue) {
+      return UNIT_OPTIONS.map(function (option) {
+        return "<option value=\"" + option.value + "\"" + (Number(selectedValue) === option.value ? " selected" : "") + ">" + option.label + "</option>";
+      }).join("");
+    }
+
+    function bowingOptionsMarkup(selectedValue) {
+      return BOWING_OPTIONS.map(function (option) {
+        const label = option || "無";
+        return "<option value=\"" + option + "\"" + (String(selectedValue || "") === option ? " selected" : "") + ">" + label + "</option>";
+      }).join("");
+    }
+
+    function buildNoteRowHtml(note, noteIndex) {
+      return (
+        "<div class=\"note-row\" data-note-index=\"" + noteIndex + "\">" +
+          "<div class=\"note-index\">音 " + (noteIndex + 1) + "</div>" +
+          "<input data-note-field=\"pitch\" type=\"text\" value=\"" + (note.pitch || "") + "\" placeholder=\"1、1'、5,\" />" +
+          "<select data-note-field=\"units\">" + unitOptionsMarkup(note.units) + "</select>" +
+          "<select data-note-field=\"bowing\">" + bowingOptionsMarkup(note.bowing) + "</select>" +
+          "<input data-note-field=\"fingering\" type=\"text\" value=\"" + (note.fingering || "") + "\" placeholder=\"0、二、四\" />" +
+          "<input data-note-field=\"upperNote\" type=\"text\" value=\"" + (note.upperNote || "") + "\" placeholder=\"3 左上角的小 5\" />" +
+          "<input data-note-field=\"slurGroup\" type=\"text\" value=\"" + (note.slurGroup || "") + "\" placeholder=\"A\" />" +
+          "<select data-note-field=\"underlineDepth\">" +
+            "<option value=\"0\"" + ((Number(note.underlineDepth) || 0) === 0 ? " selected" : "") + ">無</option>" +
+            "<option value=\"1\"" + ((Number(note.underlineDepth) || 0) === 1 ? " selected" : "") + ">一條</option>" +
+            "<option value=\"2\"" + ((Number(note.underlineDepth) || 0) === 2 ? " selected" : "") + ">兩條</option>" +
+          "<option value=\"3\"" + (Number(note.underlineDepth) === 3 ? " selected" : "") + ">三條</option>" +
+          "</select>" +
+          "<button class=\"note-remove\" type=\"button\" data-action=\"remove-note\" data-note-index=\"" + noteIndex + "\">刪除</button>" +
+        "</div>"
+      );
+    }
+
+    function renderMeasureNoteTable(card, notes) {
+      const table = card.querySelector("[data-note-table]");
+      const rows = notes.map(buildNoteRowHtml).join("");
+      table.innerHTML =
+        "<div class=\"note-row head\">" +
+          "<div>位置</div>" +
+          "<div>音</div>" +
+          "<div>拍值</div>" +
+          "<div>弓法</div>" +
+          "<div>指法</div>" +
+          "<div>上方小音</div>" +
+          "<div>連弓組</div>" +
+          "<div>底線</div>" +
+          "<div></div>" +
+        "</div>" +
+        rows;
+    }
+
+    function extractNotesFromCard(card) {
+      return Array.from(card.querySelectorAll(".note-row[data-note-index]")).map(function (row) {
+        return {
+          pitch: row.querySelector("[data-note-field='pitch']").value.trim(),
+          units: Math.max(0.5, Number(row.querySelector("[data-note-field='units']").value) || 1),
+          bowing: row.querySelector("[data-note-field='bowing']").value.trim(),
+          fingering: row.querySelector("[data-note-field='fingering']").value.trim(),
+          upperNote: row.querySelector("[data-note-field='upperNote']").value.trim(),
+          slurGroup: row.querySelector("[data-note-field='slurGroup']").value.trim(),
+          underlineDepth: Math.max(0, Number(row.querySelector("[data-note-field='underlineDepth']").value) || 0)
+        };
+      });
+    }
+
+    function bowsFromNotes(notes) {
+      return notes.reduce(function (bows, note, index) {
+        if (note.bowing) {
+          bows.push([index, index, note.bowing]);
+        }
+        return bows;
+      }, []);
+    }
+
+    function fingeringsFromNotes(notes) {
+      return notes.reduce(function (fingerings, note, index) {
+        if (note.fingering) {
+          fingerings.push([index, index, note.fingering]);
+        }
+        return fingerings;
+      }, []);
+    }
+
+    function upperNotesFromNotes(notes) {
+      return notes.reduce(function (upperNotes, note, index) {
+        if (note.upperNote) {
+          upperNotes.push([index, index, note.upperNote]);
+        }
+        return upperNotes;
+      }, []);
+    }
+
+    function slursFromNotes(notes) {
+      const slurs = [];
+      let index = 0;
+      while (index < notes.length) {
+        const group = String(notes[index].slurGroup || "").trim();
+        if (!group) {
+          index += 1;
+          continue;
+        }
+        let end = index;
+        while (end + 1 < notes.length && String(notes[end + 1].slurGroup || "").trim() === group) {
+          end += 1;
+        }
+        if (end > index) {
+          slurs.push([index, end]);
+        }
+        index = end + 1;
+      }
+      return slurs;
+    }
+
+    function underlinesFromNotes(notes) {
+      const underlines = [];
+      let index = 0;
+      while (index < notes.length) {
+        const depth = Math.max(0, Number(notes[index].underlineDepth) || 0);
+        if (!depth) {
+          index += 1;
+          continue;
+        }
+        let end = index;
+        while (end + 1 < notes.length && (Number(notes[end + 1].underlineDepth) || 0) === depth) {
+          end += 1;
+        }
+        underlines.push([index, end, depth]);
+        index = end + 1;
+      }
+      return underlines;
+    }
+
+    function buildMeasureCard(measureData, measureIndex) {
+      const card = document.createElement("article");
+      card.className = "measure-card";
+      card.dataset.measureIndex = String(measureIndex);
+      card.innerHTML =
+        "<h4>第 " + (measureIndex + 1) + " 小節</h4>" +
+        "<div class=\"measure-toolbar\">" +
+          "<div class=\"measure-tip\">直接改音、弓法、指法和上方小音就好。連弓組填相同字母，系統會自動連起來。</div>" +
+          "<div class=\"measure-actions\">" +
+            "<button class=\"mini-button\" type=\"button\" data-action=\"add-note\">新增音</button>" +
+            "<button class=\"mini-button danger\" type=\"button\" data-action=\"remove-last-note\">刪最後一音</button>" +
+            "<button class=\"mini-button\" type=\"button\" data-action=\"add-measure-after\">後面加小節</button>" +
+            "<button class=\"mini-button danger\" type=\"button\" data-action=\"delete-measure\">刪除此小節</button>" +
+          "</div>" +
+        "</div>" +
+        "<div class=\"field\"><label>力度或記號</label><input data-field=\"marker\" type=\"text\" value=\"" + (measureData.marker || "") + "\" placeholder=\"例如 f、p\" /></div>" +
+        "<div class=\"note-table\" data-note-table></div>" +
+        "<div class=\"note-help\">音可填 `1`、`1'`、`2'`。低八度下方一點請填逗號，例如 `5,`；下方兩點填 `5,,`。弓法可填 `V` 或 `ㄇ`。上方小音就是主音左上角那個小數字，例如 `3` 左上角的小 `5`。底線只有在取消「自動重算下面底線」時才會照你手動設定。</div>";
+      renderMeasureNoteTable(card, notesFromMeasureData(measureData));
+      return card;
+    }
+
+    function buildRowEditor(rowData, rowIndex) {
+      const section = document.createElement("section");
+      section.className = "row-editor";
+      section.dataset.rowIndex = String(rowIndex);
+
+      const head = document.createElement("div");
+      head.className = "row-editor-head";
+      head.innerHTML =
+        "<h3>第 " + (rowIndex + 1) + " 行</h3>" +
+        "<div class=\"field\" style=\"min-width: 140px; max-width: 220px;\">" +
+          "<label>拍號前綴</label>" +
+          "<textarea data-row-prefix rows=\"2\">" + (rowData.prefix || "") + "</textarea>" +
+        "</div>" +
+        "<div class=\"row-actions\">" +
+          "<button class=\"mini-button\" type=\"button\" data-action=\"add-row-after\">下面加一行</button>" +
+          "<button class=\"mini-button danger\" type=\"button\" data-action=\"delete-row\">刪除此行</button>" +
+        "</div>";
+      section.appendChild(head);
+
+      const grid = document.createElement("div");
+      grid.className = "measure-grid";
+      (rowData.measures || []).forEach(function (measureData, measureIndex) {
+        grid.appendChild(buildMeasureCard(measureData, measureIndex));
+      });
+
+      section.appendChild(grid);
+      return section;
+    }
+
+    function renderEditorRows(rows) {
+      const safeRows = Array.isArray(rows) && rows.length ? rows : [createDefaultRow()];
+      editorGrid.innerHTML = "";
+      safeRows.forEach(function (rowData, rowIndex) {
+        const safeRow = Object.assign({}, rowData || {});
+        if (!Array.isArray(safeRow.measures) || !safeRow.measures.length) {
+          safeRow.measures = [createDefaultMeasure()];
+        }
+        editorGrid.appendChild(buildRowEditor(safeRow, rowIndex));
+      });
+    }
+
+    function rebuildEditorWithRows(rows, statusText) {
+      renderEditorRows(rows);
+      refreshPreview(false);
+      scheduleRefresh();
+      if (statusText) {
+        setStatus(statusText);
+      }
+    }
+
+    function collectScoreFromEditor() {
+      const base = currentBaseScore || scoreApi.getBaseScore(currentTitle);
+      if (!base) {
+        throw new Error("找不到這首譜的基礎資料");
+      }
+      const score = JSON.parse(JSON.stringify(base));
+      score.header = Object.assign({}, score.header || {});
+      score.header.title = displayTitleInput.value.trim() || base.title || currentTitle;
+      score.header.left = [headerLeft1Input.value.trim(), headerLeft2Input.value.trim()].filter(Boolean);
+      score.header.right = headerRightInput.value.trim();
+      score.note = scoreNoteInput.value.trim();
+      score.autoUnderlines = autoUnderlinesInput.checked;
+      score.beatUnits = Math.max(1, Number(beatUnitsInput.value) || 4);
+      score.rows = [];
+
+      const rowSections = editorGrid.querySelectorAll(".row-editor");
+      rowSections.forEach(function (rowSection) {
+        const rowData = {
+          prefix: rowSection.querySelector("[data-row-prefix]").value,
+          measures: []
+        };
+        rowSection.querySelectorAll(".measure-card").forEach(function (card) {
+          const notes = extractNotesFromCard(card).filter(function (note) {
+            return note.pitch;
+          });
+          const measureData = {
+            cells: notes.map(function (note) {
+              return {
+                label: buildLabelFromPitchUnits(note.pitch, note.units),
+                units: note.units
+              };
+            })
+          };
+          const bows = bowsFromNotes(notes);
+          const fingerings = fingeringsFromNotes(notes);
+          const upperNotes = upperNotesFromNotes(notes);
+          const slurs = slursFromNotes(notes);
+          const underlines = underlinesFromNotes(notes);
+          const marker = card.querySelector("[data-field='marker']").value.trim();
+          if (bows.length) measureData.bows = bows;
+          if (fingerings.length) measureData.fingerings = fingerings;
+          if (upperNotes.length) measureData.upperNotes = upperNotes;
+          if (slurs.length) measureData.slurs = slurs;
+          if (underlines.length) measureData.underlines = underlines;
+          if (marker) measureData.marker = marker;
+          rowData.measures.push(measureData);
+        });
+        score.rows.push(rowData);
+      });
+
+      score.notation = buildNotation(score.rows);
+      return score;
+    }
+
+    function buildExportBlock(score) {
+      const lines = [];
+      lines.push("register(" + jsString(currentTitle) + ", {");
+      lines.push("  aliases: " + JSON.stringify(score.aliases || []) + ",");
+      lines.push("  note: " + jsString(score.note || "") + ",");
+      lines.push("  autoUnderlines: " + (score.autoUnderlines ? "true" : "false") + ",");
+      lines.push("  beatUnits: " + (Number(score.beatUnits) || 4) + ",");
+      lines.push("  header: {");
+      lines.push("    title: " + jsString((score.header && score.header.title) || currentTitle) + ",");
+      lines.push("    left: " + JSON.stringify((score.header && score.header.left) || []) + ",");
+      lines.push("    right: " + jsString((score.header && score.header.right) || "") + "");
+      lines.push("  },");
+      lines.push("  notation: [");
+      String(score.notation || "").split(/\n/).forEach(function (line, index, array) {
+        lines.push("    " + jsString(line) + (index === array.length - 1 ? "" : ","));
+      });
+      lines.push("  ].join(\"\\n\"),");
+      lines.push("  rows: [");
+
+      (score.rows || []).forEach(function (rowData, rowIndex) {
+        lines.push("    {");
+        if (rowData.prefix) {
+          lines.push("      prefix: " + jsString(rowData.prefix) + ",");
+        }
+        lines.push("      measures: [");
+        (rowData.measures || []).forEach(function (measureData, measureIndex, measureList) {
+          lines.push("        // 第 " + (rowIndex + 1) + " 行｜第 " + (measureIndex + 1) + " 小節");
+          const cellsExpr = serializeList(measureData.cells || [], cellExpression);
+          const optionLines = [];
+          if (measureData.marker) optionLines.push("marker: " + jsString(measureData.marker));
+          if (measureData.underlines && measureData.underlines.length) optionLines.push("underlines: [" + serializeList(measureData.underlines, function (item) { return "underline(" + [item[0], item[1], item[2] || 1].join(", ") + ")"; }) + "]");
+          if (measureData.slurs && measureData.slurs.length) optionLines.push("slurs: [" + serializeList(measureData.slurs, function (item) { return "span(" + [item[0], item[1]].join(", ") + ")"; }) + "]");
+          if (measureData.bows && measureData.bows.length) optionLines.push("bows: [" + serializeList(measureData.bows, function (item) { return "bow(" + [item[0], item[1], jsString(item[2])].join(", ") + ")"; }) + "]");
+          if (measureData.fingerings && measureData.fingerings.length) optionLines.push("fingerings: [" + serializeList(measureData.fingerings, function (item) { return "fingering(" + [item[0], item[1], jsString(item[2])].join(", ") + ")"; }) + "]");
+          if (measureData.upperNotes && measureData.upperNotes.length) optionLines.push("upperNotes: [" + serializeList(measureData.upperNotes, function (item) { return "upperNote(" + [item[0], item[1], jsString(item[2])].join(", ") + ")"; }) + "]");
+          if (!optionLines.length) {
+            lines.push("        measure([" + cellsExpr + "])" + (measureIndex === measureList.length - 1 ? "" : ","));
+          } else {
+            lines.push("        measure(");
+            lines.push("          [" + cellsExpr + "],");
+            lines.push("          {");
+            optionLines.forEach(function (optionLine, optionIndex) {
+              lines.push("            " + optionLine + (optionIndex === optionLines.length - 1 ? "" : ","));
+            });
+            lines.push("          }");
+            lines.push("        )" + (measureIndex === measureList.length - 1 ? "" : ","));
+          }
+        });
+        lines.push("      ]");
+        lines.push("    }" + (rowIndex === score.rows.length - 1 ? "" : ","));
+      });
+
+      lines.push("  ]");
+      lines.push("});");
+      return lines.join("\n");
+    }
+
+    function refreshPreview(showSuccess) {
+      try {
+        const score = collectScoreFromEditor();
+        renderScore(score);
+        exportText.value = buildExportBlock(score);
+        if (showSuccess) {
+          setStatus("預覽已更新。你現在看到的是目前編輯欄位對應的譜面。");
+        }
+        return score;
+      } catch (error) {
+        setStatus("語法有問題：" + error.message, "error");
+        return null;
+      }
+    }
+
+    function refreshAndSaveDraft() {
+      const score = refreshPreview(false);
+      if (!score || !currentTitle || isLoadingPiece) {
+        return;
+      }
+      if (scoreApi.saveDraft && scoreApi.saveDraft(currentStorageKey || currentTitle, score)) {
+        setStatus("草稿已保存在此瀏覽器。我的譜需按「儲存並套用」才會同步雲端；內建教材修改僅套用於本機。");
+      } else {
+        setStatus("草稿自動保存失敗，請先按「複製程式碼」保留目前內容。", "error");
+      }
+    }
+
+    function scheduleRefresh() {
+      window.clearTimeout(refreshTimer);
+      refreshTimer = window.setTimeout(function () {
+        refreshAndSaveDraft();
+      }, 180);
+    }
+
+    function loadPiece(title) {
+      isLoadingPiece = true;
+      currentTitle = title;
+      currentStorageKey = title;
+      currentBaseScore = scoreApi.getBaseScore(title);
+      const draft = scoreApi.readDraft ? scoreApi.readDraft(currentStorageKey) : null;
+      const score = draft || scoreApi.getEditableScore(title);
+      if (!score) {
+        isLoadingPiece = false;
+        setStatus("這首曲子尚無譜資料，請先上傳原譜。", "error");
+        const link=document.createElement("a"); link.className="button"; link.href="./二胡小教室-AI掃描譜.html?title="+encodeURIComponent(title); link.textContent="上傳原譜"; document.getElementById("saveButton").disabled=true; document.getElementById("saveButton").after(link);
+        return;
+      }
+
+      displayTitleInput.value = (score.header && score.header.title) || title;
+      headerLeft1Input.value = (score.header && score.header.left && score.header.left[0]) || "";
+      headerLeft2Input.value = (score.header && score.header.left && score.header.left[1]) || "";
+      headerRightInput.value = (score.header && score.header.right) || "";
+      scoreNoteInput.value = score.note || "";
+      beatUnitsInput.value = Number(score.beatUnits) || 4;
+      autoUnderlinesInput.checked = !!score.autoUnderlines;
+
+      renderEditorRows(score.rows || []);
+
+      renderScore(score);
+      exportText.value = buildExportBlock(score);
+      const draftTime = draft && draft._scoreDraftSavedAt ? formatSavedTime(draft._scoreDraftSavedAt) : "";
+      const savedTime = score && score._scoreUserSavedAt ? formatSavedTime(score._scoreUserSavedAt) : "";
+      setStatus(
+        draft
+          ? "已恢復自動保存草稿" + (draftTime ? "（" + draftTime + "）" : "") + "。按「儲存並套用」後才會成為課程頁使用的版本。"
+          : scoreApi.hasOverride(title)
+          ? "目前顯示的是你這台電腦上已套用的編輯版本。下面直接改音、弓法、指法和上方小音就可以。"
+          : "目前顯示網站預設譜面。你可以直接在下面改音、弓法、指法和上方小音。"
+      );
+      if (!draft && savedTime) {
+        setStatus("目前顯示的是你這台電腦上已套用的編輯版本" + (savedTime ? "（" + savedTime + "）" : "") + "。");
+      }
+      params.set("title", title);
+      history.replaceState(null, "", window.location.pathname + "?" + params.toString());
+      isLoadingPiece = false;
+    }
+
+    async function loadCustomScore(scoreId) {
+      if (!currentUser) {
+        setStatus("請先登入後再編輯自訂譜。", "error");
+        return;
+      }
+      isLoadingPiece = true;
+      try {
+        const doc = await window.ErhuFirebase.db
+          .collection("students")
+          .doc(currentUser.uid)
+          .collection("customScores")
+          .doc(scoreId)
+          .get();
+        const data = doc.data() || {};
+        const storedScore = window.ErhuScoreStorage.read(data);
+        if (!doc.exists || !storedScore) {
+          setStatus("找不到這份自訂譜。", "error");
+          isLoadingPiece = false;
+          return;
+        }
+        currentTitle = data.title || (storedScore.header && storedScore.header.title) || "自訂練習譜";
+        currentStorageKey = "customScore:" + scoreId;
+        currentBaseScore = JSON.parse(JSON.stringify(storedScore));
+        pieceCatalog = [{ title: currentTitle, aliases: [], note: currentBaseScore.note || "", hasRows: true }];
+        pieceSelect.innerHTML = "";
+        const option = document.createElement("option");
+        option.value = currentTitle;
+        option.textContent = currentTitle + "（我的譜）";
+        pieceSelect.appendChild(option);
+        pieceSelect.value = currentTitle;
+        pieceSelect.disabled = true;
+
+        const draft = scoreApi.readDraft ? scoreApi.readDraft(currentStorageKey) : null;
+        const score = draft || currentBaseScore;
+        document.getElementById("editorReviewed").checked = !!score.reviewed;
+        displayTitleInput.value = (score.header && score.header.title) || currentTitle;
+        headerLeft1Input.value = (score.header && score.header.left && score.header.left[0]) || "";
+        headerLeft2Input.value = (score.header && score.header.left && score.header.left[1]) || "";
+        headerRightInput.value = (score.header && score.header.right) || "";
+        scoreNoteInput.value = score.note || "";
+        beatUnitsInput.value = Number(score.beatUnits) || 4;
+        autoUnderlinesInput.checked = !!score.autoUnderlines;
+
+        renderEditorRows(score.rows || []);
+
+        renderScore(score);
+        exportText.value = buildExportBlock(score);
+        const draftTime = draft && draft._scoreDraftSavedAt ? formatSavedTime(draft._scoreDraftSavedAt) : "";
+        setStatus(
+          draft
+            ? "已恢復這份自訂譜的自動保存草稿" + (draftTime ? "（" + draftTime + "）" : "") + "。按「儲存並套用」後會寫回我的譜。"
+            : "目前顯示已保存的自訂譜。修改會自動保存草稿，按「儲存並套用」後會寫回我的譜。"
+        );
+      } catch (error) {
+        console.error("load custom score failed", error);
+        setStatus("讀取自訂譜失敗：" + (error && error.message ? error.message : "unknown-error"), "error");
+      } finally {
+        isLoadingPiece = false;
+      }
+    }
+
+    async function saveCustomScore(score) {
+      ErhuQuality.validateScore(score);
+      score.reviewed = document.getElementById("editorReviewed").checked;
+      if (!currentUser || !currentCustomScoreId) {
+        return false;
+      }
+      const title = (score.header && score.header.title) || score.title || currentTitle || "自訂練習譜";
+      score.title = title;
+      await window.ErhuFirebase.db
+        .collection("students")
+        .doc(currentUser.uid)
+        .collection("customScores")
+        .doc(currentCustomScoreId)
+        .set({
+          title: title,
+          searchTitle: title.replace(/\s+/g, "").toLowerCase(),
+          scoreDataJson: window.ErhuScoreStorage.write(score),
+          scoreData: firebase.firestore.FieldValue.delete(),
+          source: "ai-scan-edited",
+          reviewStatus: score.reviewed ? "reviewed" : "needs-review",
+          updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        }, { merge: true });
+      currentBaseScore = JSON.parse(JSON.stringify(score));
+      return true;
+    }
+
+    function renderPieceOptions() {
+      pieceSelect.innerHTML = "";
+      pieceSelect.disabled = false;
+      pieceCatalog.forEach(function (piece) {
+        const option = document.createElement("option");
+        option.value = piece.title;
+        option.textContent = piece.title;
+        pieceSelect.appendChild(option);
+      });
+    }
+
+    const reviewLabel=document.createElement("label"); reviewLabel.className="access-note";
+    reviewLabel.innerHTML='<input type="checkbox" id="editorReviewed"> 已對照原譜確認音符、節奏與記號（勾選後保存為已確認版本）';
+    document.getElementById("saveButton").before(reviewLabel);
+    async function initEditor(user) {
+      currentUser = user || null;
+      if (currentCustomScoreId) {
+        await loadCustomScore(currentCustomScoreId);
+        return;
+      }
+      renderPieceOptions();
+      const defaultTitle = params.get("title") || (pieceCatalog[0] && pieceCatalog[0].title) || "";
+      pieceSelect.value = defaultTitle;
+      loadPiece(defaultTitle);
+    }
+
+    pieceSelect.addEventListener("change", function () {
+      loadPiece(pieceSelect.value);
+    });
+
+    editorGrid.addEventListener("input", scheduleRefresh);
+    editorGrid.addEventListener("click", function (event) {
+      const button = event.target.closest("[data-action]");
+      if (!button) {
+        return;
+      }
+      const action = button.dataset.action;
+      if (action === "add-row-after" || action === "delete-row") {
+        const rowSection = button.closest(".row-editor");
+        if (!rowSection) {
+          return;
+        }
+        const rowIndex = Array.from(editorGrid.querySelectorAll(".row-editor")).indexOf(rowSection);
+        const score = refreshPreview(false);
+        if (!score || rowIndex < 0) {
+          return;
+        }
+        const rows = score.rows && score.rows.length ? score.rows : [createDefaultRow()];
+        if (action === "add-row-after") {
+          rows.splice(rowIndex + 1, 0, createDefaultRow());
+          rebuildEditorWithRows(rows, "已在第 " + (rowIndex + 1) + " 行下面新增一行。");
+          return;
+        }
+        if (rows.length <= 1) {
+          setStatus("至少要保留 1 行，不能再刪。", "warn");
+          return;
+        }
+        if (!window.confirm("確定要刪除第 " + (rowIndex + 1) + " 行嗎？這一行的小節也會一起刪除。")) {
+          return;
+        }
+        rows.splice(rowIndex, 1);
+        rebuildEditorWithRows(rows, "已刪除第 " + (rowIndex + 1) + " 行。");
+        return;
+      }
+
+      const card = button.closest(".measure-card");
+      if (!card) {
+        return;
+      }
+      const rowSection = card.closest(".row-editor");
+      const rowIndex = Array.from(editorGrid.querySelectorAll(".row-editor")).indexOf(rowSection);
+      const measureIndex = Array.from(rowSection.querySelectorAll(".measure-card")).indexOf(card);
+      const notes = extractNotesFromCard(card);
+      if (action === "add-note") {
+        notes.push(createDefaultNote());
+        renderMeasureNoteTable(card, notes);
+        scheduleRefresh();
+        return;
+      }
+      if (action === "remove-last-note") {
+        if (notes.length > 1) {
+          notes.pop();
+          renderMeasureNoteTable(card, notes);
+          scheduleRefresh();
+        }
+        return;
+      }
+      if (action === "add-measure-after" || action === "delete-measure") {
+        const score = refreshPreview(false);
+        if (!score || rowIndex < 0 || measureIndex < 0) {
+          return;
+        }
+        const rows = score.rows && score.rows.length ? score.rows : [createDefaultRow()];
+        const rowData = rows[rowIndex] || createDefaultRow();
+        rowData.measures = Array.isArray(rowData.measures) && rowData.measures.length ? rowData.measures : [createDefaultMeasure()];
+        if (action === "add-measure-after") {
+          rowData.measures.splice(measureIndex + 1, 0, createDefaultMeasure());
+          rebuildEditorWithRows(rows, "已在第 " + (rowIndex + 1) + " 行第 " + (measureIndex + 1) + " 小節後面新增小節。");
+          return;
+        }
+        if (rowData.measures.length <= 1) {
+          setStatus("每一行至少要保留 1 個小節，不能再刪。", "warn");
+          return;
+        }
+        if (!window.confirm("確定要刪除第 " + (rowIndex + 1) + " 行第 " + (measureIndex + 1) + " 小節嗎？")) {
+          return;
+        }
+        rowData.measures.splice(measureIndex, 1);
+        rebuildEditorWithRows(rows, "已刪除第 " + (rowIndex + 1) + " 行第 " + (measureIndex + 1) + " 小節。");
+        return;
+      }
+      if (action === "remove-note") {
+        const index = Number(button.dataset.noteIndex);
+        if (notes.length > 1 && index >= 0 && index < notes.length) {
+          notes.splice(index, 1);
+          renderMeasureNoteTable(card, notes);
+          scheduleRefresh();
+        }
+      }
+    });
+    displayTitleInput.addEventListener("input", scheduleRefresh);
+    headerLeft1Input.addEventListener("input", scheduleRefresh);
+    headerLeft2Input.addEventListener("input", scheduleRefresh);
+    headerRightInput.addEventListener("input", scheduleRefresh);
+    scoreNoteInput.addEventListener("input", scheduleRefresh);
+    beatUnitsInput.addEventListener("input", scheduleRefresh);
+    autoUnderlinesInput.addEventListener("change", scheduleRefresh);
+
+    document.getElementById("previewButton").addEventListener("click", function () {
+      refreshPreview(true);
+    });
+
+    document.getElementById("saveButton").addEventListener("click", async function () {
+      const score = refreshPreview(false);
+      if (!score) {
+        return;
+      }
+      if (currentCustomScoreId) {
+        try {
+          await saveCustomScore(score);
+          if (scoreApi.clearDraft) {
+            scoreApi.clearDraft(currentStorageKey || currentTitle);
+          }
+          setStatus("自訂譜已儲存並套用。AI 跟譜會使用這份最新版本。");
+        } catch (error) {
+          console.error("save custom score failed", error);
+          setStatus("自訂譜儲存失敗，請先按「複製程式碼」保留目前內容。", "error");
+        }
+        return;
+      }
+      if (!scoreApi.saveOverride(currentTitle, score)) {
+        setStatus("儲存失敗，請先按「複製程式碼」保留目前內容。", "error");
+        return;
+      }
+      if (scoreApi.clearDraft) {
+        scoreApi.clearDraft(currentStorageKey || currentTitle);
+      }
+      setStatus("編輯內容已儲存並套用。現在課程頁和 AI 跟譜練習會直接顯示這份版本。");
+    });
+
+    document.getElementById("resetButton").addEventListener("click", function () {
+      if (currentCustomScoreId) {
+        if (scoreApi.clearDraft) {
+          scoreApi.clearDraft(currentStorageKey || currentTitle);
+        }
+        loadCustomScore(currentCustomScoreId);
+        setStatus("這份自訂譜的草稿已清除，已回到上次正式儲存版本。", "warn");
+        return;
+      }
+      scoreApi.clearOverride(currentTitle);
+      loadPiece(currentTitle);
+      setStatus("本機編輯內容和草稿已清除，已切回網站預設譜面。", "warn");
+    });
+
+    document.getElementById("copyButton").addEventListener("click", function () {
+      if (!navigator.clipboard || typeof navigator.clipboard.writeText !== "function") {
+        setStatus("這裡無法直接複製，你可以手動複製下面的程式碼。", "warn");
+        return;
+      }
+      navigator.clipboard.writeText(exportText.value).then(function () {
+        setStatus("程式碼已複製。你可以直接貼回 exam-piece-scores.js。");
+      }).catch(function () {
+        setStatus("這裡無法直接複製，你可以手動複製下面的程式碼。", "warn");
+      });
+    });
+
+    window.ErhuAuth.onReady(initEditor);
+  </script>
+</body>
+</html>

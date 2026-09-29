@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="二胡小教室">
+  <rect width="64" height="64" rx="14" fill="#f5ecdc"/>
+  <path d="M37 10v39" stroke="#6b4227" stroke-width="4" stroke-linecap="round"/>
+  <path d="M45 12v37" stroke="#9b6a45" stroke-width="3" stroke-linecap="round"/>
+  <rect x="26" y="39" width="24" height="17" rx="5" fill="#8d5a39"/>
+  <path d="M28 42h20" stroke="#efc06f" stroke-width="2" stroke-linecap="round"/>
+  <path d="M13 46c11-10 26-17 39-20" stroke="#da5b3f" stroke-width="4" stroke-linecap="round" fill="none"/>
+  <circle cx="25" cy="19" r="5" fill="#bd8a55"/>
+  <path d="M22 19h6M25 16v18" stroke="#3f2719" stroke-width="2" stroke-linecap="round"/>
+</svg>
