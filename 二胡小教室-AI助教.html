@@ -337,7 +337,14 @@
   </style>
 <link rel="stylesheet" href="./erhu-refined.css?v=20260928" />
 <script src="./erhu-quality.js?v=20260928"></script>
-<link rel="stylesheet" href="./erhu-studio-ui.css?v=20260928f"><script defer src="./erhu-studio-ui.js?v=20260928f"></script></head>
+<link rel="stylesheet" href="./erhu-studio-ui.css?v=20260928f"><script defer src="./erhu-studio-ui.js?v=20260928f"></script><style>
+body.studio-redesign[data-studio-page="tutor"] .messages {
+  overflow-y: auto; overflow-x: hidden; scrollbar-gutter: stable;
+  min-height: min(320px, 45vh); max-height: 58vh;
+}
+body.studio-redesign[data-studio-page="tutor"] .message { flex-shrink: 0; }
+#chatSyncStatus { margin: 0; padding: 0 28px 12px; color: #74492b; font-size: 14px; }
+</style></head>
 <body class="erhu-site">
   <main class="shell">
     <header class="topbar">
@@ -360,16 +367,17 @@
         <div class="status" id="sourceStatus">目前來源：初始化中</div>
       </div>
 
-      <div class="messages" id="messages"></div>
+      <div class="messages" id="messages" role="log" aria-label="與 AI 助教的對話" aria-live="polite"></div>
 
       <div class="composer">
         <div>
           <label class="label" for="questionInput">要問什麼問題</label>
           <textarea id="questionInput" placeholder="例如：給我賽馬的二胡簡譜、給我賽馬的二胡示範教材、我的內外弦切換一直卡住怎麼練？"></textarea>
         </div>
-        <button class="button primary" id="askButton" type="button">送出問題</button>
-        <button class="button secondary" id="clearButton" type="button">清除聊天紀錄</button>
+        <button class="button primary" id="askButton" type="button" disabled>準備中…</button>
+        <button class="button secondary" id="clearButton" type="button" disabled>清除聊天紀錄</button>
       </div>
+      <p id="chatSyncStatus" role="status" hidden></p>
     </section>
   </main>
 
@@ -412,6 +420,10 @@
     const lightboxClose = document.getElementById("lightboxClose");
 
     let currentUser = null;
+    let isSubmitting = false;
+    let chatReady = false;
+    let historyLoaded = false;
+    let historySaveQueue = Promise.resolve();
     let historyMessages = [];
     let learningProfile = null;
     let lightboxImages = [];
@@ -488,6 +500,7 @@
         return "<div class=\"message " + item.role + "\"><small>" + author + "</small>" + ErhuQuality.markdown(item.text) + resourcesHtml + "</div>";
       }).join("");
       messages.scrollTop = messages.scrollHeight;
+      requestAnimationFrame(() => { messages.scrollTop = messages.scrollHeight; });
     }
 
     function openLightbox(index) {
@@ -624,11 +637,21 @@
     }
 
     async function saveHistory() {
+      if (!historyLoaded) return;
       const trimmed = historyMessages.slice(-24);
-      await chatRef().set({
+      const ref = chatRef();
+      historySaveQueue = historySaveQueue.then(() => ref.set({
         messages: trimmed,
         updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-      }, { merge: true });
+      }, { merge: true })).then(() => {
+        document.getElementById("chatSyncStatus").hidden = true;
+      }).catch(error => {
+        console.error("save chat history failed", error);
+        const notice = document.getElementById("chatSyncStatus");
+        notice.textContent = "對話已顯示，但尚未存到雲端。請先保留此頁，檢查網路後再試。";
+        notice.hidden = false;
+      });
+      return historySaveQueue;
     }
 
     async function loadHistory() {
@@ -646,7 +669,7 @@
         createdAt: new Date().toISOString()
       });
       renderMessages();
-      await saveHistory();
+      void saveHistory();
     }
 
     function buildAnswer(question) {
@@ -654,14 +677,19 @@
     }
 
     async function submitQuestion() {
+      if (isSubmitting || !chatReady) return;
       const question = questionInput.value.trim();
       if (!question) { questionInput.setCustomValidity("請先輸入想問的二胡問題。"); questionInput.reportValidity(); questionInput.focus(); return; }
       questionInput.setCustomValidity("");
       if (!currentUser) return;
+      isSubmitting = true;
       askButton.disabled = true;
+      clearButton.disabled = true;
       askButton.textContent = "回覆中...";
+      setSourceStatus("正在回覆你的問題…");
       try {
         await addMessage("user", question);
+        questionInput.value = "";
         let answer = null;
         try {
           answer = await askBackendTutor(question);
@@ -671,21 +699,19 @@
           answer = { text: buildAnswer(question), resources: [] };
         }
         await addMessage("assistant", answer.text, answer.resources);
-        questionInput.value = "";
       } finally {
+        isSubmitting = false;
+        clearButton.disabled = false;
         askButton.disabled = false;
         askButton.textContent = "送出問題";
       }
     }
 
     async function clearHistory() {
-      if (!currentUser) return;
+      if (!currentUser || isSubmitting || !chatReady) return;
       historyMessages = [];
       renderMessages();
-      await chatRef().set({
-        messages: [],
-        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
-      }, { merge: true });
+      await saveHistory();
     }
 
     askButton.addEventListener("click", submitQuestion);
@@ -723,8 +749,28 @@
       if (params.get("question")) {
         questionInput.value = params.get("question");
       }
-      learningProfile = await loadLearningProfile();
-      await loadHistory();
+      chatReady = false;
+      historyLoaded = false;
+      askButton.disabled = true;
+      clearButton.disabled = true;
+      if (!user) { setSourceStatus("請先登入再提問。"); return; }
+      try {
+        await loadHistory();
+        historyLoaded = true;
+      } catch (error) {
+        console.error("load chat history failed", error);
+        renderMessages();
+        const notice = document.getElementById("chatSyncStatus");
+        notice.textContent = "暫時讀不到先前對話。你仍可提問，但本次對話暫不存到雲端；請先保留此頁。";
+        notice.hidden = false;
+      }
+      chatReady = true;
+      askButton.disabled = false;
+      clearButton.disabled = false;
+      askButton.textContent = "送出問題";
+      void loadLearningProfile().then(profile => { learningProfile = profile; }).catch(error => {
+        console.error("load learning profile failed", error);
+      });
     });
   </script>
 </body>

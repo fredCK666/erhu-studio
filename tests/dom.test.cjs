@@ -46,3 +46,33 @@ test('no-data report never creates progress or zero quiz score',async()=>{
 test('demo engraves underlines, slurs, octave and rhythm dots without AI calls',async()=>{
  const {w,d}=await page('二胡小教室-AI體驗.html');assert.ok(d.querySelectorAll('#demoScore svg path').length>=5);assert.ok(d.querySelectorAll('#demoScore svg circle').length>=3);assert.match(d.querySelector('#demoPlan').textContent,/共 15 分鐘/);w.close();
 });
+test('tutor shows new questions and replies even when cloud history cannot save',async()=>{
+ let finishReply;let requests=0;
+ const {w,d}=await page('二胡小教室-AI助教.html','',{fetch:async()=>{requests++;return new Promise(resolve=>{finishReply=()=>resolve({ok:true,json:async()=>({answer:'先慢速練習換弦。'})});});}});
+ w.ErhuFirebase.askTutorUrl='https://offline.invalid/tutor';
+ w.ErhuFirebase.db.set=async()=>{throw Error('offline-test');};
+ w.console.error=()=>{};
+ d.querySelector('#questionInput').value='換弦怎麼練？';
+ const pending=w.submitQuestion();
+ await new Promise(resolve=>setImmediate(resolve));
+ assert.match(d.querySelector('#messages').textContent,/換弦怎麼練/);
+ assert.equal(requests,1);assert.equal(d.querySelector('#askButton').disabled,true);
+ assert.equal(d.querySelector('#chatSyncStatus').hidden,false);
+ d.querySelector('#questionInput').value='下一個問題';
+ await w.submitQuestion();assert.equal(requests,1);
+ finishReply();await pending;await new Promise(resolve=>setImmediate(resolve));
+ assert.match(d.querySelector('#messages').textContent,/先慢速練習換弦/);
+ assert.equal(d.querySelector('#askButton').disabled,false);
+ assert.equal(d.querySelector('#questionInput').value,'下一個問題');
+ w.close();
+});
+test('tutor request does not wait for a stalled cloud history write',async()=>{
+ let requests=0;let completeSave;
+ const {w,d}=await page('二胡小教室-AI助教.html','',{fetch:async()=>{requests++;return {ok:true,json:async()=>({answer:'收到你的新問題。'})};}});
+ w.ErhuFirebase.askTutorUrl='https://offline.invalid/tutor';
+ w.ErhuFirebase.db.set=()=>new Promise(resolve=>{completeSave=resolve;});
+ d.querySelector('#questionInput').value='如何持弓？';
+ await w.submitQuestion();
+ assert.equal(requests,1);assert.match(d.querySelector('#messages').textContent,/收到你的新問題/);
+ w.ErhuFirebase.db.set=async()=>{};completeSave();await new Promise(resolve=>setImmediate(resolve));w.close();
+});
