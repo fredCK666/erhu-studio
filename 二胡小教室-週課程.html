@@ -683,7 +683,7 @@
 
       <aside class="score-card">
         <h2 class="score-title">譜面與問答</h2>
-        <p id="scoreIntro">依中華民國國樂學會二胡曲目表整理，未取得相符譜面的曲目先保留空缺。</p>
+        <p id="scoreIntro">依中華民國國樂學會二胡曲目表整理，依曲名收錄二胡簡譜，缺譜的曲目先保留空缺。</p>
         <p class="score-note" id="scoreSourceStatus" role="status"></p>
         <div class="actions" id="scoreSourceLinks"></div>
         <div class="score-box" id="scoreBox">
@@ -724,8 +724,9 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
   <script src="./firebase-init.js?v=20260928"></script>
   <script src="./auth.js?v=20260928"></script>
-  <script src="./exam-course-data.js?v=20260929-scm"></script>
+  <script src="./exam-course-data.js?v=20260929-folk"></script>
   <script src="./exam-piece-scores.js?v=20260929-zizhu"></script>
+  <script src="./exam-folk-scores.js?v=20260929-folk"></script>
   <script src="./exam-progress.js?v=20260519a"></script>
   <script>
     window.ErhuAuth.requireAuth();
@@ -1437,7 +1438,7 @@
       scoreEditLink.hidden = true;
       songLinksSection.hidden = false;
       practiceDetailPanel.hidden = false;
-      document.getElementById("scoreIntro").textContent = "待補二胡簡譜。取得相符版本並核對小節後，才會開放跟譜練習。";
+      document.getElementById("scoreIntro").textContent = "待補二胡簡譜。收錄譜面後即可編輯與跟譜練習。";
       scoreEmpty.textContent = "《" + cleanPieceName(selectedPiece.title) + "》尚未收錄可核對的二胡簡譜，這裡先留空。";
     }
 
@@ -1446,12 +1447,10 @@
     const editionNote = window.ErhuExamData.editionNotes[pieceName] || "";
     const foundSource = window.ErhuExamData.scoreSearch[pieceName];
     document.getElementById("scoreSourceStatus").textContent =
-      (selectedPiece.scoreAvailable ? "已有練習譜・檢定版本待核對。" : "待補譜。") +
-      (editionNote ? " " + editionNote : "") +
-      (foundSource ? " " + foundSource.note : "");
+      (selectedPiece.scoreAvailable ? "二胡練習譜・依檢定曲名對應。 " + (selectedPiece.scoreData.note || "") : "待補譜。" + (editionNote ? " " + editionNote : "") + (foundSource ? " " + foundSource.note : ""));
     const sourceLinks = document.getElementById("scoreSourceLinks");
     [["官方二胡曲目表", source.repertoireUrl], ["學會索譜說明", source.requestScoreUrl]]
-      .concat(foundSource ? [[foundSource.label, foundSource.url]] : [])
+      .concat(selectedPiece.scoreAvailable && selectedPiece.scoreData.sourceUrl ? [[selectedPiece.scoreData.sourceLabel || "樂譜來源", selectedPiece.scoreData.sourceUrl]] : (foundSource ? [[foundSource.label, foundSource.url]] : []))
       .forEach(function (entry) {
         const link = document.createElement("a");
         link.className = "button secondary";
@@ -1512,7 +1511,7 @@
       aiPitchLink.hidden = false;
       aiPitchLink.href = "./二胡小教室-AI掃描譜.html?title=" + encodeURIComponent(cleanPieceName(selectedPiece.title));
       aiPitchLink.textContent = "上傳這首曲子的譜";
-      scoreEmpty.textContent = "尚未取得相符的二胡簡譜，這裡先留空。你也可以上傳原譜，核對掃描結果後再編輯與跟譜。";
+      scoreEmpty.textContent = "尚未收錄這首曲子的二胡簡譜，這裡先留空。你也可以上傳原譜，核對掃描結果後再編輯與跟譜。";
     }
 
   </script>

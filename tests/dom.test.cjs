@@ -165,3 +165,31 @@ test('exam catalog keeps missing scores blank and distinguishes practice edition
  assert.match(existing.d.querySelector('#scoreSourceStatus').textContent,/劉和平/);
  existing.w.close();
 });
+test('new folk scores route to correct grades and preserve rhythmic and pitch data',async()=>{
+ for(const [title,query,bars,beats,tonic] of [
+  ['鳳陽花鼓','?level=beginner&grade=1&piece=selected-2',24,96,'D'],
+  ['西藏舞曲','?level=beginner&grade=1&piece=selected-4',11,44,'G'],
+  ['茉莉花','?level=beginner&grade=2&piece=selected-2',21,42,'G']
+ ]){
+  const course=await page('二胡小教室-週課程.html',query);
+  assert.equal(course.d.querySelector('#pieceTitle').textContent,title);
+  assert.equal(course.d.querySelectorAll('#scoreText .score-follow-measure').length,bars);
+  const link=course.d.querySelector('#aiPitchLink');assert.equal(link.hidden,false);
+  assert.match(link.href,new RegExp('tonic='+tonic));
+  assert.ok([...course.d.querySelectorAll('#scoreSourceLinks a')].some(a=>/來源/.test(a.textContent)));
+  assert.equal(course.w.ErhuPieceScores.listPieces().filter(p=>p.title===title).length,1);
+  const pitch=await page('二胡小教室-AI音準評分.html',new URL(link.href).search);
+  const score=pitch.w.ErhuPieceScores.getScore(title);
+  const timeline=pitch.w.parsePieceTimeline(score);
+  assert.equal(timeline.totalBeats,beats);assert.ok(timeline.events.every(e=>!e.unknown));
+  assert.equal(pitch.d.querySelector('#startButton').disabled,false);
+  const measures=score.rows.flatMap(r=>r.measures);
+  assert.ok(measures.every(m=>m.cells.reduce((sum,c)=>sum+c.units,0)===(title==='茉莉花'?8:16)));
+  if(title==='西藏舞曲'){
+   assert.equal(timeline.events[0].midi,74); // opening 5 is D5, not low D4
+   assert.ok(timeline.events.some(e=>e.label==='5,' && e.midi===62));
+  }
+  if(title==='茉莉花')assert.equal(measures[19].cells[1].units,.5);
+  course.w.close();pitch.w.close();
+ }
+});
