@@ -46,6 +46,6 @@
     functionsRegion: "asia-east1",
     functionsBaseUrl: "https://asia-east1-" + firebaseConfig.projectId + ".cloudfunctions.net",
     askTutorUrl: "https://asia-east1-" + firebaseConfig.projectId + ".cloudfunctions.net/askErhuTutorLive",
-    scanScoreUrl: "https://asia-east1-" + firebaseConfig.projectId + ".cloudfunctions.net/scanErhuScore"
+    scanScoreUrl: "https://asia-east1-" + firebaseConfig.projectId + ".cloudfunctions.net/scanErhuScoreV2"
   };
 })();

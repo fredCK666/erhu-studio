@@ -394,6 +394,13 @@
 <link rel="stylesheet" href="./erhu-refined.css?v=20260928" />
 <script src="./erhu-quality.js?v=20260928"></script>
 <script src="./score-renderer.js?v=20260928"></script><link rel="stylesheet" href="./erhu-studio-ui.css?v=20260928f"><script defer src="./erhu-studio-ui.js?v=20260928f"></script><style>
+body.studio-redesign[data-studio-page="scan"] main > .grid {
+  grid-template-columns: minmax(0, 1fr) !important;
+  width: 100%; max-width: 1200px; margin-inline: auto;
+}
+body.studio-redesign[data-studio-page="scan"] main > .grid > .panel {
+  width: 100%; max-width: 860px; box-sizing: border-box; justify-self: center;
+}
 /* Keep both the source and the transcription in the normal page flow. */
 body.studio-redesign[data-studio-page="scan"] .preview-card {
   max-height: none; overflow: visible; min-width: 0;
@@ -492,7 +499,7 @@ body.studio-redesign[data-studio-page="scan"] .engraved-row svg {
   <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
-  <script src="./firebase-init.js?v=20260928"></script>
+  <script src="./firebase-init.js?v=20260929scan"></script>
   <script src="./auth.js?v=20260928"></script>
   <script>
     window.ErhuAuth.requireAuth();
@@ -589,10 +596,11 @@ body.studio-redesign[data-studio-page="scan"] .engraved-row svg {
             sourceContext.fillRect(0, 0, scaledWidth, scaledHeight);
             sourceContext.drawImage(image, 0, 0, scaledWidth, scaledHeight);
 
-            const chunkCount = Math.max(1, Math.min(maxChunks || 1, Math.ceil(scaledHeight / 1150)));
+            const chunkCount = Math.max(1, Math.min((maxChunks || 6) - 1, Math.ceil(scaledHeight / 850)));
             const overlap = chunkCount > 1 ? Math.round(scaledHeight * 0.06) : 0;
             const chunkHeight = Math.ceil(scaledHeight / chunkCount);
-            const chunks = [];
+            // Full-page context preserves row/bar boundaries before detail crops.
+            const chunks = [canvasToScanDataUrl(sourceCanvas)];
             for (let chunkIndex = 0; chunkIndex < chunkCount; chunkIndex += 1) {
               const y = Math.max(0, chunkIndex * chunkHeight - overlap);
               const bottom = Math.min(scaledHeight, (chunkIndex + 1) * chunkHeight + overlap);
@@ -603,7 +611,7 @@ body.studio-redesign[data-studio-page="scan"] .engraved-row svg {
               canvas.getContext("2d").drawImage(sourceCanvas, 0, y, scaledWidth, height, 0, 0, scaledWidth, height);
               chunks.push(canvasToScanDataUrl(canvas));
             }
-            resolve(chunks);
+            resolve(chunkCount === 1 ? chunks.slice(0, 1) : chunks);
             } catch(error) { reject(error); }
           };
           image.src = reader.result;
@@ -699,11 +707,11 @@ body.studio-redesign[data-studio-page="scan"] .engraved-row svg {
         const originalScores = [];
         for (let pageIndex=0; pageIndex<selectedFiles.length; pageIndex++) {
           const images = await fileToImageDataUrls(selectedFiles[pageIndex], 6);
-          setStatus("正在辨識第 " + (pageIndex+1) + " / " + selectedFiles.length + " 頁（" + images.length + " 個細節區塊）。請保留此頁。");
+          setStatus("正在辨識第 " + (pageIndex+1) + " / " + selectedFiles.length + " 頁：先核對譜行與小節，再辨識音符與連弓。請保留此頁。");
           const idToken = await window.ErhuFirebase.auth.currentUser.getIdToken();
           const payloadText=JSON.stringify({ title:titleInput.value.trim(), notes:
             "忠實轉錄本頁，依原圖順序保留所有譜行、小節、休止、延音、減時線、附點、高低八度點、連弓、弓法、指法、反覆與表情。區塊有重疊，不要重複轉錄。看不清楚用 ? 並列出位置，禁止猜音或補齊小節。四分音符 units=4。" + notesInput.value.trim(),
-            page:pageIndex+1, images, schemaVersion:2 });
+            page:pageIndex+1, images, imageLayout:"overview-first", schemaVersion:3 });
           if(payloadText.length>8_000_000) throw Error("此頁圖片資料太大，請裁成半頁後重試。");
           const controller=new AbortController();
           requestTimer=setTimeout(()=>controller.abort(),300000);
@@ -711,12 +719,13 @@ body.studio-redesign[data-studio-page="scan"] .engraved-row svg {
           clearTimeout(requestTimer);requestTimer=null;
           let data; try {data=await response.json();} catch {throw Error("伺服器回覆格式有誤，請稍後重試。");}
           if(!response.ok || !data.score)throw Error(data.message||"第 "+(pageIndex+1)+" 頁辨識失敗，請重試。");
+          if(!/^20260929-scan-/.test(data.score.scanVersion || "")) throw Error("掃描服務尚未更新，請先部署新版掃描 Functions，再重新掃描。");
           const validation=ErhuQuality.validateScore(data.score);
           allWarnings.push(...(data.warnings||[]).map(w=>"第 "+(pageIndex+1)+" 頁："+w), ...validation.warnings.map(w=>"第 "+(pageIndex+1)+" 頁："+w));
           originalScores.push(data.score);
           pageResults.push(...data.score.rows.map(row=>({...row,sourcePage:pageIndex+1})));
         }
-        const data={score:{...originalScores[0],rows:pageResults,scanVersion:"20260928",reviewed:false},warnings:allWarnings};
+        const data={score:{...originalScores[0],rows:pageResults,scanVersion:"20260929-scan-structure",reviewed:false},warnings:allWarnings};
         scannedScore = data.score;
         savedScoreId = "";
         if (!titleInput.value.trim()) {
@@ -760,7 +769,7 @@ body.studio-redesign[data-studio-page="scan"] .engraved-row svg {
           scoreDataJson: window.ErhuScoreStorage.write(scannedScore),
           source: "ai-scan",
           reviewStatus: scannedScore.reviewed ? "reviewed" : "needs-review",
-          scanVersion: "20260928",
+          scanVersion: scannedScore.scanVersion,
           imageCount: selectedFiles.length,
           updatedAt: firebase.firestore.FieldValue.serverTimestamp()
         };
