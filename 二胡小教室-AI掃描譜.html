@@ -707,7 +707,7 @@ body.studio-redesign[data-studio-page="scan"] .engraved-row svg {
         const originalScores = [];
         for (let pageIndex=0; pageIndex<selectedFiles.length; pageIndex++) {
           const images = await fileToImageDataUrls(selectedFiles[pageIndex], 6);
-          setStatus("正在辨識第 " + (pageIndex+1) + " / " + selectedFiles.length + " 頁：先核對譜行與小節，再辨識音符與連弓。請保留此頁。");
+          setStatus("正在辨識第 " + (pageIndex+1) + " / " + selectedFiles.length + " 頁：先核對譜行與小節，再逐行辨識音符與連弓。整頁需要較久，請保留此頁。");
           const idToken = await window.ErhuFirebase.auth.currentUser.getIdToken();
           const payloadText=JSON.stringify({ title:titleInput.value.trim(), notes:
             "忠實轉錄本頁，依原圖順序保留所有譜行、小節、休止、延音、減時線、附點、高低八度點、連弓、弓法、指法、反覆與表情。區塊有重疊，不要重複轉錄。看不清楚用 ? 並列出位置，禁止猜音或補齊小節。四分音符 units=4。" + notesInput.value.trim(),
@@ -725,7 +725,7 @@ body.studio-redesign[data-studio-page="scan"] .engraved-row svg {
           originalScores.push(data.score);
           pageResults.push(...data.score.rows.map(row=>({...row,sourcePage:pageIndex+1})));
         }
-        const data={score:{...originalScores[0],rows:pageResults,scanVersion:"20260929-scan-structure",reviewed:false},warnings:allWarnings};
+        const data={score:{...originalScores[0],rows:pageResults,scanVersion:originalScores[0].scanVersion,reviewed:false},warnings:allWarnings};
         scannedScore = data.score;
         savedScoreId = "";
         if (!titleInput.value.trim()) {
