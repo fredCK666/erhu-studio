@@ -129,3 +129,22 @@ test('planner keeps generated content when cloud save fails',async()=>{
  await w.generatePlan();await new Promise(r=>setImmediate(r));
  assert.equal(d.querySelector('#planOutput').hidden,false);assert.match(d.querySelector('#planOutput').textContent,/長弓/);assert.equal(d.querySelector('#generateButton').disabled,false);w.close();
 });
+test('Zizhu source has all 13 rows and 88 bars, with exact half-unit timing and playable notes',async()=>{
+ const {w,d}=await page('二胡小教室-AI音準評分.html','?practice=piece&piece='+encodeURIComponent('紫竹調'));
+ const score=w.ErhuPieceScores.getBaseScore('紫竹調');assert.equal(score.rows.length,13);
+ const bars=score.rows.flatMap(r=>r.measures);assert.equal(bars.length,88);
+ bars.forEach(m=>assert.equal(m.cells.reduce((s,c)=>s+c.units,0),8));
+ const timeline=w.parsePieceTimeline(score);assert.equal(timeline.totalBeats,176);assert.ok(timeline.events.every(e=>!e.unknown));
+ assert.ok(timeline.events.some(e=>e.durationUnits===0.5));
+ assert.equal(d.querySelector('#startButton').disabled,false);
+ assert.equal(d.querySelectorAll('#scoreSheet .score-follow-measure').length,88);
+ w.close();
+});
+test('Zizhu editor preserves dotted sixteenths and thirty-second notes',async()=>{
+ const {w,d}=await page('二胡小教室-譜面編輯器.html','?piece='+encodeURIComponent('紫竹調'));
+ w.loadPiece('紫竹調');const score=w.collectScoreFromEditor();
+ assert.equal(score.rows[0].measures[5].cells[0].units,1.5);
+ assert.equal(score.rows[0].measures[5].cells[0].label,'2.');
+ assert.equal(score.rows[0].measures[5].cells[1].units,0.5);
+ assert.ok(d.querySelector('.score-follow-underline.triple'));w.close();
+});

@@ -597,7 +597,13 @@
   </style>
 <link rel="stylesheet" href="./erhu-refined.css?v=20260928" />
 <script src="./erhu-quality.js?v=20260928"></script>
-<link rel="stylesheet" href="./erhu-studio-ui.css?v=20260929-polish"><script defer src="./erhu-studio-ui.js?v=20260929-polish"></script></head>
+<link rel="stylesheet" href="./erhu-studio-ui.css?v=20260929-polish"><script defer src="./erhu-studio-ui.js?v=20260929-polish"></script><style>
+.score-follow-underline.triple{box-shadow:0 3.5px 0 0 #2f2118,0 7px 0 0 #2f2118}
+.score-follow-measure:has(.score-follow-marker){margin-top:30px}
+.score-follow-marker{max-width:100%;white-space:normal;text-align:center}
+.score-source-reference{grid-column:1/-1;margin:18px 0;padding:12px;border:1px solid #d6bea5;border-radius:8px}
+.score-source-reference img{display:block;width:100%;height:auto;margin-top:12px}
+</style></head>
 <body class="erhu-site">
   <main class="shell">
     <header class="topbar">
@@ -683,7 +689,7 @@
   <script src="./firebase-init.js?v=20260928"></script>
   <script src="./auth.js?v=20260928"></script>
   <script src="./exam-course-data.js?v=20260505c"></script>
-  <script src="./exam-piece-scores.js?v=20260611d"></script>
+  <script src="./exam-piece-scores.js?v=20260929-zizhu"></script>
   <script src="./exam-progress.js?v=20260519a"></script>
   <script>
     window.ErhuAuth.requireAuth();
@@ -901,7 +907,7 @@
             const target = Math.min(end, start + tokenIndex);
             const mark = document.createElement("div");
             mark.className = className;
-            mark.style.gridColumn = (cellStarts[target] + 1) + " / " + (cellStarts[target] + cells[target].units + 1);
+            mark.style.gridColumn = ((cellStarts[target] + 1) + " / " + (cellStarts[target] + cells[target].units + 1)).split(" / ").map(function (n) { return Number(n) * 2 - 1; }).join(" / ");
             mark.textContent = token;
             measure.appendChild(mark);
           });
@@ -909,7 +915,7 @@
         }
         const mark = document.createElement("div");
         mark.className = className;
-        mark.style.gridColumn = (cellStarts[start] + 1) + " / " + (cellStarts[end] + cells[end].units + 1);
+        mark.style.gridColumn = ((cellStarts[start] + 1) + " / " + (cellStarts[end] + cells[end].units + 1)).split(" / ").map(function (n) { return Number(n) * 2 - 1; }).join(" / ");
         mark.textContent = spanMeta.text;
         measure.appendChild(mark);
       });
@@ -1039,7 +1045,7 @@
           const unitCount = Math.max(Number(measureData.totalUnits) || 0, unitCursor, 8);
           const measure = document.createElement("div");
           measure.className = "score-follow-measure";
-          measure.style.setProperty("--unit-count", String(unitCount));
+          measure.style.setProperty("--unit-count", String(unitCount * 2));
           if (measureData.marker) {
             const marker = document.createElement("div");
             marker.className = "score-follow-marker";
@@ -1061,7 +1067,7 @@
             const endUnit = cellStarts[end] + cells[end].units;
             const slur = document.createElement("div");
             slur.className = "score-follow-slur";
-            slur.style.gridColumn = (startUnit + 1) + " / " + (endUnit + 1);
+            slur.style.gridColumn = ((startUnit + 1) + " / " + (endUnit + 1)).split(" / ").map(function (n) { return Number(n) * 2 - 1; }).join(" / ");
             measure.appendChild(slur);
           });
 
@@ -1070,7 +1076,7 @@
             const endUnit = startUnit + cellData.units;
             const cell = document.createElement("div");
             cell.className = "score-follow-cell";
-            cell.style.gridColumn = (startUnit + 1) + " / " + (endUnit + 1);
+            cell.style.gridColumn = ((startUnit + 1) + " / " + (endUnit + 1)).split(" / ").map(function (n) { return Number(n) * 2 - 1; }).join(" / ");
             const upperNote = upperNoteMap[cellIndex] ? ("<span class=\"score-follow-upper-note\">" + upperNoteMap[cellIndex] + "</span>") : "";
             cell.innerHTML = upperNote + "<span class=\"score-follow-main\">" + buildJianpuHtml(cellData.label) + "</span>";
             measure.appendChild(cell);
@@ -1078,7 +1084,7 @@
             if (lowDots) {
               const lowMarker = document.createElement("div");
               lowMarker.className = "score-follow-low-octave-marker";
-              lowMarker.style.gridColumn = (startUnit + 1) + " / " + (endUnit + 1);
+              lowMarker.style.gridColumn = ((startUnit + 1) + " / " + (endUnit + 1)).split(" / ").map(function (n) { return Number(n) * 2 - 1; }).join(" / ");
               lowMarker.textContent = lowDots;
               measure.appendChild(lowMarker);
             }
@@ -1096,8 +1102,8 @@
             const startUnit = cellStarts[start];
             const endUnit = cellStarts[end] + cells[end].units;
             const underline = document.createElement("div");
-            underline.className = "score-follow-underline" + ((Number(underlineRange[2]) || 1) >= 2 ? " double" : " single");
-            underline.style.gridColumn = (startUnit + 1) + " / " + (endUnit + 1);
+            underline.className = "score-follow-underline" + ((Number(underlineRange[2]) || 1) >= 3 ? " triple" : (Number(underlineRange[2]) || 1) >= 2 ? " double" : " single");
+            underline.style.gridColumn = ((startUnit + 1) + " / " + (endUnit + 1)).split(" / ").map(function (n) { return Number(n) * 2 - 1; }).join(" / ");
             measure.appendChild(underline);
           });
 
@@ -1132,6 +1138,11 @@
           scoreText.appendChild(header);
         }
         renderStructuredScore(scoreText, scoreData.rows, scoreData);
+        if (scoreData.sourceImage) {
+          const details=document.createElement('details');details.className='score-source-reference';
+          const summary=document.createElement('summary');summary.textContent='對照原譜（含裝飾音與反覆記號）';
+          const img=document.createElement('img');img.src=scoreData.sourceImage;img.alt=scoreData.header.title+'原譜';img.loading='lazy';details.append(summary,img);scoreText.append(details);
+        }
         return;
       }
       if (!scoreData.notation) {

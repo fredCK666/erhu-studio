@@ -723,7 +723,13 @@
   </style>
 <link rel="stylesheet" href="./erhu-refined.css?v=20260928" />
 <script src="./erhu-quality.js?v=20260928"></script>
-<link rel="stylesheet" href="./erhu-studio-ui.css?v=20260929-polish"><script defer src="./erhu-studio-ui.js?v=20260929-polish"></script><link rel="stylesheet" href="./erhu-score-reference.css?v=20260929"><script defer src="./erhu-score-reference.js?v=20260929"></script><link rel="stylesheet" href="./erhu-direct-edit.css?v=20260929-wide"><script defer src="./erhu-direct-edit.js?v=20260929"></script></head>
+<link rel="stylesheet" href="./erhu-studio-ui.css?v=20260929-polish"><script defer src="./erhu-studio-ui.js?v=20260929-polish"></script><link rel="stylesheet" href="./erhu-score-reference.css?v=20260929"><script defer src="./erhu-score-reference.js?v=20260929"></script><link rel="stylesheet" href="./erhu-direct-edit.css?v=20260929-wide"><script defer src="./erhu-direct-edit.js?v=20260929"></script><style>
+.score-follow-underline.triple{box-shadow:0 3.5px 0 0 #2f2118,0 7px 0 0 #2f2118}
+.score-follow-measure:has(.score-follow-marker){margin-top:30px}
+.score-follow-marker{max-width:100%;white-space:normal;text-align:center}
+.score-source-reference{margin:18px 0;padding:12px;border:1px solid #d6bea5;border-radius:8px}
+.score-source-reference img{display:block;width:100%;height:auto;margin-top:12px}
+</style></head>
 <body class="erhu-site">
   <main class="shell">
     <header class="topbar">
@@ -816,7 +822,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
   <script src="./firebase-init.js?v=20260928"></script>
   <script src="./auth.js?v=20260928"></script>
-  <script src="./exam-piece-scores.js?v=20260611d"></script>
+  <script src="./exam-piece-scores.js?v=20260929-zizhu"></script>
   <script>
     window.ErhuAuth.requireAuth();
     window.ErhuAuth.attachAuthUI();
@@ -933,7 +939,7 @@
             const target = Math.min(end, start + tokenIndex);
             const mark = document.createElement("div");
             mark.className = className;
-            mark.style.gridColumn = (cellStarts[target] + 1) + " / " + (cellStarts[target] + cells[target].units + 1);
+            mark.style.gridColumn = ((cellStarts[target] + 1) + " / " + (cellStarts[target] + cells[target].units + 1)).split(" / ").map(function (n) { return Number(n) * 2 - 1; }).join(" / ");
             mark.textContent = token;
             measure.appendChild(mark);
           });
@@ -941,7 +947,7 @@
         }
         const mark = document.createElement("div");
         mark.className = className;
-        mark.style.gridColumn = (cellStarts[start] + 1) + " / " + (cellStarts[end] + cells[end].units + 1);
+        mark.style.gridColumn = ((cellStarts[start] + 1) + " / " + (cellStarts[end] + cells[end].units + 1)).split(" / ").map(function (n) { return Number(n) * 2 - 1; }).join(" / ");
         mark.textContent = spanMeta.text;
         measure.appendChild(mark);
       });
@@ -1097,7 +1103,7 @@
           measure.tabIndex = 0;
           measure.setAttribute("role", "button");
           measure.setAttribute("aria-label", "編輯第 " + (sourceRowIndex + 1) + " 行第 " + (sourceMeasureIndex + 1) + " 小節");
-          measure.style.setProperty("--unit-count", String(unitCount));
+          measure.style.setProperty("--unit-count", String(unitCount * 2));
           measure.style.width = Math.max(140, cells.length * 44, unitCount * 10) + "px";
           measure.style.maxWidth = "100%";
           measure.style.boxSizing = "border-box";
@@ -1124,7 +1130,7 @@
             }
             const upperNote = document.createElement("div");
             upperNote.className = "score-follow-upper-note";
-            upperNote.style.gridColumn = (cellStarts[cellIndex] + 1) + " / " + (cellStarts[cellIndex] + cells[cellIndex].units + 1);
+            upperNote.style.gridColumn = ((cellStarts[cellIndex] + 1) + " / " + (cellStarts[cellIndex] + cells[cellIndex].units + 1)).split(" / ").map(function (n) { return Number(n) * 2 - 1; }).join(" / ");
             upperNote.textContent = upperNoteMap[cellIndex];
             measure.appendChild(upperNote);
           });
@@ -1137,7 +1143,7 @@
             }
             const slur = document.createElement("div");
             slur.className = "score-follow-slur";
-            slur.style.gridColumn = (cellStarts[start] + 1) + " / " + (cellStarts[end] + cells[end].units + 1);
+            slur.style.gridColumn = ((cellStarts[start] + 1) + " / " + (cellStarts[end] + cells[end].units + 1)).split(" / ").map(function (n) { return Number(n) * 2 - 1; }).join(" / ");
             measure.appendChild(slur);
           });
 
@@ -1147,14 +1153,14 @@
             const cell = document.createElement("div");
             cell.className = "score-follow-cell";
             cell.dataset.sourceNote = cellIndex;
-            cell.style.gridColumn = (startUnit + 1) + " / " + (endUnit + 1);
+            cell.style.gridColumn = ((startUnit + 1) + " / " + (endUnit + 1)).split(" / ").map(function (n) { return Number(n) * 2 - 1; }).join(" / ");
             cell.innerHTML = "<span class=\"score-follow-main\">" + parseJianpuText(cellData.label) + "</span>";
             measure.appendChild(cell);
             const lowDots = lowOctaveText(cellData.label);
             if (lowDots) {
               const lowMarker = document.createElement("div");
               lowMarker.className = "score-follow-low-octave-marker";
-              lowMarker.style.gridColumn = (startUnit + 1) + " / " + (endUnit + 1);
+              lowMarker.style.gridColumn = ((startUnit + 1) + " / " + (endUnit + 1)).split(" / ").map(function (n) { return Number(n) * 2 - 1; }).join(" / ");
               lowMarker.textContent = lowDots;
               measure.appendChild(lowMarker);
             }
@@ -1170,8 +1176,8 @@
               return;
             }
             const underline = document.createElement("div");
-            underline.className = "score-follow-underline" + ((Number(underlineRange[2]) || 1) >= 2 ? " double" : " single");
-            underline.style.gridColumn = (cellStarts[start] + 1) + " / " + (cellStarts[end] + cells[end].units + 1);
+            underline.className = "score-follow-underline" + ((Number(underlineRange[2]) || 1) >= 3 ? " triple" : (Number(underlineRange[2]) || 1) >= 2 ? " double" : " single");
+            underline.style.gridColumn = ((cellStarts[start] + 1) + " / " + (cellStarts[end] + cells[end].units + 1)).split(" / ").map(function (n) { return Number(n) * 2 - 1; }).join(" / ");
             measure.appendChild(underline);
           });
 
@@ -1194,6 +1200,8 @@
     }
 
     const UNIT_OPTIONS = [
+      { value: 0.5, label: "32 分音" },
+      { value: 1.5, label: "附點 16 分" },
       { value: 1, label: "16 分音" },
       { value: 2, label: "8 分音" },
       { value: 3, label: "附點 8 分" },
@@ -1241,7 +1249,7 @@
         return "";
       }
       const safeUnits = Number(units) || 1;
-      if (safeUnits === 3 || safeUnits === 6) {
+      if (safeUnits === 1.5 || safeUnits === 3 || safeUnits === 6) {
         return safePitch + ".";
       }
       if (safeUnits === 8) {
@@ -1386,6 +1394,7 @@
             "<option value=\"0\"" + ((Number(note.underlineDepth) || 0) === 0 ? " selected" : "") + ">無</option>" +
             "<option value=\"1\"" + ((Number(note.underlineDepth) || 0) === 1 ? " selected" : "") + ">一條</option>" +
             "<option value=\"2\"" + ((Number(note.underlineDepth) || 0) === 2 ? " selected" : "") + ">兩條</option>" +
+          "<option value=\"3\"" + (Number(note.underlineDepth) === 3 ? " selected" : "") + ">三條</option>" +
           "</select>" +
           "<button class=\"note-remove\" type=\"button\" data-action=\"remove-note\" data-note-index=\"" + noteIndex + "\">刪除</button>" +
         "</div>"
@@ -1414,7 +1423,7 @@
       return Array.from(card.querySelectorAll(".note-row[data-note-index]")).map(function (row) {
         return {
           pitch: row.querySelector("[data-note-field='pitch']").value.trim(),
-          units: Math.max(1, Number(row.querySelector("[data-note-field='units']").value) || 1),
+          units: Math.max(0.5, Number(row.querySelector("[data-note-field='units']").value) || 1),
           bowing: row.querySelector("[data-note-field='bowing']").value.trim(),
           fingering: row.querySelector("[data-note-field='fingering']").value.trim(),
           upperNote: row.querySelector("[data-note-field='upperNote']").value.trim(),
