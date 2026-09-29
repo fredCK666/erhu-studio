@@ -688,14 +688,37 @@
     body.erhu-site.studio-redesign .studio-editor-workspace > .panel {
       min-width: 0;
     }
+    #previewSheet {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 22px 0;
+      padding: 12px 4px;
+    }
     #previewSheet .score-follow-header {
+      grid-column: 1 / -1;
       overflow-wrap: anywhere;
     }
-    #previewSheet .score-follow-row {
-      min-width: 0;
+    #previewSheet .score-follow-row,
+    #previewSheet .score-follow-measure-row { display: contents; }
+    #previewSheet .score-follow-prefix {
+      grid-column: 1 / -1;
+      justify-content: flex-start;
+      min-height: 0;
+      font-size: 18px;
+      line-height: 1.4;
     }
-    #previewSheet .score-follow-measure-row {
-      row-gap: 12px;
+    #previewSheet .score-follow-measure {
+      width: 100% !important;
+      padding: 6px 14px 0;
+      border-right: 1px solid #9e806a;
+    }
+    #previewSheet .score-follow-digit { font-size: 25px; font-weight: 700; }
+    @media (max-width: 760px) {
+      #previewSheet { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      #previewSheet .score-follow-measure { padding: 6px 8px 0; }
+    }
+    @media (max-width: 380px) {
+      #previewSheet { grid-template-columns: minmax(0, 1fr); }
     }
   </style>
 <link rel="stylesheet" href="./erhu-refined.css?v=20260928" />
@@ -1155,6 +1178,12 @@
         });
         rowWrap.appendChild(measureRow);
         previewSheet.appendChild(rowWrap);
+      });
+      // Reflow source rows visually without modifying stored musical content.
+      const displayedMeasures = Array.from(previewSheet.querySelectorAll(".score-follow-measure"));
+      ["--bow-height", "--guide-height", "--upper-height", "--slur-height"].forEach(function (lane) {
+        const height = Math.max(0, ...displayedMeasures.map(m => parseInt(m.style.getPropertyValue(lane), 10) || 0));
+        displayedMeasures.forEach(m => m.style.setProperty(lane, height + "px"));
       });
     }
 
