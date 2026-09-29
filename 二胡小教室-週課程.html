@@ -599,10 +599,25 @@
 <script src="./erhu-quality.js?v=20260928"></script>
 <link rel="stylesheet" href="./erhu-studio-ui.css?v=20260929-polish"><script defer src="./erhu-studio-ui.js?v=20260929-polish"></script><style>
 .score-follow-underline.triple{box-shadow:0 3.5px 0 0 #2f2118,0 7px 0 0 #2f2118}
-.score-follow-measure:has(.score-follow-marker){margin-top:30px}
+.score-follow-measure{margin-top:38px}
 .score-follow-marker{max-width:100%;white-space:normal;text-align:center}
 .score-source-reference{grid-column:1/-1;margin:18px 0;padding:12px;border:1px solid #d6bea5;border-radius:8px}
 .score-source-reference img{display:block;width:100%;height:auto;margin-top:12px}
+</style><style>
+.score-follow-measure{column-gap:0;align-items:start}
+.score-follow-measure .score-follow-cell{align-self:end;align-items:flex-end;min-height:40px}
+.score-follow-marker{top:-34px!important;left:8px!important;right:8px;transform:none!important;max-width:none!important;height:30px;display:flex;align-items:center;justify-content:center;line-height:1.4!important;background:transparent!important;color:#72543f!important;font-weight:500!important}
+.score-follow-meta-right{white-space:pre-line;overflow-wrap:anywhere}
+.score-follow-main{position:relative}
+.score-follow-rhythm-dot{position:absolute;left:100%;bottom:0;line-height:1}
+</style><style>
+#scoreBox{overflow:visible;min-width:0}
+#scoreText{min-width:0;width:100%;gap:14px}
+#scoreText .score-follow-row{min-width:0}
+#scoreText .score-follow-measure-row{grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:12px 0;align-items:start}
+#scoreText .score-follow-measure{padding:12px 14px 0;grid-template-rows:22px 22px 16px 42px 18px;border-right:1px solid #bda58e}
+#scoreText .score-follow-prefix{padding-top:95px;align-items:flex-start;min-height:0}
+@media(max-width:600px){#scoreText .score-follow-measure-row{grid-template-columns:minmax(0,1fr)}#scoreText .score-follow-prefix{font-size:20px}#scoreBox{padding:14px}}
 </style></head>
 <body class="erhu-site">
   <main class="shell">
@@ -841,8 +856,9 @@
 
     function buildJianpuHtml(label) {
       const raw = String(label || "");
-      const noteMatch = raw.match(/^([1-7])('+)?(,*)?(\.)?(.*)$/);
+      const noteMatch = raw.match(/^([0-7])('+)?(,*)?(\.)?(.*)$/);
       if (!noteMatch) {
+        if (/^[-—–]$/.test(raw)) return '<span class="score-follow-jianpu"><span class="score-follow-octave"></span><span class="score-follow-digit">−</span></span>';
         return raw;
       }
       const digit = noteMatch[1];
