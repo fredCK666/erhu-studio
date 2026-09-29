@@ -76,3 +76,18 @@ test('tutor request does not wait for a stalled cloud history write',async()=>{
  assert.equal(requests,1);assert.match(d.querySelector('#messages').textContent,/收到你的新問題/);
  w.ErhuFirebase.db.set=async()=>{};completeSave();await new Promise(resolve=>setImmediate(resolve));w.close();
 });
+
+test('short engraved rows keep the same note scale and retain all rows', async()=>{
+ const {w,d}=await page('二胡小教室-AI體驗.html');
+ const measure=labels=>({cells:labels.map(label=>({label,units:4}))});
+ const score={header:{title:'排版測試',left:[],right:''},rows:[{measures:[measure(['1','2','3','1']),measure(['1','2','3','1'])]},{measures:[measure(['3','4','5'])]}]};
+ const before=JSON.stringify(score);
+ w.ErhuScoreRenderer.render(score,d.querySelector('#demoScore'));
+ const rows=[...d.querySelectorAll('#demoScore svg')];
+ assert.equal(rows.length,2);
+ assert.equal(rows[0].getAttribute('viewBox'),rows[1].getAttribute('viewBox'));
+ assert.equal(rows[0].style.width,rows[1].style.width);
+ assert.equal(rows[1].querySelector('text').getAttribute('font-size'),'27');
+ assert.equal(JSON.stringify(score),before);
+ w.close();
+});
