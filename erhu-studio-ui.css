@@ -182,3 +182,22 @@ body.erhu-site.studio-redesign .studio-start-list h3{font-size:19px!important;li
 body.erhu-site.studio-redesign :is(.intro-link,.studio-start-list a,.studio-faq-list summary):focus-visible{outline:2px solid #795333;outline-offset:5px;border-radius:2px}
 @media(max-width:1050px){.studio-start-list{grid-template-columns:1fr;gap:22px}.studio-start-list>li{display:flex;gap:22px;border-right:0;border-bottom:1px solid #cdb394;padding:0 0 22px}.studio-start-list>li:last-child{padding-bottom:0}.start-number{min-width:40px}.studio-intro,.studio-faq{grid-template-columns:1fr;gap:24px}}
 @media(max-width:760px){.studio-intro,.studio-faq{padding-top:30px;padding-bottom:28px}.studio-intro{margin-bottom:10px}.studio-start{padding:23px 20px;margin-top:30px}.studio-start .studio-section-title{align-items:flex-start;gap:10px;flex-direction:column}.studio-start-list{margin-top:24px!important}.studio-start-list>li{gap:15px}.studio-faq-list summary{font-size:16px}.studio-faq{margin-bottom:0}}
+/* Consistent reading rhythm and usable controls across the learning tools. */
+body.studio-redesign :is(input,select,textarea){color:#3d2d22;accent-color:#795238}
+body.studio-redesign :is(input,textarea)::placeholder{color:#817062;opacity:1}
+body.studio-redesign :is(button,.button):disabled{opacity:1!important;background:#e6ddd2!important;color:#75685d!important;border-color:#d3c4b4!important;cursor:not-allowed;box-shadow:none!important;transform:none!important}
+body.studio-redesign :is(button,a,input,select,textarea){-webkit-tap-highlight-color:#b3876033}
+body.studio-redesign :is(.panel,.card,.live-card,.history-card) p{overflow-wrap:anywhere}
+body.studio-redesign :is(.level-tabs,.week-tabs,.focus-options){flex-wrap:wrap;gap:8px}
+body.studio-redesign :is(.status,.empty,.empty-state){line-height:1.8;overflow-wrap:anywhere}
+body.studio-redesign :is(.plan-output,.report-body,.message-content){line-height:1.85;overflow-wrap:anywhere}
+body.studio-redesign :is(.plan-output,.report-body,.message-content) :is(ul,ol){padding-left:1.5em}
+.studio-skip{position:fixed;left:16px;top:-100px;z-index:2000;background:#fff8ee;color:#493121;padding:12px 20px;border:2px solid #795238;border-radius:6px}
+.studio-skip:focus{top:12px}
+@media(max-width:760px){
+ body.studio-redesign :is(input,select,textarea){font-size:16px!important}
+ body.studio-redesign :is(.panel,.card,.plan-card,.summary-card,.report-card,.history-card,.result-card,.help-card,.course-card){padding:20px!important}
+ body.studio-redesign .topbar{gap:10px;flex-wrap:wrap}
+ body.studio-redesign :is(.mini-button,.tab-button){min-height:42px}
+ body.studio-redesign h2{font-size:22px!important}
+}

@@ -4,7 +4,8 @@
   let page;try{page=decodeURIComponent(location.pathname.split('/').pop()||'index.html')}catch{page='index.html'}
   if(page&&!page.includes('.'))page+='.html';
   const routes=[['課程與紀錄',[['01','練習首頁','index.html'],['02','十級課程','二胡小教室.html'],['03','練習打卡','二胡小教室-練習打卡.html'],['04','級數測驗','二胡小教室-小測驗.html']]],['AI 練習工具',[['問','問答助教','二胡小教室-AI助教.html'],['練','練習規劃','二胡小教室-AI練習規劃師.html'],['譜','掃描樂譜','二胡小教室-AI掃描譜.html'],['聽','音準跟譜','二胡小教室-AI音準評分.html'],['記','學習回報','二胡小教室-AI錯音複習師.html']]],['譜面與調音',[['編','譜面編輯','二胡小教室-譜面編輯器.html'],['調','二胡調音器','二胡小教室-調音器.html']]]];
-  const labels=routes.flatMap(x=>x[1]);const current=labels.find(x=>x[2]===page)?.[1]||'二胡課程';
+  const extraLabels={'二胡小教室-登入.html':'登入','二胡小教室-AI體驗.html':'功能示範','二胡小教室-AI使用與隱私.html':'AI 使用與隱私','二胡小教室-影片.html':'教學影片','二胡小教室-週課程.html':'本週課程','二胡小教室-比賽展示.html':'平台介紹'};
+  const labels=routes.flatMap(x=>x[1]);const current=labels.find(x=>x[2]===page)?.[1]||extraLabels[page]||'二胡課程';
   document.body.classList.add('studio-redesign');
   const kind=page.includes('掃描譜')?'scan':page.includes('練習規劃師')?'planner':page.includes('AI助教')?'tutor':page.includes('音準評分')?'pitch':page.includes('錯音複習師')?'report':page.includes('編輯器')?'editor':page==='二胡小教室.html'?'courses':'other';
   document.body.dataset.studioPage=kind;
@@ -14,6 +15,10 @@
   const menu=rail.querySelector("details"),wide=window.matchMedia("(min-width:761px)");menu.open=wide.matches;wide.addEventListener("change",event=>{menu.open=event.matches;});
   const top=document.querySelector('.topbar');if(top){top.querySelector('.brand')?.remove();const crumb=document.createElement('div');crumb.className='studio-breadcrumb';crumb.textContent='二胡考級 ／ '+current;top.prepend(crumb);}
   const shell=document.querySelector('main.shell');if(!shell)return;
+  shell.id = shell.id || 'studioMain';
+  const skip=document.createElement('a');skip.className='studio-skip';skip.href='#'+shell.id;skip.textContent='跳到主要內容';document.body.prepend(skip);
+  shell.tabIndex=-1;
+  document.querySelectorAll('#statusText,#sourceStatus').forEach(el=>{el.setAttribute('role','status');el.setAttribute('aria-live','polite');});
   if(kind==='scan'){
    const grid=shell.querySelector(':scope > .grid');const preview=shell.querySelector(':scope > .panel');
    if(grid&&preview){const library=grid.querySelector('aside.panel');const results=document.createElement('div');results.className='studio-scan-results';results.append(preview);if(library)results.append(library);grid.append(results);}

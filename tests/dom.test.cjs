@@ -116,3 +116,16 @@ test('pitch cents preserve octave errors and detector rejects silence and noise'
  let seed=42;const noise=Float32Array.from({length:2048},()=>{seed=(1664525*seed+1013904223)>>>0;return (seed/4294967296-.5)*.4;});
  assert.equal(w.autoCorrelate(noise,48000),null);w.close();
 });
+test('AI requests surface service errors and time out without retrying',async()=>{
+ const {w}=await page('二胡小教室-AI助教.html');let calls=0;
+ w.fetch=async()=>{calls++;return {ok:false,status:429,json:async()=>({message:'今天的使用次數已達上限。'})};};
+ await assert.rejects(w.ErhuAI.request('/offline',{}),/使用次數已達上限/);assert.equal(calls,1);
+ let signal;w.fetch=async(u,o)=>{signal=o.signal;return new Promise(()=>{});};
+ await assert.rejects(w.ErhuAI.request('/offline',{},5),/逾時/);assert.equal(signal.aborted,true);w.close();
+});
+test('planner keeps generated content when cloud save fails',async()=>{
+ const {w,d}=await page('二胡小教室-AI練習規劃師.html','',{fetch:async()=>({ok:true,json:async()=>({answer:'完成',tasks:[{title:'長弓',instruction:'放鬆肩膀',minutes:15}]})})});
+ w.ErhuFirebase.db.set=async()=>{throw Error('offline');};
+ await w.generatePlan();await new Promise(r=>setImmediate(r));
+ assert.equal(d.querySelector('#planOutput').hidden,false);assert.match(d.querySelector('#planOutput').textContent,/長弓/);assert.equal(d.querySelector('#generateButton').disabled,false);w.close();
+});

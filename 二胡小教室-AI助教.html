@@ -337,14 +337,14 @@
   </style>
 <link rel="stylesheet" href="./erhu-refined.css?v=20260928" />
 <script src="./erhu-quality.js?v=20260928"></script>
-<link rel="stylesheet" href="./erhu-studio-ui.css?v=20260928f"><script defer src="./erhu-studio-ui.js?v=20260928f"></script><style>
+<link rel="stylesheet" href="./erhu-studio-ui.css?v=20260929-polish"><script defer src="./erhu-studio-ui.js?v=20260929-polish"></script><style>
 body.studio-redesign[data-studio-page="tutor"] .messages {
   overflow-y: auto; overflow-x: hidden; scrollbar-gutter: stable;
   min-height: min(320px, 45vh); max-height: 58vh;
 }
 body.studio-redesign[data-studio-page="tutor"] .message { flex-shrink: 0; }
 #chatSyncStatus { margin: 0; padding: 0 28px 12px; color: #74492b; font-size: 14px; }
-</style></head>
+</style><script src="./erhu-ai-request.js?v=20260929"></script></head>
 <body class="erhu-site">
   <main class="shell">
     <header class="topbar">
@@ -605,14 +605,14 @@ body.studio-redesign[data-studio-page="tutor"] .message { flex-shrink: 0; }
         level: currentLevel,
         grade: currentGrade,
         week: currentGrade,
-        history: historyMessages,
+        history: historyMessages.slice(0, -1),
         studentProfile: learningProfile
       });
       const urls = [window.ErhuFirebase.askTutorUrl].filter(Boolean);
       let lastError = null;
       for (let index = 0; index < urls.length; index += 1) {
         try {
-          const response = await fetch(urls[index], {
+          const data = await ErhuAI.request(urls[index], {
             method: "POST",
             headers: {
               "Content-Type": "application/json",
@@ -620,8 +620,7 @@ body.studio-redesign[data-studio-page="tutor"] .message { flex-shrink: 0; }
             },
             body: payload
           });
-          const data = await response.json();
-          if (!response.ok || !data.answer) {
+          if (!data.answer) {
             throw new Error(data && data.error ? data.error : "backend-failed");
           }
           setSourceStatus("AI 助教已回覆");
@@ -695,8 +694,8 @@ body.studio-redesign[data-studio-page="tutor"] .message { flex-shrink: 0; }
           answer = await askBackendTutor(question);
         } catch (error) {
           console.error("askBackendTutor failed", error);
-          setSourceStatus("AI 暫時無法連線，請稍後重試。");
-          answer = { text: buildAnswer(question), resources: [] };
+          setSourceStatus(ErhuAI.message(error));
+          answer = { text: ErhuAI.message(error) + "\n\n以下是系統提供的一般練習提示，並非本次 AI 回覆：\n" + buildAnswer(question), resources: [] };
         }
         await addMessage("assistant", answer.text, answer.resources);
       } finally {

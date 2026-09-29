@@ -311,7 +311,7 @@
   </style>
 <link rel="stylesheet" href="./erhu-refined.css?v=20260928" />
 <script src="./erhu-quality.js?v=20260928"></script>
-<link rel="stylesheet" href="./erhu-studio-ui.css?v=20260928f"><script defer src="./erhu-studio-ui.js?v=20260928f"></script></head>
+<link rel="stylesheet" href="./erhu-studio-ui.css?v=20260929-polish"><script defer src="./erhu-studio-ui.js?v=20260929-polish"></script></head>
 <body class="erhu-site">
   <main class="shell">
     <header class="topbar">
@@ -389,7 +389,7 @@
             </div>
           </div>
           <div class="button-row">
-            <button class="button primary" id="generateButton" type="button" disabled>生成 AI 級數回報</button>
+            <button class="button primary" id="generateButton" type="button" disabled>整理本級學習回報</button>
             <button class="button secondary" id="refreshButton" type="button">重新整理資料</button>
           </div>
           <div class="status" id="statusText">目前尚未載入級數回報資料。</div>
@@ -400,7 +400,7 @@
         <section class="report-card">
           <div class="eyebrow">AI GRADE SUMMARY</div>
           <h2>本級回報</h2>
-          <div class="report-body" id="reportBody">先選擇等級和級數，等左邊整理好資料後，再按「生成 AI 級數回報」。</div>
+          <div class="report-body" id="reportBody">先選擇等級和級數，等左邊整理好資料後，再按「整理本級學習回報」。</div>
         </section>
 
         <section class="history-card section">
@@ -725,13 +725,13 @@
         renderSummary(currentSummary, pitchRecords);
 
         if (!currentSummary.hasData) {
-          reportBody.textContent = "目前這一級還沒有足夠資料。先做打卡、測驗或音準跟譜後，再回來生成 AI 級數回報。";
+          reportBody.textContent = "目前這一級還沒有足夠資料。先做打卡、測驗或音準跟譜後，再回來整理本級學習回報。";
           reportBody.classList.remove("loading");
           statusText.textContent = "這個等級和級數目前還沒有足夠資料。";
         } else {
-          reportBody.textContent = "資料已整理完成，現在可以生成 AI 級數回報。";
+          reportBody.textContent = "資料已整理完成，現在可以整理本級學習回報。";
           reportBody.classList.remove("loading");
-          statusText.textContent = "已整理好本級資料，現在可以生成 AI 級數回報。";
+          statusText.textContent = "已整理好本級資料，現在可以整理本級學習回報。";
         }
       } catch (error) {
         if (generation !== summaryGeneration) return;
@@ -757,7 +757,7 @@
       // Facts are composed from known evidence. Never render free-form AI claims as observations.
       reportBody.innerHTML = ErhuQuality.markdown(buildFallbackReport(currentSummary));
       reportBody.classList.remove("loading");
-      statusText.textContent = "已依本級紀錄整理回報；缺少資料的項目不推論表現。";
+      statusText.textContent = "已由系統依本級紀錄整理，未使用 AI 生成；缺少資料的項目不推論表現。";
     }
 
     generateButton.addEventListener("click", generateWeeklyReport);

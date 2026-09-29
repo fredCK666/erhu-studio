@@ -309,7 +309,7 @@
   </style>
 <link rel="stylesheet" href="./erhu-refined.css?v=20260928" />
 <script src="./erhu-quality.js?v=20260928"></script>
-<link rel="stylesheet" href="./erhu-studio-ui.css?v=20260928f"><script defer src="./erhu-studio-ui.js?v=20260928f"></script></head>
+<link rel="stylesheet" href="./erhu-studio-ui.css?v=20260929-polish"><script defer src="./erhu-studio-ui.js?v=20260929-polish"></script><script src="./erhu-ai-request.js?v=20260929"></script></head>
 <body class="erhu-site">
   <main class="shell">
     <header class="topbar">
@@ -685,7 +685,7 @@
         throw new Error("missing-auth-session");
       }
       const idToken = await firebaseUser.getIdToken();
-      const response = await fetch(window.ErhuFirebase.functionsBaseUrl + (window.ErhuFirebase.qualityAi ? "/askErhuPracticePlannerV2" : "/askErhuPracticePlanner"), {
+      const data = await ErhuAI.request(window.ErhuFirebase.functionsBaseUrl + (window.ErhuFirebase.qualityAi ? "/askErhuPracticePlannerV2" : "/askErhuPracticePlanner"), {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -702,8 +702,7 @@
           studentProfile: learningProfile
         })
       });
-      const data = await response.json();
-      if (!response.ok || !data.answer) {
+      if (!data.answer) {
         throw new Error(data && data.error ? data.error : "planner-failed");
       }
       if (Array.isArray(data.tasks) && data.tasks.length) return ErhuQuality.planText(currentMinutes, data.tasks);
@@ -716,7 +715,12 @@
       return ErhuQuality.planText(currentMinutes,tasks)+"\n\n此為系統時間表；本次 AI 未回傳可驗證的分段格式。";
     }
 
+    let generatingPlan = false;
     async function generatePlan() {
+      if (generatingPlan) return;
+      generatingPlan = true;
+      const settings = Array.from(document.querySelectorAll('button,input,select,textarea')).map(el => [el,el.disabled]);
+      settings.forEach(([el]) => {el.disabled = true;});
       generateButton.disabled = true;
       reuseButton.disabled = true;
       generateButton.textContent = "生成中...";
@@ -725,15 +729,17 @@
         const text = await askPlannerBackend();
         const metaText = plannerData[currentLevel].label + "｜" + currentGradeData().grade + "｜" + currentMinutes + " 分鐘";
         renderPlan(text, metaText);
-        await saveLatestPlan(text);
-        setStatus("已生成完成");
+        setStatus("已生成完成，正在保存…");
+        saveLatestPlan(text).then(() => setStatus("已生成並保存"), () => setStatus("計畫已生成，但尚未保存成功，請先保留這個頁面。"));
       } catch (error) {
         console.error("generatePlan failed", error);
-        setStatus("生成失敗，請再試一次");
+        setStatus(ErhuAI.message(error));
         planEmpty.hidden = false;
         planOutput.hidden = true;
         planEmpty.textContent = "這次尚未生成練習計畫，請再按一次。若連續失敗，請確認登入狀態後再試。";
       } finally {
+        generatingPlan = false;
+        settings.forEach(([el,disabled]) => {el.disabled = disabled;});
         generateButton.disabled = false;
         reuseButton.disabled = false;
         generateButton.textContent = "生成今日練習計畫";
