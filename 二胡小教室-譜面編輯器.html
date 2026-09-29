@@ -221,13 +221,17 @@
       border-radius: 20px;
       background: rgba(255, 255, 255, 0.88);
       border: 1px solid rgba(125, 75, 43, 0.08);
-      overflow-x: auto;
+      overflow: visible;
+      width: 100%;
+      min-width: 0;
+      box-sizing: border-box;
     }
 
     .score-follow-sheet {
       display: grid;
       gap: 8px;
-      min-width: 1180px;
+      min-width: 0;
+      width: 100%;
     }
 
     .score-follow-header {
@@ -288,7 +292,7 @@
     .score-follow-measure-row {
       flex: 1;
       display: grid;
-      grid-template-columns: repeat(var(--measure-count, 1), minmax(240px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
       gap: 10px;
       min-width: 0;
     }
@@ -674,6 +678,22 @@
       .note-remove {
         grid-column: 1 / -1;
       }
+    }
+    /* Give the full score the page width; wrap whole measures instead of scrolling. */
+    body.erhu-site.studio-redesign .studio-editor-workspace {
+      grid-template-columns: minmax(0, 1fr) !important;
+    }
+    body.erhu-site.studio-redesign .studio-editor-workspace > .panel {
+      min-width: 0;
+    }
+    #previewSheet .score-follow-header {
+      overflow-wrap: anywhere;
+    }
+    #previewSheet .score-follow-row {
+      min-width: 0;
+    }
+    #previewSheet .score-follow-measure-row {
+      row-gap: 24px;
     }
   </style>
 <link rel="stylesheet" href="./erhu-refined.css?v=20260928" />
