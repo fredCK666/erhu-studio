@@ -393,7 +393,29 @@
   </style>
 <link rel="stylesheet" href="./erhu-refined.css?v=20260928" />
 <script src="./erhu-quality.js?v=20260928"></script>
-<script src="./score-renderer.js?v=20260928"></script><link rel="stylesheet" href="./erhu-studio-ui.css?v=20260928f"><script defer src="./erhu-studio-ui.js?v=20260928f"></script></head>
+<script src="./score-renderer.js?v=20260928"></script><link rel="stylesheet" href="./erhu-studio-ui.css?v=20260928f"><script defer src="./erhu-studio-ui.js?v=20260928f"></script><style>
+/* Keep both the source and the transcription in the normal page flow. */
+body.studio-redesign[data-studio-page="scan"] .preview-card {
+  max-height: none; overflow: visible; min-width: 0;
+}
+body.studio-redesign[data-studio-page="scan"] #sourceImages {
+  display: grid; gap: 20px; max-height: none; overflow: visible; min-width: 0;
+}
+body.studio-redesign[data-studio-page="scan"] #sourceImages img {
+  display: block; width: 100%; height: auto; max-height: none;
+}
+body.studio-redesign[data-studio-page="scan"] #previewBox {
+  min-width: 0; max-width: 100%; box-sizing: border-box; color: #36271d;
+}
+body.studio-redesign[data-studio-page="scan"] .engraved-row { overflow: visible; }
+body.studio-redesign[data-studio-page="scan"] .engraved-row svg {
+  min-width: 0 !important; width: 100%; height: auto; max-height: none !important;
+}
+#scanResultHeading { margin: 28px 0 14px; color: #493327; }
+#scanReview label { display: flex; align-items: start; gap: 10px; color: #493327; }
+#scanReview input { width: 18px; height: 18px; flex: 0 0 18px; margin: 4px 0; accent-color: #785238; }
+#scanSaveActions { border-top: 1px solid #dbc7b1; padding-top: 18px; }
+</style></head>
 <body class="erhu-site">
   <main class="shell">
     <header class="topbar">
@@ -435,9 +457,7 @@
         </div>
         <div class="button-row">
           <button class="button" id="scanButton" type="button">開始 AI 掃描</button>
-          <button class="button secondary" id="saveButton" type="button" disabled>保存成我的譜</button>
-          <a class="button secondary" id="editLink" href="#" hidden>到編輯器細修</a>
-          <a class="button secondary" id="pitchLink" href="#" hidden>到 AI 跟譜練習</a>
+
         </div>
         <div class="status" id="statusBox">請先選圖片，再開始 AI 掃描。</div>
       </section>
@@ -455,9 +475,17 @@
       <div class="eyebrow">PREVIEW</div>
       <h2>掃描預覽</h2>
       <div class="preview-card">
+        <h3 id="scanResultHeading">辨識結果</h3>
         <div id="previewBox" class="empty">掃描完成後，這裡會先顯示 AI 辨識出的簡譜。保存後再去編輯器修細節。</div>
       </div>
       <div class="warning-list" id="warningList"></div>
+      <div id="scanReview" hidden><label><input type="checkbox" id="reviewedScore">我已對照原譜，確認音符、節奏及記號</label></div>
+      <p class="muted">先對照上方原譜與辨識結果；需要修正時，可保存草稿後進入編輯器。</p>
+      <div class="button-row" id="scanSaveActions">
+        <button class="button secondary" id="saveButton" type="button" disabled>保存成我的譜</button>
+        <a class="button secondary" id="editLink" href="#" hidden>到編輯器細修</a>
+        <a class="button secondary" id="pitchLink" href="#" hidden>到 AI 跟譜練習</a>
+      </div>
     </section>
   </main>
 
@@ -484,8 +512,8 @@
     const libraryList = document.getElementById("libraryList");
 
     const originalPanel=document.createElement("section");originalPanel.className="source-comparison";
-    originalPanel.innerHTML='<h3>原譜對照</h3><p>保留原圖供逐行核對。原圖僅留在此頁，不會隨保存上傳；重新開啟時可再次選圖。</p><div id="sourceImages"></div><div id="scanReview" hidden><label><input type="checkbox" id="reviewedScore">我已對照原譜，確認音符、節奏及記號</label></div>';
-    previewBox.before(originalPanel);
+    originalPanel.innerHTML='<h3>原譜對照</h3><p>保留原圖供逐行核對。原圖僅留在此頁，不會隨保存上傳；重新開啟時可再次選圖。</p><div id="sourceImages"></div>';
+    document.getElementById("scanResultHeading").before(originalPanel);
     titleInput.value=new URLSearchParams(location.search).get("title")||"";
 
     let currentUser = null;
