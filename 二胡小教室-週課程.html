@@ -623,6 +623,17 @@
 #scoreText .score-follow-marker{top:-26px!important;height:24px;font-size:10px;line-height:1.2!important}
 #scoreText .score-follow-slur{height:10px;margin-top:1px}
 #scoreText .score-follow-header{margin-bottom:4px}
+</style><style>
+/* Let measures from adjacent source rows fill the same visual line. */
+#scoreText.continuous-score{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,230px),1fr));gap:4px 0;align-items:start}
+#scoreText.continuous-score .score-follow-row,
+#scoreText.continuous-score .score-follow-measure-row{display:contents}
+#scoreText.continuous-score .score-follow-header,
+#scoreText.continuous-score .score-follow-prefix,
+#scoreText.continuous-score .score-follow-label,
+#scoreText.continuous-score .score-source-reference{grid-column:1/-1}
+#scoreText.continuous-score .score-follow-prefix{display:block;padding:0 8px;min-height:0;font-size:16px;line-height:1.3;text-align:left;white-space:normal}
+#scoreText.continuous-score .score-follow-measure{padding-left:8px;padding-right:8px}
 </style></head>
 <body class="erhu-site">
   <main class="shell">
@@ -1029,7 +1040,7 @@
     }
 
     function renderStructuredScore(scoreText, rows, scoreData) {
-      scoreText.className = "score-follow-sheet";
+      scoreText.className = "score-follow-sheet continuous-score";
       rows.forEach(function (rowData, rowIndex) {
         const rowWrap = document.createElement("div");
         rowWrap.className = "score-follow-row";
@@ -1044,7 +1055,7 @@
         if (rowData.prefix) {
           const prefix = document.createElement("div");
           prefix.className = "score-follow-prefix";
-          prefix.textContent = rowData.prefix;
+          prefix.textContent = String(rowData.prefix).trim().replace(/\s*\n\s*/g, "/");
           rowWrap.appendChild(prefix);
         }
 
