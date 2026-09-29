@@ -91,3 +91,15 @@ test('short engraved rows keep the same note scale and retain all rows', async()
  assert.equal(JSON.stringify(score),before);
  w.close();
 });
+test('preview quick editor writes through to original controls and supports note actions',async()=>{
+ const {w,d}=await page('二胡小教室-譜面編輯器.html');
+ const measure=d.querySelector('#previewSheet [data-source-row]');assert.ok(measure);measure.click();
+ const panel=d.querySelector('#directEdit');assert.equal(panel.hidden,false);
+ const input=panel.querySelector('[data-note-field="pitch"]');input.value='7';input.dispatchEvent(new w.Event('input',{bubbles:true}));
+ assert.equal(d.querySelector('#editorGrid [data-note-field="pitch"]').value,'7');
+ const before=panel.querySelectorAll('.note-row[data-note-index]').length;
+ panel.querySelector('[data-action="add-note"]').click();
+ assert.equal(panel.querySelectorAll('.note-row[data-note-index]').length,before+1);
+ assert.equal(d.querySelector('#editorGrid .measure-card').querySelectorAll('.note-row[data-note-index]').length,before+1);
+ panel.querySelector('[data-nav="close"]').click();assert.equal(panel.hidden,true);w.close();
+});

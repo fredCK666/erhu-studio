@@ -723,7 +723,7 @@
   </style>
 <link rel="stylesheet" href="./erhu-refined.css?v=20260928" />
 <script src="./erhu-quality.js?v=20260928"></script>
-<link rel="stylesheet" href="./erhu-studio-ui.css?v=20260928f"><script defer src="./erhu-studio-ui.js?v=20260928f"></script><link rel="stylesheet" href="./erhu-score-reference.css?v=20260929"><script defer src="./erhu-score-reference.js?v=20260929"></script></head>
+<link rel="stylesheet" href="./erhu-studio-ui.css?v=20260928f"><script defer src="./erhu-studio-ui.js?v=20260928f"></script><link rel="stylesheet" href="./erhu-score-reference.css?v=20260929"><script defer src="./erhu-score-reference.js?v=20260929"></script><link rel="stylesheet" href="./erhu-direct-edit.css?v=20260929"><script defer src="./erhu-direct-edit.js?v=20260929"></script></head>
 <body class="erhu-site">
   <main class="shell">
     <header class="topbar">
@@ -1053,7 +1053,7 @@
         previewSheet.appendChild(header);
       }
 
-      (scoreData.rows || []).forEach(function (rowData) {
+      (scoreData.rows || []).forEach(function (rowData, sourceRowIndex) {
         const rowWrap = document.createElement("div");
         rowWrap.className = "score-follow-row";
 
@@ -1068,7 +1068,7 @@
         measureRow.className = "score-follow-measure-row";
         measureRow.style.setProperty("--measure-count", String((rowData.measures || []).length || 1));
 
-        (rowData.measures || []).forEach(function (measureData) {
+        (rowData.measures || []).forEach(function (measureData, sourceMeasureIndex) {
           const cells = (measureData.cells || []).map(function (cellData) {
             if (typeof cellData === "string") {
               return { label: cellData, units: 1 };
@@ -1092,6 +1092,11 @@
           const unitCount = Math.max(Number(measureData.totalUnits) || 0, unitCursor, 8);
           const measure = document.createElement("div");
           measure.className = "score-follow-measure";
+          measure.dataset.sourceRow = sourceRowIndex;
+          measure.dataset.sourceMeasure = sourceMeasureIndex;
+          measure.tabIndex = 0;
+          measure.setAttribute("role", "button");
+          measure.setAttribute("aria-label", "編輯第 " + (sourceRowIndex + 1) + " 行第 " + (sourceMeasureIndex + 1) + " 小節");
           measure.style.setProperty("--unit-count", String(unitCount));
           measure.style.width = Math.max(140, cells.length * 44, unitCount * 10) + "px";
           measure.style.maxWidth = "100%";
@@ -1141,6 +1146,7 @@
             const endUnit = startUnit + cellData.units;
             const cell = document.createElement("div");
             cell.className = "score-follow-cell";
+            cell.dataset.sourceNote = cellIndex;
             cell.style.gridColumn = (startUnit + 1) + " / " + (endUnit + 1);
             cell.innerHTML = "<span class=\"score-follow-main\">" + parseJianpuText(cellData.label) + "</span>";
             measure.appendChild(cell);
