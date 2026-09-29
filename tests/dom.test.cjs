@@ -103,3 +103,16 @@ test('preview quick editor writes through to original controls and supports note
  assert.equal(d.querySelector('#editorGrid .measure-card').querySelectorAll('.note-row[data-note-index]').length,before+1);
  panel.querySelector('[data-nav="close"]').click();assert.equal(panel.hidden,true);w.close();
 });
+test('pitch cents preserve octave errors and detector rejects silence and noise',async()=>{
+ const {w}=await page('二胡小教室-AI音準評分.html');
+ assert.ok(Math.abs(w.getClosestTargetAlignment(440,69).signedCents)<0.001);
+ assert.ok(Math.abs(w.getClosestTargetAlignment(880,69).signedCents-1200)<0.001);
+ assert.ok(Math.abs(w.getClosestTargetAlignment(440*Math.pow(2,-25/1200),69).signedCents+25)<0.001);
+ for(const rate of [44100,48000])for(const hz of [196,293.665,440,880]){
+ const buffer=Float32Array.from({length:2048},(_,i)=>0.3*Math.sin(2*Math.PI*hz*i/rate));
+ const detected=w.autoCorrelate(buffer,rate);assert.ok(detected);assert.ok(Math.abs(1200*Math.log2(detected/hz))<8,`${hz}: ${detected}`);
+ }
+ assert.equal(w.autoCorrelate(new Float32Array(2048),48000),null);
+ let seed=42;const noise=Float32Array.from({length:2048},()=>{seed=(1664525*seed+1013904223)>>>0;return (seed/4294967296-.5)*.4;});
+ assert.equal(w.autoCorrelate(noise,48000),null);w.close();
+});

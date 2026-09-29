@@ -1041,7 +1041,16 @@
   </style>
 <link rel="stylesheet" href="./erhu-refined.css?v=20260928" />
 <script src="./erhu-quality.js?v=20260928"></script>
-<link rel="stylesheet" href="./erhu-studio-ui.css?v=20260928f"><script defer src="./erhu-studio-ui.js?v=20260928f"></script></head>
+<link rel="stylesheet" href="./erhu-studio-ui.css?v=20260928f"><script defer src="./erhu-studio-ui.js?v=20260928f"></script><style>
+body.studio-redesign[data-studio-page="pitch"] .layout { grid-template-columns:minmax(0,1fr); }
+#scoreSheet { min-width:0; max-width:100%; }
+.score-follow-measure-row { grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr)); }
+.score-follow-measure { box-sizing:border-box; column-gap:0; }
+.live-value { font-variant-numeric:tabular-nums; }
+#detectedCents { color:#573c28; }
+.score-stage { overflow:visible; max-height:none; }
+.score-follow-cell.current { outline:2px solid #94643e; outline-offset:2px; }
+</style></head>
 <body class="erhu-site">
   <main class="shell">
     <header class="topbar">
@@ -1254,8 +1263,8 @@
     const MAJOR_SCALE_OFFSETS = { "1": 0, "2": 2, "3": 4, "4": 5, "5": 7, "6": 9, "7": 11 };
     const PITCH_JUDGMENT = {
       nearCents: 36,
-      goodCents: 60,
-      matchCents: 165,
+      goodCents: 30,
+      matchCents: 50,
       pitchControlPenaltyPerCent: 0.82,
       passScore: 58,
       passCorrectRatio: 0.6,
@@ -1569,21 +1578,8 @@
     }
 
     function getClosestTargetAlignment(frequency, targetMidi) {
-      let best = null;
-      [-24, -12, 0, 12, 24].forEach(function (shift) {
-        const candidateMidi = targetMidi + shift;
-        const candidateFrequency = midiToFrequency(candidateMidi);
-        const signedCents = 1200 * (Math.log(frequency / candidateFrequency) / Math.log(2));
-        const absCents = Math.abs(signedCents);
-        if (!best || absCents < best.absCents) {
-          best = {
-            midi: candidateMidi,
-            signedCents: signedCents,
-            absCents: absCents
-          };
-        }
-      });
-      return best;
+      const signedCents = 1200 * Math.log2(frequency / midiToFrequency(targetMidi));
+      return { midi: targetMidi, signedCents: signedCents, absCents: Math.abs(signedCents) };
     }
 
     function formatSigned(value) {
@@ -1992,6 +1988,12 @@
         return null;
       }
 
+      let energyA = 0, energyB = 0;
+      for (let i = 0; i < size - bestOffset; i++) {
+        energyA += trimmed[i] * trimmed[i];
+        energyB += trimmed[i + bestOffset] * trimmed[i + bestOffset];
+      }
+      if (bestCorrelation / Math.sqrt(energyA * energyB) < 0.85) return null;
       const left = correlations[bestOffset - 1] || 0;
       const center = correlations[bestOffset] || 0;
       const right = correlations[bestOffset + 1] || 0;
@@ -2400,6 +2402,7 @@
     function buildAssessments() {
       return currentTimeline.events.map(function () {
         return {
+          expectedSamples: 0,
           samples: 0,
           goodSamples: 0,
           matchingSamples: 0,
@@ -2536,10 +2539,10 @@
         sessionState.smoothedFrequency = null;
         return null;
       }
-      if (!sessionState.smoothedFrequency) {
+      if (!sessionState.smoothedFrequency || Math.abs(1200 * Math.log2(frequency / sessionState.smoothedFrequency)) > 80) {
         sessionState.smoothedFrequency = frequency;
       } else {
-        sessionState.smoothedFrequency = sessionState.smoothedFrequency * 0.55 + frequency * 0.45;
+        sessionState.smoothedFrequency = Math.exp(Math.log(sessionState.smoothedFrequency) * 0.55 + Math.log(frequency) * 0.45);
       }
       return sessionState.smoothedFrequency;
     }
@@ -2547,7 +2550,12 @@
     function recordCurrentPitch(index, frequency, elapsedBeat) {
       const event = currentTimeline.events[index];
       const assess = sessionState.assessments[index];
-      if (event.rest || event.unknown) return;
+      if (event.rest || event.unknown) {
+        detectedNote.textContent = "--"; detectedCents.textContent = "--";
+        detectedNoteMeta.textContent = event.rest ? "休止" : "音符待確認";
+        detectedCentsMeta.textContent = "不計音準";
+        return;
+      }
       const detectedMidi = frequencyToMidi(frequency);
       const alignment = getClosestTargetAlignment(frequency, event.midi);
       const signedCents = alignment.signedCents;
@@ -2592,13 +2600,14 @@
 
       const averageAbsCentsValue = assess.samples ? assess.sumAbsCents / assess.samples : 999;
       const averageMatchedCentsValue = assess.matchingSamples ? assess.sumMatchedAbsCents / assess.matchingSamples : averageAbsCentsValue;
-      const goodRatio = assess.samples ? assess.goodSamples / assess.samples : 0;
-      const matchRatio = assess.samples ? assess.matchingSamples / assess.samples : 0;
+      const judgedSamples = Math.max(assess.expectedSamples || 0, assess.samples);
+      const goodRatio = judgedSamples ? assess.goodSamples / judgedSamples : 0;
+      const matchRatio = judgedSamples ? assess.matchingSamples / judgedSamples : 0;
       const correctRatio = goodRatio;
       const pitchControl = clamp(100 - averageMatchedCentsValue * PITCH_JUDGMENT.pitchControlPenaltyPerCent, 0, 100);
-      const stablePass = assess.samples > 0
+      const stablePass = assess.samples >= 3
         && correctRatio >= PITCH_JUDGMENT.passCorrectRatio;
-      const quickHitPass = isPieceCellHitPassEvent(event) && assess.matchingSamples > 0;
+      const quickHitPass = isPieceCellHitPassEvent(event) && assess.matchingSamples >= 3 && matchRatio >= 0.6;
       let score = assess.samples
         ? Math.round(goodRatio * 60 + matchRatio * 28 + pitchControl * 0.12)
         : 0;
@@ -2855,7 +2864,11 @@
       const currentIndex = getEventAtBeat(elapsedBeat);
       if (currentIndex >= 0) {
         setCurrentEvent(currentIndex, elapsedBeat);
-        if (frequency) {
+        const targetEvent = currentTimeline.events[currentIndex];
+        if (!targetEvent.rest && !targetEvent.unknown && elapsedBeat - targetEvent.startBeat >= targetEvent.durationBeats * noteJudgeStartRatioFor(targetEvent)) {
+          sessionState.assessments[currentIndex].expectedSamples += 1;
+        }
+        if (frequency || targetEvent.rest || targetEvent.unknown) {
           recordCurrentPitch(currentIndex, frequency, elapsedBeat);
         }
       }
