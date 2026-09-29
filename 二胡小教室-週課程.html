@@ -634,6 +634,9 @@
 #scoreText.continuous-score .score-source-reference{grid-column:1/-1}
 #scoreText.continuous-score .score-follow-prefix{display:block;padding:0 8px;min-height:0;font-size:16px;line-height:1.3;text-align:left;white-space:normal}
 #scoreText.continuous-score .score-follow-measure{padding-left:8px;padding-right:8px}
+#scoreSourceStatus{color:#503a2b;line-height:1.65;margin:10px 0}
+#scoreSourceLinks{gap:8px;margin:8px 0 14px;flex-wrap:wrap}
+#scoreSourceLinks a{font-size:13px;padding:8px 12px}
 </style></head>
 <body class="erhu-site">
   <main class="shell">
@@ -680,7 +683,9 @@
 
       <aside class="score-card">
         <h2 class="score-title">譜面與問答</h2>
-        <p id="scoreIntro">這裡不提供站內簡譜，會直接引導你用 AI 助教要譜，再搭配影片和本級重點練習。</p>
+        <p id="scoreIntro">依中華民國國樂學會二胡曲目表整理，未取得相符譜面的曲目先保留空缺。</p>
+        <p class="score-note" id="scoreSourceStatus" role="status"></p>
+        <div class="actions" id="scoreSourceLinks"></div>
         <div class="score-box" id="scoreBox">
           <div class="score-follow-sheet" id="scoreText"></div>
         </div>
@@ -690,7 +695,7 @@
           <a class="button secondary" id="videoSearchLink" href="#" target="_blank" rel="noopener noreferrer">其他示範教材</a>
           <a class="button secondary" id="aiPitchLink" href="#">AI 跟譜練習</a>
           <a class="button secondary" id="scoreEditLink" href="#">編輯譜面</a>
-          <a class="button secondary" id="aiScoreLink" href="#">問 AI 助教要簡譜</a>
+          <a class="button secondary" id="aiScoreLink" href="#">問 AI 練習方法</a>
         </div>
         <div class="song-links" id="songLinksSection">
           <h3>這一級所有檢定曲子</h3>
@@ -719,7 +724,7 @@
   <script src="https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore-compat.js"></script>
   <script src="./firebase-init.js?v=20260928"></script>
   <script src="./auth.js?v=20260928"></script>
-  <script src="./exam-course-data.js?v=20260505c"></script>
+  <script src="./exam-course-data.js?v=20260929-scm"></script>
   <script src="./exam-piece-scores.js?v=20260929-zizhu"></script>
   <script src="./exam-progress.js?v=20260519a"></script>
   <script>
@@ -760,11 +765,11 @@
       "茉莉花": { id: "HSnWpG8ALk8", source: "fixed" },
       "六月茉莉": { id: "dDuanUTimn4", source: "fixed" },
       "採茶撲蝶": { id: "JefwQnfy-pk", source: "fixed" },
-      "G、D 弦第一、二把位內外弦練習（吳榮燊曲）": { id: "WWjA1Cj7yRo", source: "approx" },
+      "G、D 弦第一、二把位內外弦練習（吳榮燦曲）": { id: "WWjA1Cj7yRo", source: "approx" },
       "小花鼓": { id: "cm0EfM1PgAI", source: "fixed" },
       "迎春曲": { id: "Vri3w9CYiN8", source: "fixed" },
       "喜洋洋": { id: "ZxWPDroeBH8", source: "fixed" },
-      "常動曲（黃正路曲）": { id: "jCkIopWfmNA", source: "fixed" },
+      "常動曲（黃正銘曲）": { id: "jCkIopWfmNA", source: "fixed" },
       "阿美族舞曲": { id: "zToMf8yTVVw", source: "fixed" },
       "良宵": { id: "Nld4t3c2214", source: "fixed" },
       "光明行": { id: "qZ-7nyX9Vco", source: "fixed" },
@@ -1398,7 +1403,7 @@
     aiPitchLink.href = buildAiPitchUrl(selectedPiece);
     const scoreEditLink = document.getElementById("scoreEditLink");
     scoreEditLink.href = buildScoreEditorUrl(selectedPiece);
-    document.getElementById("aiScoreLink").href = buildAiTutorUrl(selectedPiece.title, true);
+    document.getElementById("aiScoreLink").href = buildAiTutorUrl(selectedPiece.title, false);
 
     const scoreEmpty = document.getElementById("scoreEmpty");
     const scoreBox = document.getElementById("scoreBox");
@@ -1432,9 +1437,30 @@
       scoreEditLink.hidden = true;
       songLinksSection.hidden = false;
       practiceDetailPanel.hidden = false;
-      document.getElementById("scoreIntro").textContent = "這裡不提供站內簡譜，會直接引導你用 AI 助教要譜，再搭配示範教材和本級重點練習。";
-      scoreEmpty.textContent = "這首曲子目前沒有站內簡譜。你可以看左邊示範教材，再用下方按鈕查看其他示範教材，或直接問 AI 助教要《" + cleanPieceName(selectedPiece.title) + "》的二胡簡譜。";
+      document.getElementById("scoreIntro").textContent = "待補二胡簡譜。取得相符版本並核對小節後，才會開放跟譜練習。";
+      scoreEmpty.textContent = "《" + cleanPieceName(selectedPiece.title) + "》尚未收錄可核對的二胡簡譜，這裡先留空。";
     }
+
+    const source = window.ErhuExamData.source;
+    const pieceName = cleanPieceName(selectedPiece.title);
+    const editionNote = window.ErhuExamData.editionNotes[pieceName] || "";
+    const foundSource = window.ErhuExamData.scoreSearch[pieceName];
+    document.getElementById("scoreSourceStatus").textContent =
+      (selectedPiece.scoreAvailable ? "已有練習譜・檢定版本待核對。" : "待補譜。") +
+      (editionNote ? " " + editionNote : "") +
+      (foundSource ? " " + foundSource.note : "");
+    const sourceLinks = document.getElementById("scoreSourceLinks");
+    [["官方二胡曲目表", source.repertoireUrl], ["學會索譜說明", source.requestScoreUrl]]
+      .concat(foundSource ? [[foundSource.label, foundSource.url]] : [])
+      .forEach(function (entry) {
+        const link = document.createElement("a");
+        link.className = "button secondary";
+        link.textContent = entry[0];
+        link.href = entry[1];
+        link.target = "_blank";
+        link.rel = "noopener noreferrer";
+        sourceLinks.appendChild(link);
+      });
 
     const pieceTabs = document.getElementById("pieceTabs");
     const songLinkList = document.getElementById("songLinkList");
@@ -1446,7 +1472,7 @@
         grade: week,
         piece: piece.id
       });
-      tab.textContent = piece.type + "｜" + cleanPieceName(piece.title);
+      tab.textContent = piece.type + "｜" + cleanPieceName(piece.title) + (piece.scoreAvailable ? "・有練習譜" : "・待補譜");
       pieceTabs.appendChild(tab);
 
       const row = document.createElement("div");
@@ -1486,7 +1512,7 @@
       aiPitchLink.hidden = false;
       aiPitchLink.href = "./二胡小教室-AI掃描譜.html?title=" + encodeURIComponent(cleanPieceName(selectedPiece.title));
       aiPitchLink.textContent = "上傳這首曲子的譜";
-      scoreEmpty.textContent = "這首曲子尚無站內譜面。請上傳你有權使用的原譜，確認辨識結果後即可編輯與跟譜。";
+      scoreEmpty.textContent = "尚未取得相符的二胡簡譜，這裡先留空。你也可以上傳原譜，核對掃描結果後再編輯與跟譜。";
     }
 
   </script>

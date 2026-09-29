@@ -148,3 +148,20 @@ test('Zizhu editor preserves dotted sixteenths and thirty-second notes',async()=
  assert.equal(score.rows[0].measures[5].cells[1].units,0.5);
  assert.ok(d.querySelector('.score-follow-underline.triple'));w.close();
 });
+test('exam catalog keeps missing scores blank and distinguishes practice editions',async()=>{
+ const missing=await page('二胡小教室-週課程.html','?level=intermediate&grade=1&piece=selected-3');
+ assert.match(missing.d.querySelector('#scoreEmpty').textContent,/先留空/);
+ assert.equal(missing.d.querySelector('#scoreBox').hidden,true);
+ assert.match(missing.d.querySelector('#scoreSourceStatus').textContent,/沈立群/);
+ assert.equal(missing.d.querySelector('#aiScoreLink').textContent,'問 AI 練習方法');
+ assert.match(missing.d.querySelector('#scoreSourceLinks a').href,/scm.org.tw/);
+ const grades=Object.values(missing.w.ErhuExamData.levels).flatMap(level=>level.grades);
+ assert.equal(grades.length,10);assert.ok(grades.every(grade=>!grade.score));
+ assert.ok(grades[6].selected.includes('閒居吟'));assert.ok(grades[8].selected.includes('椰島風情'));
+ missing.w.close();
+ const existing=await page('二胡小教室-週課程.html','?level=beginner&grade=1&piece=selected-1');
+ assert.equal(existing.d.querySelector('#scoreBox').hidden,false);
+ assert.equal(existing.d.querySelectorAll('#scoreText .score-follow-measure').length,88);
+ assert.match(existing.d.querySelector('#scoreSourceStatus').textContent,/劉和平/);
+ existing.w.close();
+});
